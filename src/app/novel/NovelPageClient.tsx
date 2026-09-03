@@ -8,6 +8,8 @@ import Loader2 from "../components/Loader2";
 import { formatSafeDate } from "@/lib/seo";
 import YouTubeSection from "../components/YouTubeSection";
 import ReaderPoll from "../components/homePageComponents/ReaderPoll";
+import ReadingStreak from "../components/ReadingStreak";
+import Achievements from "../components/Achievements";
 
 interface NovelPageProps {
   initialNovels: any[];
@@ -491,6 +493,20 @@ export default function NovelPageClient({
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* READING STREAK */}
+      <section aria-labelledby="streak-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <ReadingStreak />
+        </div>
+      </section>
+
+      {/* ACHIEVEMENTS */}
+      <section aria-labelledby="achievements-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <Achievements />
         </div>
       </section>
 
