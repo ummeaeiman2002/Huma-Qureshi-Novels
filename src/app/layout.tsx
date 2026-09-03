@@ -7,9 +7,12 @@ import DesktopHeader from "./components/headerComponents/DesktopHeader";
 import Up from "./components/headerComponents/Up";
 import Script from "next/script";
 import AuthProvider from "./components/AuthProvider";
+import CookieConsent from "./components/CookieConsent";
 import { PremiumThemeProvider } from "./components/PremiumThemeProvider";
 import { UserIdProvider } from "./context/UserIdContext";
 import { SITE_URL, SITE_NAME } from "@/lib/seo";
+
+const ADSENSE_ID = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-english" });
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -31,9 +34,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return <html lang="en" className="overflow-x-hidden"><body className={`bg-primary my-3 overflow-x-hidden ${nastaliq.variable} ${playfair.variable} ${geistMono.variable} ${geistSans.variable} ${inter.variable}`}>
     <AuthProvider><PremiumThemeProvider><UserIdProvider><MobileHeader /><DesktopHeader /><div className="px-5 lg:px-20 overflow-x-hidden">{children}</div><Footer /></UserIdProvider>
       <Up />
+      <CookieConsent />
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-X7F51SY5RZ" strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-X7F51SY5RZ');`}</Script>
-      <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9826860279589874" strategy="afterInteractive" crossOrigin="anonymous" />
+      {ADSENSE_ID && <Script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`} strategy="afterInteractive" crossOrigin="anonymous" />}
     </PremiumThemeProvider></AuthProvider>
   </body></html>;
 }

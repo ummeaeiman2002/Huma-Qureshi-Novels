@@ -57,6 +57,40 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
   const rawPage = parseInt(searchParams.get("page") || "1", 10);
   const currentPage = Math.min(Math.max(isNaN(rawPage) ? 1 : rawPage, 1), totalPages);
 
+  const novelSlug = episode.novelparent?.slug?.current || "";
+  const episodeSlug = episode.episodeslug?.current || "";
+
+  // Load saved reading position and jump to it if the URL has no explicit page
+  useEffect(() => {
+    if (!episodeSlug) return;
+    try {
+      const saved = localStorage.getItem(`reading_${novelSlug}_${episodeSlug}`);
+      if (saved) {
+        const savedPage = parseInt(saved, 10);
+        if (!isNaN(savedPage) && savedPage > 1 && savedPage <= totalPages && !searchParams.get("page")) {
+          const url = `${pathname}?page=${savedPage}`;
+          window.history.replaceState(null, "", url);
+        }
+      }
+    } catch {}
+  }, [episodeSlug, novelSlug, totalPages, pathname, searchParams]);
+
+  // Save reading position whenever currentPage changes
+  useEffect(() => {
+    if (!episodeSlug || currentPage <= 1) return;
+    try {
+      localStorage.setItem(`reading_${novelSlug}_${episodeSlug}`, String(currentPage));
+    } catch {}
+  }, [currentPage, episodeSlug, novelSlug]);
+
+  // Track the most recent episode read for the novel (for Continue button)
+  useEffect(() => {
+    if (!episodeSlug) return;
+    try {
+      localStorage.setItem(`last_read_${novelSlug}`, JSON.stringify({ episodeSlug, name: episode.name, page: currentPage, ts: Date.now() }));
+    } catch {}
+  }, [currentPage, episodeSlug, novelSlug, episode.name]);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, [currentPage]);
@@ -106,7 +140,7 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
       </div>
 
       {totalPages > 1 && (
-        <nav className="flex flex-wrap items-center justify-center gap-2 px-10" aria-label="Pagination">
+        <nav className="flex flex-wrap items-center justify-center gap-2 px-2 sm:px-10" aria-label="Pagination">
         {currentPage > 1 && <Link href={pageLink(currentPage - 1)} className="px-4 py-2 rounded-full border border-secondary text-secondary hover:bg-secondary hover:text-primary transition">Prev</Link>}
         {pages.map((_, i) => {
           const n = i + 1;

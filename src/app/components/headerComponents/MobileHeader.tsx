@@ -3,11 +3,8 @@ import React, { useEffect, useState } from "react";
 import Logo from "../Logo";
 import Link from "next/link";
 import Search from "./Search";
-import { signOut, useSession } from "next-auth/react";
-import ThemeToggle from "../ThemeToggle";
 
 export default function MobileHeader() {
-  const { data: session, status } = useSession();
   const [menu, setMenu] = useState(false);
 
   const openMenu = () => {
@@ -42,11 +39,6 @@ export default function MobileHeader() {
     };
   }, [menu]);
 
-  // logout
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" });
-  };
-
   return (
     <>
       {menu && (
@@ -62,11 +54,6 @@ export default function MobileHeader() {
           <Logo />
 
           <div className="flex gap-4 items-center">
-            {/* Theme Toggle - Shows when logged in */}
-            <div className={status === "authenticated" ? "block" : "hidden"}>
-              <ThemeToggle />
-            </div>
-
             {/* hamburger menu */}
             <button onClick={openMenu} className="w-8 h-8 flex items-center justify-center">
               <div className={`flex flex-col gap-1.5 transition-all duration-300 ease-in-out ${menu ? "rotate-45" : "rotate-0"}`}>
@@ -90,14 +77,7 @@ export default function MobileHeader() {
           ${menu ? "translate-x-0 visible" : "translate-x-full invisible"}
         flex flex-col items-center justify-start gap-4 text-secondary overflow-y-auto`}
         >
-          <div className="flex flex-col gap-3 justify-start items-center w-full px-10 pt-4 pb-8">
-            <Link
-              href={`/dashboard`}
-              className={`px-6 py-2 rounded-full border border-secondary text-primary bg-secondary hover:bg-secondary/80 transition ${status == "unauthenticated" ? "hidden" : "block"}`}
-            >
-              <button onClick={() => setMenu(false)}>Dashboard</button>
-            </Link>
-
+          <div className="flex flex-col gap-3 justify-start items-center w-full px-6 sm:px-10 pt-4 pb-8">
             <Link
               href={`/`}
               className="px-6 py-2 rounded-full border border-transparent text-[#111111] font-bold hover:text-secondary hover:bg-secondary/10 hover:border-secondary/40 transition"
@@ -147,14 +127,6 @@ export default function MobileHeader() {
             >
               <button onClick={() => setMenu(false)}>Terms & Conditions</button>
             </Link>
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className={`px-6 py-2 rounded-full border border-secondary/40 text-tertiary opacity-75 hover:opacity-100 hover:border-tertiary transition text-sm
-                ${status == "unauthenticated" ? "hidden" : "block"}`}
-            >
-              Logout
-            </button>
           </div>
         </nav>
     </>

@@ -11,6 +11,10 @@ export default function Episode({
   teaser: any;
   href: any; date: string
 }) {
+  const blockCopy = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+  };
+
   const colors = [
     { cls: "border-[#C9A96E]" },
     { cls: "border-[#fec7a9]" },
@@ -29,7 +33,9 @@ export default function Episode({
   return (
     <Link
       href={href}
-      className={`group relative border-3 ${bg} rounded-2xl flex flex-col justify-start items-start py-4 px-2 gap-3 shadow-xl text-tertiary w-[200px] h-[300px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(30,93,80,0.3)] active:scale-[1.06] bg-secondary/5`}
+      onCopy={blockCopy}
+      onCut={blockCopy}
+      className={`group relative border-3 ${bg} rounded-2xl flex flex-col justify-start items-start py-4 px-2 gap-3 shadow-xl text-tertiary w-full max-w-[200px] min-h-[300px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(30,93,80,0.3)] active:scale-[1.06] bg-secondary/5`}
     >
       {/* <div className="flex justify-between"> */}
       <h3 className="font-bold text-sm title-bright px-2">{episodeTitle}</h3>
@@ -42,9 +48,9 @@ export default function Episode({
       /> */}
       {/* </div> */}
 
-      <div className="h-[200px]">
+      <div className="flex flex-col gap-2">
         <p className="text-right text-xs opacity-60">Published at: {date}</p>
-        <p className="font-urdu leading-8 text-xs overflow-hidden h-[190px] text-ellipsis relative" dir="rtl">
+        <p className="font-urdu leading-8 text-xs overflow-hidden text-ellipsis relative max-h-[190px]" dir="rtl">
           {teaser}
           <span>.&nbsp;&nbsp;.&nbsp;&nbsp;.</span>
         </p>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { client } from "@/sanity/lib/client";
-import { absoluteUrl, cleanDescription, SITE_NAME } from "@/lib/seo";
+import { absoluteUrl, cleanDescription, cleanDescriptionLong, SITE_NAME } from "@/lib/seo";
 import NovelPageClient from "./NovelPageClient";
 
 export const revalidate = 300;
@@ -22,6 +22,16 @@ async function getNovelViews(id: string) {
   return (views || []).reduce((a: number, v: number) => a + (Number(v) || 0), 0);
 }
 
+async function getRelatedNovels(novel: any, id: string) {
+  const currentGenre = novel.genre?._id || "";
+  const currentWriter = novel.writer?._id || "";
+  return client.fetch<any[]>(
+    `*[_type == "novelparent" && _id != $id && defined(novelreleasedate) && novelreleasedate <= now() && (genre->_id == $genre || writer->_id == $writer)][0...4] { _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername} }`,
+    { id, genre: currentGenre, writer: currentWriter },
+    { next: { revalidate: 300 } }
+  );
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const novel = await getNovel(slug);
@@ -37,6 +47,7 @@ export default async function Page({ params }: Props) {
   if (!novel) notFound();
   const episodes = await getEpisodes(novel._id);
   const views = await getNovelViews(novel._id);
+  const related = await getRelatedNovels(novel, novel._id);
   const schema = { "@context": "https://schema.org", "@type": "Book", name: novel.title, author: novel.writer?.writername ? { "@type": "Person", name: novel.writer.writername } : undefined, genre: novel.genre?.genrename, image: novel.banner, description: cleanDescription(novel.noveldescription, `Read ${novel.title} on ${SITE_NAME}.`), url: absoluteUrl(`/novel/${novel.slug?.current || slug}`) };
-  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} /><NovelPageClient novel={novel} episodes={episodes} hasMore={episodes.length === 4} slug={slug} views={views} /></>;
+  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} /><NovelPageClient novel={novel} episodes={episodes} hasMore={episodes.length === 4} slug={slug} views={views} related={related} /></>;
 }

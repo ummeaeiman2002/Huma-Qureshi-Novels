@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { client } from "@/sanity/lib/client";
-import { absoluteUrl, cleanDescription, SITE_NAME } from "@/lib/seo";
+import { absoluteUrl, cleanDescription, isValidUrl, SITE_NAME } from "@/lib/seo";
 import Image from "next/image";
 import Heading from "@/app/components/Heading";
 import NovelDescription from "@/app/components/novelPage/NovelDescription";
@@ -98,6 +98,10 @@ export default async function Page({ params }: Props) {
               className="w-full h-auto object-cover"
             />
           </div>
+          <div className="mx-auto max-w-4xl text-center text-sm leading-7 opacity-80 text-tertiary">
+            <p>&copy; {new Date().getFullYear()} humaqureshinovels.com</p>
+            <p>This PDF novel is an original work by the author. All rights reserved.</p>
+          </div>
         </div>
       </section>
 
@@ -118,8 +122,8 @@ export default async function Page({ params }: Props) {
       )}
 
       <div className="flex flex-wrap gap-4 justify-center">
-        {pdf.pdfurl && <DownloadPDFButton pdf={pdf.pdfurl} />}
-        {pdf.youtubeurl && <WatchOnYT YTurl={pdf.youtubeurl} />}
+        {isValidUrl(pdf.pdfurl) && <DownloadPDFButton pdf={pdf.pdfurl} />}
+        {isValidUrl(pdf.youtubeurl) && <WatchOnYT YTurl={pdf.youtubeurl} />}
       </div>
 
       <Tags tags={pdf.tags || []} />

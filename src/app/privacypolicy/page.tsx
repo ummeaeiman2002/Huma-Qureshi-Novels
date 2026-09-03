@@ -56,7 +56,10 @@ export default function page() {
         <div className="bg-[#FFFDF9] rounded-2xl border-2 border-[#DCCFC2] p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
           <h2 className="text-xl font-extrabold text-[#1E5D50]">Google AdSense and Third-Party Advertising</h2>
           <p className="leading-8">
-            We use third-party advertising companies, including Google AdSense, to serve ads when you visit our website. These companies may use information (not including your name, address, email address, or telephone number) about your visits to this and other websites in order to provide advertisements about goods and services of interest to you.
+            We use third-party advertising companies, including Google AdSense, to serve ads when you visit our website. These companies may use information (not including your name, address, email address, or telephone number) about your visits to this and other websites in order to provide advertisements about goods and services of interest to you. This information is collected through cookies and other similar technologies placed by third-party ad servers or ad networks.
+          </p>
+          <p className="leading-8">
+            Third-party vendors, including Google, use first-party cookies (such as the Google Analytics cookie) and third-party cookies (such as the Google DoubleClick cookie) to inform, optimize, and serve ads based on your past visits to this website and other websites across the internet. This allows them to deliver more relevant advertisements.
           </p>
           <p className="leading-8">
             Google, as a third-party vendor, uses cookies (such as the DART cookie on the Google network) to serve ads to our visitors based on their visits to this and other websites. You may opt out of the use of the DART cookie by visiting the Google ad and content network privacy policy at{" "}
@@ -76,6 +79,9 @@ export default function page() {
             <a href="https://www.networkadvertising.org/choices/" className="font-bold text-[#1E5D50] underline underline-offset-4 hover:text-[#C9A96E] transition" target="_blank" rel="noopener noreferrer">
               networkadvertising.org/choices
             </a>.
+          </p>
+          <p className="leading-8">
+            Please note that disabling or opting out of cookies through your browser settings will not stop ads from being shown, but it will mean the ads you see will not be personalised to you. By using this website you acknowledge and agree to the collection of data by Google and other third-party advertising partners as described above.
           </p>
         </div>
 

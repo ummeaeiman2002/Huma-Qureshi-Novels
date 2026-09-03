@@ -1,42 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Logo from "../Logo";
-import Image from "next/image";
 import Link from "next/link";
 import Search from "./Search";
-import ThemeToggle from "../ThemeToggle";
-import { client } from "@/sanity/lib/client";
-import { signOut, useSession } from "next-auth/react";
 
 export default function DesktopHeader() {
-  const { data: session, status } = useSession();
   const [menu, setMenu] = useState(false);
-  const [writers, setWriters] = useState<any[]>([]);
-  const [genres, setGenres] = useState<any[]>([]);
-
-  // fetching categories
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [writerRes, genreRes] = await Promise.all([
-          client.fetch('*[_type == "writer"]'),
-          client.fetch('*[_type == "genre"]'),
-        ]);
-
-        setWriters(writerRes);
-        setGenres(genreRes);
-      } catch (error) {
-        console.error("Error fetching search data:", error);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  // logout
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" });
-  };
 
   return (
     <>
@@ -53,27 +22,6 @@ export default function DesktopHeader() {
           <Logo />
 
           <div className="flex items-center gap-4 lg:gap-6">
-            {/* Theme Toggle - Premium Feature */}
-            <div className={status === "authenticated" ? "block" : "hidden"}>
-              <ThemeToggle />
-            </div>
-
-            {/* dashboard if logged in */}
-            <Link
-              href={`/dashboard`}
-              className={`px-5 py-1.5 rounded-full border border-secondary text-primary bg-secondary hover:bg-secondary/80 transition ${status == "unauthenticated" ? "hidden" : "block"}`}
-            >
-              <button onClick={() => setMenu(false)}>Dashboard</button>
-            </Link>
-
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className={`px-4 py-1.5 rounded-full border border-secondary/40 text-tertiary opacity-75 hover:opacity-100 hover:border-tertiary transition text-sm
-                ${status == "unauthenticated" ? "hidden" : "block"}`}
-            >
-              Logout
-            </button>
             <Search />
           </div>
         </div>

@@ -43,7 +43,7 @@ export default function NovelDescription({
 
   return (
     <div
-      className={`px-10 lg:px-24 text-start text-tertiary text-[19px] leading-9 whitespace-pre-wrap ${font}`}
+      className={`px-5 sm:px-10 lg:px-24 text-start text-tertiary text-[19px] leading-9 whitespace-pre-wrap break-words ${font}`}
     >
       <h3 className="heading-stylish text-3xl lg:text-4xl font-bold mb-3 text-start">
         Summary

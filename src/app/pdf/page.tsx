@@ -19,7 +19,7 @@ export default async function Page() {
   const totalPDFCount = await getTotalPDFCount();
 
   // Prefetch next few pages in the background
-  void prefetchPDFPages(1, 2); // Prefetch pages 1 and 2
+  void prefetchPDFPages(1, 2).catch(() => {}); // Prefetch pages 1 and 2
 
   return (
     <div>

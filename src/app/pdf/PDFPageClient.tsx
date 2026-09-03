@@ -7,6 +7,7 @@ import PDF from '../components/Cards/PDF';
 import Heading from '../components/Heading';
 import { getPaginatedPDFs } from '@/lib/sanity/queries';
 import Loader2 from "../components/Loader2";
+import { formatSafeDate } from "@/lib/seo";
 
 interface PDFPageProps {
   initialPDFs: any[];
@@ -191,6 +192,33 @@ export default function PDFPageClient({
           <p className="mx-auto max-w-2xl text-base lg:text-lg leading-8 text-white/80">
             Complete Urdu novels available as PDF downloads. Read offline on your phone or computer.
           </p>
+          <p className="mx-auto max-w-2xl text-base lg:text-lg leading-8 text-[#C9A96E] font-semibold">
+            Download any title for free and enjoy your favourite stories anywhere, without internet.
+          </p>
+        </div>
+      </section>
+
+      {/* STATS BAR — social proof */}
+      <section aria-labelledby="stats-heading" className="mx-4 lg:mx-0">
+        <div className="bg-[#FFFDF9] rounded-3xl border-2 border-[#1E5D50]/30 px-6 py-8 lg:px-12 shadow-md">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{totalPDFCount.toLocaleString()}</span>
+              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">PDF Downloads</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{writers.length.toLocaleString()}</span>
+              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">Writers</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{genres.length.toLocaleString()}</span>
+              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">Genres</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{(initialPDFs || []).reduce((a: number, p: any) => a + (p.views || 0), 0).toLocaleString()}</span>
+              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">Total Reads</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -266,7 +294,7 @@ export default function PDFPageClient({
               key={`${pdf._id}-${index}`}
               date={
                 pdf.pdfreleasedate
-                  ? new Date(pdf.pdfreleasedate).toLocaleDateString("en-GB")
+                  ? formatSafeDate(pdf.pdfreleasedate)
                   : ""
               }
               href={
@@ -304,6 +332,158 @@ export default function PDFPageClient({
           You&apos;ve reached the end of the list
         </div>
       )}
+
+      {/* ABOUT PDF LIBRARY — SEO content */}
+      <section aria-labelledby="about-pdf-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <div className="bg-[#FFFDF9] rounded-3xl border-2 border-[#1E5D50]/30 p-6 lg:p-10 flex flex-col gap-5">
+            <h2 id="about-pdf-heading" className="text-2xl lg:text-3xl font-extrabold text-[#1E5D50]">
+              About the PDF Library
+            </h2>
+            <div className="leading-8 text-tertiary font-medium flex flex-col gap-4">
+              <p>
+                Our PDF library contains complete Urdu novels and stories that are ready to
+                download and read offline. Unlike episodic novels that are published chapter
+                by chapter, a PDF novel is the entire story in one file — from the first page
+                to the last.
+              </p>
+              <p>
+                These PDFs are perfect for readers who prefer to enjoy a full story in one
+                sitting or want to read on the go without an internet connection. Simply
+                download the file to your phone, tablet, or computer and start reading
+                immediately.
+              </p>
+              <p>
+                The collection includes romance, women-centric fiction, family drama,
+                mystery, suspense, and short afsanas. Every PDF is free to download —
+                no sign-up, no payment, no restrictions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHY DOWNLOAD PDF — SEO content */}
+      <section aria-labelledby="why-pdf-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <div className="bg-[#FFFDF9] rounded-3xl border-2 border-[#1E5D50]/30 p-6 lg:p-10 flex flex-col gap-5">
+            <h2 id="why-pdf-heading" className="text-2xl lg:text-3xl font-extrabold text-[#1E5D50]">
+              Why Download PDF Novels?
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                {
+                  title: "Read Offline",
+                  desc: "Download once and read anywhere — on the bus, in a park, or anywhere without internet. The story goes wherever you go.",
+                },
+                {
+                  title: "Complete Story",
+                  desc: "Unlike episodic reading, a PDF gives you the entire novel from start to finish. No waiting for new chapters.",
+                },
+                {
+                  title: "Works on Any Device",
+                  desc: "PDF files open on phones, tablets, laptops, and e-readers. No special app needed — just open and read.",
+                },
+                {
+                  title: "Free Forever",
+                  desc: "Every PDF in our library is completely free to download. There are no hidden charges or subscription requirements.",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-3 rounded-2xl border-2 border-[#1E5D50]/30 bg-[#FFFDF9] p-6 hover:border-[#1E5D50] hover:shadow-xl hover:-translate-y-0.5 transition duration-300"
+                >
+                  <h3 className="text-lg font-extrabold text-[#1E5D50]">{item.title}</h3>
+                  <p className="leading-7 text-tertiary font-medium">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HOW TO DOWNLOAD — Guide */}
+      <section aria-labelledby="guide-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <Heading name="How to Download & Read PDF Novels" />
+          <div className="rounded-3xl border-2 border-[#1E5D50]/30 bg-[#FFFDF9] p-6 lg:p-10 flex flex-col gap-5">
+            <ol className="flex flex-col gap-4">
+              {[
+                {
+                  title: "Find a Novel",
+                  desc: "Browse the PDF list above or use the filters to find a story by writer or genre. Click on any PDF card to open its details page.",
+                },
+                {
+                  title: "Read the Description",
+                  desc: "Before downloading, read the summary to make sure the story is what you are looking for. Each PDF page includes the full description and author notes.",
+                },
+                {
+                  title: "Download the PDF",
+                  desc: "Click the Download PDF button on the novel page. The file will save to your device. Open it with any PDF reader to start reading.",
+                },
+                {
+                  title: "Read Offline",
+                  desc: "Once downloaded, you can read the full novel anytime without internet. Carry it on your phone or transfer it to any device.",
+                },
+              ].map((step, i) => (
+                <li key={i} className="flex gap-4 items-start">
+                  <span className="w-9 h-9 shrink-0 rounded-full bg-[#8B6914] text-white font-extrabold flex items-center justify-center shadow">
+                    {i + 1}
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-lg font-extrabold text-[#1E5D50]">
+                      {step.title}
+                    </h3>
+                    <p className="leading-7 text-tertiary font-medium">
+                      {step.desc}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQs — SEO content */}
+      <section aria-labelledby="faq-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <Heading name="Frequently Asked Questions" />
+          <div className="bg-[#FFFDF9] rounded-3xl border-2 border-[#1E5D50]/30 p-6 lg:p-10 flex flex-col gap-6">
+            {[
+              {
+                q: "Are all PDF novels free to download?",
+                a: "Yes. Every PDF novel in our library is completely free to download and read. There are no charges, subscriptions, or sign-up requirements.",
+              },
+              {
+                q: "What format are the novel files in?",
+                a: "All files are in standard PDF format. They open on any phone, tablet, laptop, or e-reader using a built-in PDF reader or any free PDF app.",
+              },
+              {
+                q: "Can I read the PDF on my phone?",
+                a: "Absolutely. PDF files work on all modern smartphones. Download the file and open it with your phone's default document viewer or any PDF reader app.",
+              },
+              {
+                q: "How do I find a specific novel?",
+                a: "Use the filter section above to search by writer name or genre. You can also sort by latest, trending, or popular to discover new stories.",
+              },
+              {
+                q: "What genres are available as PDF?",
+                a: "Our PDF collection includes romance, women-centric fiction, family drama, mystery, suspense, short stories (afsanas), and more. Use the genre filter to explore.",
+              },
+              {
+                q: "Is there a limit on how many PDFs I can download?",
+                a: "No. You can download as many PDF novels as you want. There is no daily or monthly limit on downloads.",
+              },
+            ].map((f, i) => (
+              <div key={i} className="flex flex-col gap-1">
+                <h3 className="text-lg font-extrabold text-[#1E5D50]">{f.q}</h3>
+                <p className="leading-7 text-tertiary font-medium">{f.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

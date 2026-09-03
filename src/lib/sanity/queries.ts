@@ -16,7 +16,7 @@ function textSummary(value: unknown): string {
       )
       .join(" ");
   }
-  return text.replace(/\s+/g, " ").trim().slice(0, 140);
+  return text.replace(/\s+/g, " ").trim().slice(0, 420);
 }
 
 export async function getPaginatedNovels(page: number = 0, limit: number = 20) {

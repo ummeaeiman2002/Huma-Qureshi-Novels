@@ -24,6 +24,10 @@ export default function Novel({
 }) {
   const { userId, isPremium } = useUserId();
 
+  const blockCopy = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+  };
+
   // Generate user-specific link if premium
   const getLink = () => {
     if (isPremium && userId) {
@@ -36,7 +40,9 @@ export default function Novel({
     <Link
       // href={getLink()}
       href={`/novel/${href}`}
-      className="group relative text-tertiary w-[260px] rounded-2xl flex flex-col justify-start items-center py-5 px-4 gap-3 bg-[#FFFDF9] border-2 border-[#DCCFC2] shadow-lg hover:border-[#1E5D50] hover:shadow-[0_0_24px_rgba(30,93,80,0.35)] hover:-translate-y-1 active:scale-[1.03] transition-all duration-300"
+      onCopy={blockCopy}
+      onCut={blockCopy}
+      className="group relative text-tertiary w-full max-w-[260px] rounded-2xl flex flex-col justify-start items-center py-5 px-4 gap-3 bg-[#FFFDF9] border-2 border-[#DCCFC2] shadow-lg hover:border-[#1E5D50] hover:shadow-[0_0_24px_rgba(30,93,80,0.35)] hover:-translate-y-1 active:scale-[1.03] transition-all duration-300"
     >
       <div className="absolute inset-0 rounded-2xl bg-[#1E5D50]/0 group-hover:bg-[#1E5D50]/5 transition-all duration-300 pointer-events-none" />
       {cardBanner ? (
@@ -51,7 +57,7 @@ export default function Novel({
         </div>
       ) : null}
       <div className="flex flex-col gap-2.5 w-full items-center">
-        <p className="text-[11px] text-right pr-4 opacity-60 w-full">{date}</p>
+        {date && <p className="text-[11px] text-right pr-4 opacity-60 w-full">{date}</p>}
         <h3 className="text-lg font-extrabold text-wrap text-center px-3 title-bright leading-snug">
           {novelName}
         </h3>
@@ -60,7 +66,7 @@ export default function Novel({
             <p className="text-[11px] uppercase tracking-wider font-bold text-[#8B6914]">
               Summary
             </p>
-            <p className="text-xs text-start leading-5 text-tertiary line-clamp-2 overflow-hidden">
+            <p className="text-xs text-start leading-5 text-tertiary line-clamp-4 overflow-hidden">
               {summary}
             </p>
           </div>

@@ -33,10 +33,10 @@ export default function Footer() {
         {/* logo + tagline */}
         <div className="flex flex-col gap-3 w-fit">
           <Link href="/" className="w-fit bg-[#FFFDF9] border border-[#DCCFC2] px-3 py-2 rounded-xl block">
-            <Image src={"https://res.cloudinary.com/dx1gryhqc/image/upload/v1758662209/Logo_ox1c8z.png"} alt="Huma Qureshi Novels" width={100} height={100} className="w-[100px] h-[100px] object-contain invert" />
+            <Image src={"https://res.cloudinary.com/dx1gryhqc/image/upload/v1758662209/Logo_ox1c8z.png"} alt="Huma Qureshi Novels" width={100} height={100} className="w-16 h-16 sm:w-20 sm:h-20 object-contain invert" />
           </Link>
           <p className="text-[#111111]/70 text-sm max-w-[220px] leading-6">
-            Original Urdu novels, episodic stories and PDF books by Huma Qureshi.
+            Original Urdu novels, episodic stories and PDF books by Huma Qureshi and other writers.
           </p>
         </div>
         {/* pages */}

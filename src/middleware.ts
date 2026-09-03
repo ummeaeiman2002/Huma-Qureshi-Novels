@@ -5,41 +5,22 @@ import { NextResponse } from "next/server";
  * Middleware for authentication
  *
  * Current setup:
- * - Free plan active (premium checks disabled)
- * - Auth routes redirect authenticated users to dashboard
+ * - Simple public website (no login/dashboard/premium)
+ * - /login, /checkout, /dashboard all redirect to homepage
  */
 
 export default auth((req) => {
   const { nextUrl } = req;
-  const session = req.auth;
 
-  // Define route patterns
-  const isAuthRoute =
+  // Redirect all auth/premium routes to homepage (simple public website)
+  const isRestrictedRoute =
     nextUrl.pathname.startsWith("/login") ||
-    nextUrl.pathname.startsWith("/checkout");
+    nextUrl.pathname.startsWith("/checkout") ||
+    nextUrl.pathname.startsWith("/dashboard") ||
+    nextUrl.pathname.startsWith("/premium");
 
-  const isApiRoute = nextUrl.pathname.startsWith("/api");
-
-  // Auth route handling (login, checkout)
-  if (isAuthRoute) {
-    if (session) {
-      // Already logged in - redirect to user dashboard
-      if (session?.user?.id) {
-        return NextResponse.redirect(new URL(`/${session.user.id}/dashboard`, nextUrl.origin));
-      }
-    }
-    return NextResponse.next();
-  }
-
-  // API route protection for user-specific endpoints
-  if (isApiRoute && nextUrl.pathname.startsWith("/api/user")) {
-    if (!session) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
-    }
-    return NextResponse.next();
+  if (isRestrictedRoute) {
+    return NextResponse.redirect(new URL("/", nextUrl.origin));
   }
 
   // Default - allow access

@@ -6,6 +6,8 @@ import { comment } from "./comment";
 import { novelparent } from "./novelparent";
 import { pdf } from "./pdf";
 import { systemConfig } from "./systemConfig";
+import { testimonial } from "./testimonial";
+import { announcement } from "./announcement";
 
 // Premium/Auth schemas
 import { user } from "./user";
@@ -23,6 +25,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     novelparent,
     pdf,
     systemConfig,
+    testimonial,
+    announcement,
     // Premium/Auth schemas
     user,
     premiumNovel,
