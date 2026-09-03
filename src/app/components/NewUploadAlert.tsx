@@ -63,7 +63,7 @@ export default function NewUploadAlert() {
             </p>
             <div className="mt-3 flex items-center gap-3">
               <Link
-                href={alert.href}
+                href={alert.href as any}
                 className="bg-[#C9A96E] text-[#1E5D50] font-bold px-4 py-2 rounded-full hover:bg-[#d4b57a] active:scale-95 transition text-sm whitespace-nowrap"
               >
                 Read Now
