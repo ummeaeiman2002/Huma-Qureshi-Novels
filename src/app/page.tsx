@@ -3,6 +3,8 @@ import PDF from "./components/Cards/PDF";
 import Heading from "./components/Heading";
 import HomeFilter from "./components/HomeFilter";
 import ReaderPoll from "./components/homePageComponents/ReaderPoll";
+import ReadingStreak from "./components/ReadingStreak";
+import Achievements from "./components/Achievements";
 import Link from "next/link";
 import { client } from "@/sanity/lib/client";
 import { cleanDescriptionLong, formatSafeDate } from "@/lib/seo";
@@ -672,6 +674,20 @@ export default async function HomePage({
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* READING STREAK */}
+      <section aria-labelledby="streak-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <ReadingStreak />
+        </div>
+      </section>
+
+      {/* ACHIEVEMENTS */}
+      <section aria-labelledby="achievements-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <Achievements />
         </div>
       </section>
 
