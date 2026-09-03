@@ -54,6 +54,7 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
   const [comments, setComments] = useState(initialComments || []);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -135,10 +136,19 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
   }, [episode._id, episode.novelparent]);
 
   async function submitComment() {
-    if (!commentName.trim() || !commentText.trim()) return;
-    const created = await addCommentAction(episode._id, commentName.trim(), commentText.trim());
-    setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
-    setCommentName(""); setCommentText("");
+    if (!commentName.trim() || !commentText.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const created = await addCommentAction(episode._id, commentName.trim(), commentText.trim());
+      setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
+      setCommentName(""); setCommentText("");
+      alert("Your comment has been posted. Thank you!");
+    } catch (err) {
+      console.error("Comment submission failed:", err);
+      alert("Sorry, your comment could not be posted. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const pageLink = (n: number) => `${pathname}?page=${n}` as any;
@@ -183,9 +193,9 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
       )}
     </div>
 
-    <div className="flex flex-wrap items-center justify-center gap-3">
+    <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
       <BookmarkButton slug={`${novelSlug}/${episodeSlug}`} title={`${episode.name} — ${episode.novelparent?.title || ""}`} type="episode" />
-      <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-[#e65564] text-white font-bold text-lg w-fit self-center px-7 py-3 rounded-full shadow-lg hover:bg-[#c94050] active:scale-95 transition">
+      <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-[#e65564] text-white font-bold text-sm sm:text-base w-full sm:w-fit self-center justify-center px-5 py-2.5 sm:px-7 sm:py-3 rounded-full shadow-lg hover:bg-[#c94050] active:scale-95 transition">
         Read Full Novel
       </Link>
     </div>
@@ -205,6 +215,6 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
       </div>
     </section>
 
-    <section className="flex flex-col gap-10"><Heading name="Comments" /><div className="flex flex-col gap-10 lg:mx-10"><CommentForm handleCommentSubmit={submitComment} commentName={commentName} commentNameHandle={(e: any) => setCommentName(e.target.value)} commentText={commentText} commentTextHandle={(e: any) => setCommentText(e.target.value)} />{comments.map((c) => <Comment key={c._id} name={c.name} createdAt={c._createdAt} comment={c.comment} />)}</div></section>
+    <section className="flex flex-col gap-10"><Heading name="Comments" /><div className="flex flex-col gap-10 lg:mx-10"><CommentForm handleCommentSubmit={submitComment} commentName={commentName} commentNameHandle={(e: any) => setCommentName(e.target.value)} commentText={commentText} commentTextHandle={(e: any) => setCommentText(e.target.value)} isSubmitting={isSubmitting} />{comments.map((c) => <Comment key={c._id} name={c.name} createdAt={c._createdAt} comment={c.comment} />)}</div></section>
   </main>;
 }

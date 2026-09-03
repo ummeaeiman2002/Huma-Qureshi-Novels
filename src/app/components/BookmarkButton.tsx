@@ -44,7 +44,7 @@ export default function BookmarkButton({ slug, title, type }: BookmarkButtonProp
   return (
     <button
       onClick={toggle}
-      className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition active:scale-95 ${
+      className={`inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full font-bold text-sm transition active:scale-95 ${
         saved
           ? "bg-[#1E5D50] text-white"
           : "border-2 border-[#1E5D50]/30 text-[#1E5D50] hover:border-[#1E5D50] hover:bg-[#1E5D50]/5"

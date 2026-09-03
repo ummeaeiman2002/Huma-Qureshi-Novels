@@ -57,8 +57,8 @@ export default function ShortStoriesClient({ initialStories }: ShortStoriesClien
             <span className="text-5xl">📚</span>
             <h2 className="text-2xl font-extrabold text-[#1E5D50]">No Short Stories Yet</h2>
             <p className="leading-8 text-tertiary font-medium max-w-xl">
-              Short stories are coming soon! To publish a short story, add the tag{" "}
-              <span className="font-bold text-[#1E5D50]">short-story</span> to a novel in Sanity Studio, and it will appear here automatically.
+              Short stories are coming soon! To publish a short story, open the novel in Sanity Studio and turn ON the{" "}
+              <span className="font-bold text-[#1E5D50]">"Is this a Short Story?"</span> option, and it will appear here automatically.
             </p>
           </div>
         </div>

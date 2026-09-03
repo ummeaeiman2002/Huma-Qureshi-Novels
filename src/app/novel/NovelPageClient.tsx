@@ -281,7 +281,7 @@ export default function NovelPageClient({
           {(filters.selectedWriter || filters.selectedSort || filters.selectedGenres.length > 0 || filters.youtubeOnly) && (
             <button
               onClick={() => handleFilterChange({ selectedWriter: "", selectedSort: "", selectedGenres: [], youtubeOnly: false })}
-              className="border-2 border-[#DCCFC2] text-[#111111] font-bold px-6 py-2 text-sm rounded-full hover:border-[#1E5D50] hover:text-[#1E5D50] hover:shadow-[0_0_12px_rgba(30,93,80,0.15)] active:scale-95 transition-all duration-300"
+              className="border-2 border-[#DCCFC2] text-[#111111] font-bold px-5 py-2 sm:px-6 text-sm rounded-full hover:border-[#1E5D50] hover:text-[#1E5D50] hover:shadow-[0_0_12px_rgba(30,93,80,0.15)] active:scale-95 transition-all duration-300"
             >
               Clear Filters
             </button>
@@ -319,7 +319,7 @@ export default function NovelPageClient({
           <button
             onClick={handleLoadMoreClick}
             disabled={isLoading}
-            className="bg-[#1E5D50] text-white font-bold px-8 py-3 rounded-full hover:bg-[#16483E] active:scale-95 transition shadow-lg disabled:opacity-50"
+            className="bg-[#1E5D50] text-white font-bold px-6 py-2.5 sm:px-8 sm:py-3 rounded-full text-sm sm:text-base hover:bg-[#16483E] active:scale-95 transition shadow-lg disabled:opacity-50"
           >
             {isLoading ? (
               <span className="flex items-center gap-2"><Loader2 /> Loading...</span>

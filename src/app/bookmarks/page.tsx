@@ -79,11 +79,11 @@ export default function BookmarksPage() {
           <p className="mt-2 text-sm opacity-70 max-w-md mx-auto">
             While reading a novel or PDF, tap the Bookmark button to save it here.
           </p>
-          <div className="mt-6 flex justify-center gap-3">
-            <Link href="/novel" className="px-6 py-2.5 rounded-full bg-[#1E5D50] text-white font-bold hover:bg-[#16483E] transition">
+          <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+            <Link href="/novel" className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-full bg-[#1E5D50] text-white text-sm font-bold hover:bg-[#16483E] transition text-center">
               Browse Novels
             </Link>
-            <Link href="/pdf" className="px-6 py-2.5 rounded-full border-2 border-[#1E5D50]/40 text-[#1E5D50] font-bold hover:border-[#1E5D50] hover:bg-[#1E5D50]/5 transition">
+            <Link href="/pdf" className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-full border-2 border-[#1E5D50]/40 text-[#1E5D50] text-sm font-bold hover:border-[#1E5D50] hover:bg-[#1E5D50]/5 transition text-center">
               PDF Library
             </Link>
           </div>
@@ -96,31 +96,31 @@ export default function BookmarksPage() {
           {bookmarks.map((b) => (
             <div
               key={b.slug}
-              className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border-2 border-[#1E5D50]/20 bg-[#FFFDF9] p-5 hover:border-[#1E5D50]/60 hover:shadow-xl transition duration-300"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 rounded-2xl border-2 border-[#1E5D50]/20 bg-[#FFFDF9] p-4 sm:p-5 hover:border-[#1E5D50]/60 hover:shadow-xl transition duration-300 overflow-hidden"
             >
-              <div className="flex items-center gap-4 min-w-0">
-                <span className="w-12 h-12 shrink-0 rounded-full bg-[#1E5D50]/10 flex items-center justify-center text-2xl">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0 w-full sm:w-auto overflow-hidden">
+                <span className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full bg-[#1E5D50]/10 flex items-center justify-center text-xl sm:text-2xl">
                   {TYPE_ICON[b.type] || "🔖"}
                 </span>
-                <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-xs font-bold uppercase tracking-wide text-[#8B6914]">
+                <div className="flex flex-col gap-0.5 min-w-0 overflow-hidden">
+                  <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-[#8B6914]">
                     {TYPE_LABEL[b.type] || "Saved"}
                   </span>
-                  <Link href={hrefFor(b) as any} className="text-lg font-extrabold text-[#1E5D50] hover:underline truncate">
+                  <Link href={hrefFor(b) as any} className="text-base sm:text-lg font-extrabold text-[#1E5D50] hover:underline truncate block">
                     {b.title}
                   </Link>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
                 <Link
                   href={hrefFor(b) as any}
-                  className="px-5 py-2 rounded-full bg-[#1E5D50] text-white text-sm font-bold hover:bg-[#16483E] active:scale-95 transition"
+                  className="px-4 py-1.5 sm:px-5 sm:py-2 rounded-full bg-[#1E5D50] text-white text-xs sm:text-sm font-bold hover:bg-[#16483E] active:scale-95 transition"
                 >
                   Open
                 </Link>
                 <button
                   onClick={() => remove(b.slug)}
-                  className="px-5 py-2 rounded-full border-2 border-[#e65564]/40 text-[#e65564] text-sm font-bold hover:bg-[#e65564] hover:text-white active:scale-95 transition"
+                  className="px-4 py-1.5 sm:px-5 sm:py-2 rounded-full border-2 border-[#e65564]/40 text-[#e65564] text-xs sm:text-sm font-bold hover:bg-[#e65564] hover:text-white active:scale-95 transition"
                 >
                   Remove
                 </button>

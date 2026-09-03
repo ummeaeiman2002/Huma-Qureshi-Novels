@@ -35,6 +35,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
   const [comments, setComments] = useState<CommentItem[]>(initialNovel.comment || []);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const limit = 4;
 
   const [lastRead, setLastRead] = useState<{ episodeSlug: string; name: string; page: number; ts: number } | null>(null);
@@ -66,10 +67,19 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
   }
 
   async function submitComment() {
-    if (!commentName.trim() || !commentText.trim()) return;
-    const created = await addCommentAction(novel._id, commentName.trim(), commentText.trim());
-    setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
-    setCommentName(""); setCommentText("");
+    if (!commentName.trim() || !commentText.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const created = await addCommentAction(novel._id, commentName.trim(), commentText.trim());
+      setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
+      setCommentName(""); setCommentText("");
+      alert("Your comment has been posted. Thank you!");
+    } catch (err) {
+      console.error("Comment submission failed:", err);
+      alert("Sorry, your comment could not be posted. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -110,7 +120,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
             </div>
             <Link
               href={`/novel/${slug}/${lastRead.episodeSlug}?page=${lastRead.page > 1 ? lastRead.page : 1}`}
-              className="shrink-0 bg-[#1E5D50] text-white font-bold px-7 py-3 rounded-full hover:bg-[#16483E] active:scale-95 transition shadow-lg"
+              className="shrink-0 bg-[#1E5D50] text-white font-bold px-5 py-2.5 sm:px-7 sm:py-3 rounded-full text-sm sm:text-base hover:bg-[#16483E] active:scale-95 transition shadow-lg"
             >
               Resume Reading
             </Link>
@@ -137,7 +147,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
               </div>
               <Link
                 href={`/novel/${slug}/${latest.episodeslug?.current}`}
-                className="shrink-0 bg-[#1E5D50] text-white font-bold px-6 py-3 rounded-full hover:bg-[#16483E] active:scale-95 transition shadow-lg"
+                className="shrink-0 bg-[#1E5D50] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base hover:bg-[#16483E] active:scale-95 transition shadow-lg"
               >
                 Read Now
               </Link>
@@ -195,7 +205,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
       <section className="flex flex-col gap-10" aria-labelledby="comments-heading">
         <Heading name="Comments" />
         <div className="flex flex-col gap-10 lg:mx-10">
-          <CommentForm handleCommentSubmit={submitComment} commentName={commentName} commentNameHandle={(e: any) => setCommentName(e.target.value)} commentText={commentText} commentTextHandle={(e: any) => setCommentText(e.target.value)} />
+          <CommentForm handleCommentSubmit={submitComment} commentName={commentName} commentNameHandle={(e: any) => setCommentName(e.target.value)} commentText={commentText} commentTextHandle={(e: any) => setCommentText(e.target.value)} isSubmitting={isSubmitting} />
           {comments.map((c) => <Comment key={c._id} name={c.name} createdAt={c._createdAt} comment={c.comment} />)}
         </div>
       </section>

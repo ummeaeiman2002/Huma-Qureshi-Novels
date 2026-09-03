@@ -131,7 +131,7 @@ export async function getShortStories() {
     return cached;
   }
 
-  const shortQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && "short-story" in coalesce(tags[], [])] | order(_createdAt desc) {
+  const shortQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && coalesce(isShortStory, false) == true] | order(_createdAt desc) {
     title,
     banner,
     _id,

@@ -68,10 +68,10 @@ export default function ReaderReviews({
                 Community Rating
               </span>
               {average ? (
-                <div className="flex items-center justify-center sm:justify-start gap-3">
-                  <span className="text-5xl font-extrabold text-[#1E5D50]">{average}</span>
+                <div className="flex items-center justify-center sm:justify-start gap-3 flex-wrap">
+                  <span className="text-4xl sm:text-5xl font-extrabold text-[#1E5D50]">{average}</span>
                   <div className="flex flex-col gap-1">
-                    <div className="flex gap-0.5 text-[#C9A96E]">
+                    <div className="flex gap-0.5 text-[#C9A96E] shrink-0">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <svg key={s} width="18" height="18" viewBox="0 0 24 24" fill={s <= Math.round(Number(average)) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                           <path d="M12 2l2.9 6.26 6.6.6-5 4.4 1.5 6.5L12 16.9 5.9 19.8l1.5-6.5-5-4.4 6.6-.6L12 2z" />
@@ -96,25 +96,28 @@ export default function ReaderReviews({
               Write Your Review
             </span>
             <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex items-center gap-1" role="radiogroup" aria-label="Rating">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    role="radio"
-                    aria-checked={rating === s}
-                    aria-label={`${s} star${s !== 1 ? "s" : ""}`}
-                    onClick={() => setRating(s)}
-                    onMouseEnter={() => setHover(s)}
-                    onMouseLeave={() => setHover(0)}
-                    className="transition active:scale-90"
-                  >
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill={(hover || rating) >= s ? "#C9A96E" : "none"} stroke="#C9A96E" strokeWidth="1.5" aria-hidden="true">
-                      <path d="M12 2l2.9 6.26 6.6.6-5 4.4 1.5 6.5L12 16.9 5.9 19.8l1.5-6.5-5-4.4 6.6-.6L12 2z" />
-                    </svg>
-                  </button>
-                ))}
-                <span className="ml-1 text-sm font-bold text-[#e65564]">*</span>
+              <div className="flex flex-col gap-1.5 sm:min-w-[180px] sm:max-w-[200px] shrink-0">
+                <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wide">Your Rating <span className="text-[#e65564]">*</span></span>
+                <div className="flex items-center gap-1" role="radiogroup" aria-label="Rating">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      role="radio"
+                      aria-checked={rating === s}
+                      aria-label={`${s} star${s !== 1 ? "s" : ""}`}
+                      onClick={() => setRating(s)}
+                      onMouseEnter={() => setHover(s)}
+                      onMouseLeave={() => setHover(0)}
+                      className="transition active:scale-90"
+                    >
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill={(hover || rating) >= s ? "#C9A96E" : "none"} stroke="#C9A96E" strokeWidth="1.5" aria-hidden="true">
+                        <path d="M12 2l2.9 6.26 6.6.6-5 4.4 1.5 6.5L12 16.9 5.9 19.8l1.5-6.5-5-4.4 6.6-.6L12 2z" />
+                      </svg>
+                    </button>
+                  ))}
+                  <span className="ml-1 text-sm font-bold text-[#e65564]">*</span>
+                </div>
               </div>
               <label className="flex-1 min-w-0 flex flex-col gap-1">
                 <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wide">Your Name <span className="text-[#e65564]">*</span></span>
@@ -145,7 +148,7 @@ export default function ReaderReviews({
               <button
                 onClick={addReview}
                 disabled={!name.trim() || !text.trim() || rating < 1}
-                className="bg-[#1E5D50] text-white font-bold px-7 py-2.5 rounded-full hover:bg-[#16483E] active:scale-95 transition shadow disabled:opacity-40"
+                className="bg-[#1E5D50] text-white font-bold px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-sm hover:bg-[#16483E] active:scale-95 transition shadow disabled:opacity-40"
               >
                 Post Review
               </button>
@@ -156,28 +159,28 @@ export default function ReaderReviews({
           {reviews.length > 0 && (
             <div className="mt-8 flex flex-col gap-4">
               {reviews.map((r, i) => (
-                <div key={i} className="flex gap-4 items-start rounded-2xl border border-[#C9A96E]/25 bg-[#FFFDF9] p-5 shadow-sm">
+                <div key={i} className="flex gap-3 sm:gap-4 items-start rounded-2xl border border-[#C9A96E]/25 bg-[#FFFDF9] p-4 sm:p-5 shadow-sm overflow-hidden">
                   <span
-                    className="w-11 h-11 shrink-0 rounded-full text-white font-extrabold flex items-center justify-center text-base shadow"
+                    className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full text-white font-extrabold flex items-center justify-center text-base shadow"
                     style={{ backgroundColor: AVATAR_PALETTE[i % AVATAR_PALETTE.length] }}
                   >
                     {(r.name || "R").charAt(0).toUpperCase()}
                   </span>
-                  <div className="flex flex-col gap-1 min-w-0">
+                  <div className="flex flex-col gap-1 min-w-0 overflow-hidden">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-extrabold text-[#1E5D50]">{r.name || "Reader"}</span>
-                      <span className="flex gap-0.5 text-[#C9A96E]">
+                      <span className="font-extrabold text-[#1E5D50] truncate">{r.name || "Reader"}</span>
+                      <span className="flex gap-0.5 text-[#C9A96E] shrink-0">
                         {[1, 2, 3, 4, 5].map((s) => (
                           <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s <= r.rating ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                             <path d="M12 2l2.9 6.26 6.6.6-5 4.4 1.5 6.5L12 16.9 5.9 19.8l1.5-6.5-5-4.4 6.6-.6L12 2z" />
                           </svg>
                         ))}
                       </span>
-                      <span className="text-xs text-tertiary/60 font-medium">
+                      <span className="text-xs text-tertiary/60 font-medium shrink-0">
                         {new Date(r.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                       </span>
                     </div>
-                    <p className="leading-6 text-tertiary font-medium">{r.text}</p>
+                    <p className="leading-6 text-tertiary font-medium break-words">{r.text}</p>
                   </div>
                 </div>
               ))}

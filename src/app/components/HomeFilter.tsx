@@ -89,7 +89,7 @@ export default function HomeFilter({
       {hasFilters && (
         <button
           onClick={clearFilters}
-          className="border-2 border-[#DCCFC2] text-[#111111] font-bold px-6 py-2 text-sm rounded-full hover:border-[#1E5D50] hover:text-[#1E5D50] hover:shadow-[0_0_12px_rgba(30,93,80,0.15)] active:scale-95 transition-all duration-300"
+          className="border-2 border-[#DCCFC2] text-[#111111] font-bold px-5 py-2 sm:px-6 text-sm rounded-full hover:border-[#1E5D50] hover:text-[#1E5D50] hover:shadow-[0_0_12px_rgba(30,93,80,0.15)] active:scale-95 transition-all duration-300"
         >
           Clear Filters
         </button>

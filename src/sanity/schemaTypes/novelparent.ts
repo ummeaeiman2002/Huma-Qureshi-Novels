@@ -126,6 +126,14 @@ export const novelparent = defineType({
     }),
 
     defineField({
+      name: "isShortStory",
+      type: "boolean",
+      title: "Is this a Short Story?",
+      description: "Turn ON if this novel is a short story / afsana to show it on the Short Stories page.",
+      initialValue: false,
+    }),
+
+    defineField({
       name: "comment",
       type: "array",
       title: "Comment",

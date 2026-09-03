@@ -11,6 +11,7 @@ export default function PDFComments({ pdfId, initialComments }: { pdfId: string;
   const [comments, setComments] = useState<CommentItem[]>(initialComments || []);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!pdfId) return;
@@ -21,11 +22,20 @@ export default function PDFComments({ pdfId, initialComments }: { pdfId: string;
   }, [pdfId]);
 
   async function submitComment() {
-    if (!commentName.trim() || !commentText.trim()) return;
-    const created = await addCommentAction(pdfId, commentName.trim(), commentText.trim());
-    setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
-    setCommentName("");
-    setCommentText("");
+    if (!commentName.trim() || !commentText.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const created = await addCommentAction(pdfId, commentName.trim(), commentText.trim());
+      setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
+      setCommentName("");
+      setCommentText("");
+      alert("Your comment has been posted. Thank you!");
+    } catch (err) {
+      console.error("Comment submission failed:", err);
+      alert("Sorry, your comment could not be posted. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -36,6 +46,7 @@ export default function PDFComments({ pdfId, initialComments }: { pdfId: string;
         commentNameHandle={(e: any) => setCommentName(e.target.value)}
         commentText={commentText}
         commentTextHandle={(e: any) => setCommentText(e.target.value)}
+        isSubmitting={isSubmitting}
       />
       {comments.map((c) => <Comment key={c._id} name={c.name} createdAt={c._createdAt} comment={c.comment} />)}
     </>
