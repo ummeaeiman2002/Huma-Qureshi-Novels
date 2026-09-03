@@ -142,6 +142,11 @@ a {
   0%{background-position: 100%}
 }
 
+@keyframes slideDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 .fade_end{
   mask-image: linear-gradient(to left, transparent 0%, black 12%, black 100%);
 

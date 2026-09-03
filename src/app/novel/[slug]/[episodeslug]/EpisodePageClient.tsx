@@ -10,6 +10,11 @@ import CommentForm from "@/app/components/novelPage/CommentForm";
 import Comment from "@/app/components/novelPage/Comment";
 import Heading from "@/app/components/Heading";
 import ViewsBadge from "@/app/components/ViewsBadge";
+import ReaderReviews from "@/app/components/ReaderReviews";
+import ReaderPoll from "@/app/components/homePageComponents/ReaderPoll";
+import BookmarkButton from "@/app/components/BookmarkButton";
+import ReadingStreak from "@/app/components/ReadingStreak";
+import Achievements from "@/app/components/Achievements";
 
 type CommentItem = { _id: string; name: string; comment: string; _createdAt: string };
 
@@ -103,6 +108,32 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
     localStorage.setItem(key, "true");
   }, [episode._id]);
 
+  // Track reading achievements (episodes read + novel completion)
+  useEffect(() => {
+    if (!episode._id) return;
+    try {
+      // Track unique episodes read
+      const readEpisodesRaw = localStorage.getItem("hq_read_episodes");
+      const readEpisodes: string[] = readEpisodesRaw ? JSON.parse(readEpisodesRaw) : [];
+      if (!readEpisodes.includes(episode._id)) {
+        readEpisodes.push(episode._id);
+        localStorage.setItem("hq_read_episodes", JSON.stringify(readEpisodes));
+      }
+
+      // Track completed novels: if this is the last episode, mark novel complete
+      const totalEpisodes = episode.novelparent?.totalEpisodes || 0;
+      const latestEpisodeOrder = episode.order || 0;
+      // We don't have an order field reliably; use a collection of read episodes per novel
+      const readNovelsRaw = localStorage.getItem("hq_read_novels");
+      const readNovels: string[] = readNovelsRaw ? JSON.parse(readNovelsRaw) : [];
+      const parentId = episode.novelparent?._id || episode.novelparent?.slug?.current || "";
+      if (parentId && !readNovels.includes(parentId + "__" + episode._id)) {
+        readNovels.push(parentId + "__" + episode._id);
+        localStorage.setItem("hq_read_novels", JSON.stringify(readNovels));
+      }
+    } catch {}
+  }, [episode._id, episode.novelparent]);
+
   async function submitComment() {
     if (!commentName.trim() || !commentText.trim()) return;
     const created = await addCommentAction(episode._id, commentName.trim(), commentText.trim());
@@ -152,11 +183,28 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
       )}
     </div>
 
-    <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-[#e65564] text-white font-bold text-lg w-fit self-center px-7 py-3 rounded-full shadow-lg hover:bg-[#c94050] active:scale-95 transition">
-      Read Full Novel
-    </Link>
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <BookmarkButton slug={`${novelSlug}/${episodeSlug}`} title={`${episode.name} — ${episode.novelparent?.title || ""}`} type="episode" />
+      <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-[#e65564] text-white font-bold text-lg w-fit self-center px-7 py-3 rounded-full shadow-lg hover:bg-[#c94050] active:scale-95 transition">
+        Read Full Novel
+      </Link>
+    </div>
 
     <Tags tags={episode.tags || []} />
+
+    <ReaderReviews storageKey={`review_episode_${episode._id || episodeSlug}`} />
+
+    <ReadingStreak />
+
+    <Achievements />
+
+    <section aria-labelledby="poll-heading" className="py-4">
+      <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+        <Heading name="Reader Poll" />
+        <ReaderPoll />
+      </div>
+    </section>
+
     <section className="flex flex-col gap-10"><Heading name="Comments" /><div className="flex flex-col gap-10 lg:mx-10"><CommentForm handleCommentSubmit={submitComment} commentName={commentName} commentNameHandle={(e: any) => setCommentName(e.target.value)} commentText={commentText} commentTextHandle={(e: any) => setCommentText(e.target.value)} />{comments.map((c) => <Comment key={c._id} name={c.name} createdAt={c._createdAt} comment={c.comment} />)}</div></section>
   </main>;
 }

@@ -37,7 +37,13 @@ export default function DesktopHeader() {
             href={`/novel`}
             className="px-5 py-1.5 rounded-full border border-transparent text-[#111111] font-bold hover:text-secondary hover:bg-secondary/10 hover:border-secondary/40 transition"
           >
-            <button onClick={() => setMenu(false)}>All Novels</button>
+            <button onClick={() => setMenu(false)}>Novels</button>
+          </Link>
+          <Link
+            href={`/short-stories`}
+            className="px-5 py-1.5 rounded-full border border-transparent text-[#111111] font-bold hover:text-secondary hover:bg-secondary/10 hover:border-secondary/40 transition"
+          >
+            <button onClick={() => setMenu(false)}>Short Stories</button>
           </Link>
           <Link
             href={`/pdf`}
@@ -57,23 +63,12 @@ export default function DesktopHeader() {
           >
             <button onClick={() => setMenu(false)}>Contact us</button>
           </Link>
+
           <Link
-            href={`/privacypolicy`}
-            className="px-5 py-1.5 rounded-full border border-transparent text-[#111111] font-bold hover:text-secondary hover:bg-secondary/10 hover:border-secondary/40 transition"
-          >
-            <button onClick={() => setMenu(false)}>Privacy Policy</button>
-          </Link>
-          <Link
-            href={`/terms`}
-            className="px-5 py-1.5 rounded-full border border-transparent text-[#111111] font-bold hover:text-secondary hover:bg-secondary/10 hover:border-secondary/40 transition"
-          >
-            <button onClick={() => setMenu(false)}>Terms & Conditions</button>
-          </Link>
-          <Link
-            href={`/getyourwebsite`}
+            href={`/bookmarks`}
             className="px-5 py-1.5 rounded-full border border-secondary/50 text-secondary hover:bg-secondary hover:text-primary transition"
           >
-            <button onClick={() => setMenu(false)}>For Writers</button>
+            <button onClick={() => setMenu(false)}>Bookmarks</button>
           </Link>
         </nav>
       </header>

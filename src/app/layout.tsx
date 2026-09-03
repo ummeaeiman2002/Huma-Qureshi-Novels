@@ -10,6 +10,7 @@ import AuthProvider from "./components/AuthProvider";
 import CookieConsent from "./components/CookieConsent";
 import { PremiumThemeProvider } from "./components/PremiumThemeProvider";
 import { UserIdProvider } from "./context/UserIdContext";
+import NewUploadAlert from "./components/NewUploadAlert";
 import { SITE_URL, SITE_NAME } from "@/lib/seo";
 
 const ADSENSE_ID = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID || "";
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <AuthProvider><PremiumThemeProvider><UserIdProvider><MobileHeader /><DesktopHeader /><div className="px-5 lg:px-20 overflow-x-hidden">{children}</div><Footer /></UserIdProvider>
       <Up />
       <CookieConsent />
+      <NewUploadAlert />
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-X7F51SY5RZ" strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-X7F51SY5RZ');`}</Script>
       {ADSENSE_ID && <Script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`} strategy="afterInteractive" crossOrigin="anonymous" />}

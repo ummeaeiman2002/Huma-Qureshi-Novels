@@ -2,6 +2,7 @@
 // Cache for frequently accessed data
 const novelCache = new Map();
 const metadataCache = new Map();
+let shortStoriesCache: { data: any; timestamp: number; ttl: number } | null = null;
 
 export const NovelCache = {
   // Cache novels by page
@@ -50,8 +51,25 @@ export const NovelCache = {
     return null;
   },
 
+  // Cache short stories
+  getShortStories(): any[] | null {
+    if (shortStoriesCache && Date.now() - shortStoriesCache.timestamp < shortStoriesCache.ttl) {
+      return shortStoriesCache.data;
+    }
+    return null;
+  },
+
+  setShortStories(stories: any[]) {
+    shortStoriesCache = {
+      data: stories,
+      timestamp: Date.now(),
+      ttl: 5 * 60 * 1000 // 5 minutes TTL
+    };
+  },
+
   clear() {
     novelCache.clear();
     metadataCache.clear();
+    shortStoriesCache = null;
   }
 };

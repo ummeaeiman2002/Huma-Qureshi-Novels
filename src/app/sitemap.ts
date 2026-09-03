@@ -19,7 +19,7 @@ async function getUrls() {
     { next: { revalidate: 3600 } },
   );
 
-  const staticPages = ["", "/about", "/contact", "/privacypolicy", "/terms", "/novel", "/pdf"];
+  const staticPages = ["", "/about", "/contact", "/privacypolicy", "/terms", "/novel", "/pdf", "/short-stories"];
   const urls: MetadataRoute.Sitemap = staticPages.map((path) => ({
     url: `${SITE_URL}${path}`,
     changeFrequency: path === "" ? "daily" : "monthly",

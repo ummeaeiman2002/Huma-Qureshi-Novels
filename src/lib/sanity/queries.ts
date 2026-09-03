@@ -39,6 +39,7 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
     novelreleasedate,
     noveldescription,
     youtubeurl,
+    tags,
     genre->{genrename},
     writer->{writername}
   }`;
@@ -124,6 +125,67 @@ export async function getTotalNovelCount() {
   return count;
 }
 
+export async function getShortStories() {
+  const cached = NovelCache.getShortStories();
+  if (cached) {
+    return cached;
+  }
+
+  const shortQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && "short-story" in coalesce(tags[], [])] | order(_createdAt desc) {
+    title,
+    banner,
+    _id,
+    _createdAt,
+    slug,
+    novelreleasedate,
+    noveldescription,
+    youtubeurl,
+    tags,
+    genre->{genrename},
+    writer->{writername}
+  }`;
+
+  const shortStories = await optimizedClient.fetchWithTags(shortQuery, ['short-stories']);
+
+  const episodesQuery = `*[_type == "novel"] {
+    _id,
+    novelparent,
+    views,
+    monthlyViews
+  }`;
+
+  const episodes = await optimizedClient.fetchWithTags(episodesQuery, ['episodes']);
+
+  const storiesWithViews = shortStories
+    .filter((story: any) => story && story._id)
+    .map((story: any) => {
+      const storyEpisodes = episodes.filter(
+        (episode: any) => episode.novelparent && episode.novelparent._ref === story._id
+      );
+
+      const totalViews = storyEpisodes.reduce(
+        (sum: number, episode: any) => sum + (episode.views || 0),
+        0
+      );
+
+      const totalMonthlyViews = storyEpisodes.reduce(
+        (sum: number, episode: any) => sum + (episode.monthlyViews || 0),
+        0
+      );
+
+      return {
+        ...story,
+        summary: textSummary(story.noveldescription),
+        totalViews,
+        totalMonthlyViews,
+      };
+    });
+
+  NovelCache.setShortStories(storiesWithViews);
+
+  return storiesWithViews;
+}
+
 // PDF-related functions
 export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
   const startIndex = page * limit;
@@ -138,6 +200,7 @@ export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
     slug,
     pdfreleasedate,
     pdfdescription,
+    youtubeurl,
     genre->{genrename},
     writer->{writername},
     views,

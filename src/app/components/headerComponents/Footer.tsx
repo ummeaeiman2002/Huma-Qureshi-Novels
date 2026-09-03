@@ -36,7 +36,7 @@ export default function Footer() {
             <Image src={"https://res.cloudinary.com/dx1gryhqc/image/upload/v1758662209/Logo_ox1c8z.png"} alt="Huma Qureshi Novels" width={100} height={100} className="w-16 h-16 sm:w-20 sm:h-20 object-contain invert" />
           </Link>
           <p className="text-[#111111]/70 text-sm max-w-[220px] leading-6">
-            Original Urdu novels, episodic stories and PDF books by Huma Qureshi and other writers.
+            Original Urdu novels, episodic stories and PDF books by Huma Qureshi.
           </p>
         </div>
         {/* pages */}
@@ -49,14 +49,15 @@ export default function Footer() {
             <Link href="/about" className="text-[#111111] font-bold hover:text-secondary transition">
               About Us
             </Link>
+
+            <Link href="/contact" className="text-[#111111] font-bold hover:text-secondary transition">
+              Contact Us
+            </Link>
             <Link href="/privacypolicy" className="text-[#111111] font-bold hover:text-secondary transition">
               Privacy Policy
             </Link>
             <Link href="/terms" className="text-[#111111] font-bold hover:text-secondary transition">
-              Terms
-            </Link>
-            <Link href="/contact" className="text-[#111111] font-bold hover:text-secondary transition">
-              Contact Us
+              Terms & Conditions
             </Link>
           </div>
           <div className="text-sm w-fit flex flex-col gap-2">
@@ -67,7 +68,9 @@ export default function Footer() {
             <Link href="/novel" className="text-[#111111] font-bold hover:text-secondary transition">
               Episodic Novels
             </Link>
-            <Link href="/#latest" className="text-[#111111] font-bold hover:text-secondary transition">
+            <Link href="/short-stories" className="text-[#111111] font-bold hover:text-secondary transition">
+              Short Stories
+            </Link>            <Link href="/#latest" className="text-[#111111] font-bold hover:text-secondary transition">
               Latest
             </Link>
             <Link href="/#trending" className="text-[#111111] font-bold hover:text-secondary transition">
@@ -78,18 +81,24 @@ export default function Footer() {
             </Link>
           </div>
           <div className="text-sm w-fit flex flex-col gap-2">
-            <p className="font-bold text-[#C9A96E]">For Writers</p>
+            <p className="font-bold text-[#C9A96E]">Bookmarks</p>
             <Link
-              href="/getyourwebsite"
+              href="/bookmarks"
               className="text-[#111111] font-bold hover:text-secondary transition w-fit"
             >
-              Get Your Own Website
+              View My Bookmarks
             </Link>
             <Link
-              href="https://wa.me/+923366873934"
+              href="/novel"
               className="text-[#111111] font-bold hover:text-secondary transition w-fit"
             >
-              Contact Developer on WhatsApp
+              Browse Novels
+            </Link>
+            <Link
+              href="/pdf"
+              className="text-[#111111] font-bold hover:text-secondary transition w-fit"
+            >
+              PDF Library
             </Link>
           </div>
         </div>
@@ -122,17 +131,25 @@ export default function Footer() {
           © {new Date().getFullYear()} Huma Qureshi Novels. All rights reserved.
         </p>
         <div className="w-full max-w-[70vw] h-px bg-secondary/20"></div>
-        <p className="text-xs text-[#111111]/70 pt-1 flex flex-wrap justify-center items-center gap-1" dir="rtl">
-          <span className="font-urdu">
-            اپنی ویب سائٹ حاصل کرنے کے لیے
-          </span>
+        <p className="text-xs text-[#111111]/70 pt-1 text-center">
+          Built with <span className="text-[#e65564]">♥</span> by{" "}
           <Link
-            href={"/getyourwebsite"}
-            className="font-bold text-[#C9A96E] underline hover:text-secondary transition text-sm"
+            href="https://agentack.co"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-[#C9A96E] hover:text-secondary hover:underline transition"
           >
-            ڈویلپر
+            Agentack
+          </Link>{" "}
+          · Want a site like this?{" "}
+          <Link
+            href="https://agentack.co"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-[#1E5D50] hover:text-secondary hover:underline transition"
+          >
+            Let&apos;s talk
           </Link>
-          <span className="font-urdu">سے رابطہ کریں!</span>
         </p>
       </div>
     </div>

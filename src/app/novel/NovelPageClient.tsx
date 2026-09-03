@@ -6,6 +6,8 @@ import Heading from "../components/Heading";
 import { getPaginatedNovels } from "@/lib/sanity/queries";
 import Loader2 from "../components/Loader2";
 import { formatSafeDate } from "@/lib/seo";
+import YouTubeSection from "../components/YouTubeSection";
+import ReaderPoll from "../components/homePageComponents/ReaderPoll";
 
 interface NovelPageProps {
   initialNovels: any[];
@@ -445,6 +447,13 @@ export default function NovelPageClient({
         </div>
       </section>
 
+      {/* WATCH / LISTEN ON YOUTUBE — before FAQ */}
+      <YouTubeSection
+        items={(initialNovels || []).filter(
+          (n) => n && n.youtubeurl && n.youtubeurl.trim() !== ""
+        )}
+      />
+
       {/* FAQs — SEO content */}
       <section aria-labelledby="faq-heading" className="py-4">
         <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
@@ -482,6 +491,14 @@ export default function NovelPageClient({
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* READER POLL — after FAQ */}
+      <section aria-labelledby="poll-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <Heading name="Reader Poll" />
+          <ReaderPoll />
         </div>
       </section>
     </div>

@@ -11,6 +11,10 @@ import WatchOnYT from "@/app/components/novelPage/WatchOnYT";
 import Tags from "@/app/components/novelPage/Tags";
 import PDFComments from "./PDFComments";
 import ViewsBadge from "@/app/components/ViewsBadge";
+import RelatedContent from "@/app/components/RelatedContent";
+import YouTubeSection from "@/app/components/YouTubeSection";
+import BookmarkButton from "@/app/components/BookmarkButton";
+import ReaderReviews from "@/app/components/ReaderReviews";
 
 export const revalidate = 300;
 
@@ -19,6 +23,58 @@ type Props = { params: Promise<{ slug: string }> };
 async function getPdf(slug: string) {
   const query = `*[_type == "pdf" && slug.current == $slug][0]{title, slug, pdfdescription, pdfreleasedate, descriptionlanguage, authornote, authornotelang, views, writer->{writername,_id}, genre->{genrename,_id}, banner, _id, tags, pdfurl, youtubeurl, comment[]->{name,_id,comment,_createdAt}}`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
+}
+
+async function getRelatedPdfData(pdf: any) {
+  const genreName = pdf?.genre?.genrename || "";
+  const writerRef = pdf?.writer?._id || "";
+  const relatedQuery = `{
+    "relatedPDFs": *[_type == "pdf" && defined(slug.current) && _id != $currentId && genre->genrename == $genre] | order(coalesce(views,0) desc)[0...6] { title, banner, slug, pdfreleasedate, views, genre->{genrename}, writer->{writername} },
+    "recommendedNovels": *[_type == "novelparent" && defined(slug.current) && genre->genrename == $genre] | order(_createdAt desc)[0...6] {
+      _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
+      "views": *[_type == "novel" && references(^._id)].views
+    },
+    "popularNovels": *[_type == "novelparent" && defined(slug.current)] | order(_createdAt desc)[0...6] {
+      _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
+      "views": *[_type == "novel" && references(^._id)].views
+    },
+    "writers": *[_type == "writer"]{writername},
+    "youtubeNovels": *[_type == "novelparent" && defined(slug.current) && defined(youtubeurl) && youtubeurl != ""][0...6] { _id, title, youtubeurl, writer->{writername} }
+  }`;
+  const data = await client.fetch<any>(
+    relatedQuery,
+    { currentId: pdf?._id || "", genre: genreName },
+    { next: { revalidate: 300 } }
+  );
+
+  const sumViews = (v: any) =>
+    Array.isArray(v) ? v.reduce((a: number, x: number) => a + (Number(x) || 0), 0) : Number(v) || 0;
+  const enrich = (list: any[]) =>
+    (list || []).filter((n: any) => n && n.slug?.current).map((n: any) => ({
+      ...n,
+      summary: n.noveldescription
+        ? String(n.noveldescription).replace(/\s+/g, " ").trim().slice(0, 160)
+        : "",
+      totalViews: sumViews(n.views),
+    }));
+
+  const recommendedNovels = enrich(data?.recommendedNovels || []);
+  const popularNovels = enrich(data?.popularNovels || []);
+  const combined = [...recommendedNovels];
+  const seen = new Set(combined.map((n) => n._id));
+  for (const n of popularNovels) {
+    if (!seen.has(n._id)) {
+      combined.push(n);
+      seen.add(n._id);
+    }
+  }
+
+  return {
+    relatedPDFs: data?.relatedPDFs || [],
+    relatedNovels: combined.slice(0, 6),
+    otherWriters: (data?.writers || []).map((w: any) => w.writername).filter(Boolean),
+    youtubeNovels: data?.youtubeNovels || [],
+  };
 }
 
 function formatDate(value?: string) {
@@ -53,6 +109,7 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const pdf = await getPdf(slug);
   if (!pdf) notFound();
+  const related = await getRelatedPdfData(pdf);
 
   const schema = {
     "@context": "https://schema.org",
@@ -122,11 +179,61 @@ export default async function Page({ params }: Props) {
       )}
 
       <div className="flex flex-wrap gap-4 justify-center">
-        {isValidUrl(pdf.pdfurl) && <DownloadPDFButton pdf={pdf.pdfurl} />}
+        <BookmarkButton slug={pdf.slug?.current || ""} title={pdf.title || ""} type="pdf" />
+        {isValidUrl(pdf.pdfurl) && <DownloadPDFButton pdf={pdf.pdfurl} slug={pdf.slug?.current} type="pdf" />}
         {isValidUrl(pdf.youtubeurl) && <WatchOnYT YTurl={pdf.youtubeurl} />}
       </div>
 
       <Tags tags={pdf.tags || []} />
+
+      {/* WHY DOWNLOAD — rich SEO content */}
+      <section aria-labelledby="why-download-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <Heading name="Why Download This PDF" />
+          <div className="bg-[#FFFDF9] rounded-3xl border-2 border-[#1E5D50]/30 p-6 lg:p-10 flex flex-col gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                {
+                  title: "Read Offline, Anywhere",
+                  desc: "Download the complete novel to your phone or computer and keep reading even without internet — perfect for travel, commutes, or bedtime reading.",
+                },
+                {
+                  title: "Complete Story in One File",
+                  desc: "Unlike episodic novels that are published chapter by chapter, this PDF gives you the full story in a single downloadable file.",
+                },
+                {
+                  title: "100% Free Download",
+                  desc: "Every PDF in our library is completely free. No payment, no subscription, no sign-up required to download and read.",
+                },
+                {
+                  title: "Preserve Urdu Text Clearly",
+                  desc: "The Urdu text is rendered clearly in the PDF, keeping the original script, tone, and reading flow intact for the best experience.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col gap-3 rounded-2xl border-2 border-[#1E5D50]/30 bg-[#FFFDF9] p-6 hover:border-[#1E5D50] hover:shadow-xl hover:-translate-y-0.5 transition duration-300">
+                  <h3 className="text-lg font-extrabold text-[#1E5D50]">{item.title}</h3>
+                  <p className="leading-7 text-tertiary font-medium">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RELATED CONTENT — suggestions */}
+      <section aria-labelledby="related-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <RelatedContent
+            relatedNovels={related.relatedNovels}
+            relatedPDFs={related.relatedPDFs}
+            otherWriters={related.otherWriters}
+          />
+
+          <YouTubeSection items={related.youtubeNovels} id="youtube-pdf-heading" />
+        </div>
+      </section>
+
+      <ReaderReviews storageKey={`review_pdf_${pdf.slug?.current || pdf._id}`} />
 
       <section className="flex flex-col gap-10" aria-labelledby="comments-heading">
         <Heading name="Comments" />

@@ -5,11 +5,11 @@ import React from "react";
 export default function Episode({
   episodeTitle,
   teaser,
-  href, date
+  href, date, isNew
 }: {
   episodeTitle: string;
   teaser: any;
-  href: any; date: string
+  href: any; date: string; isNew?: boolean
 }) {
   const blockCopy = (e: React.ClipboardEvent) => {
     e.preventDefault();
@@ -37,6 +37,11 @@ export default function Episode({
       onCut={blockCopy}
       className={`group relative border-3 ${bg} rounded-2xl flex flex-col justify-start items-start py-4 px-2 gap-3 shadow-xl text-tertiary w-full max-w-[200px] min-h-[300px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(30,93,80,0.3)] active:scale-[1.06] bg-secondary/5`}
     >
+      {isNew && (
+        <span className="absolute -top-2 -right-2 z-10 px-3 py-1 rounded-full bg-[#e65564] text-white text-[10px] font-extrabold uppercase tracking-wide shadow-lg animate-pulse">
+          New
+        </span>
+      )}
       {/* <div className="flex justify-between"> */}
       <h3 className="font-bold text-sm title-bright px-2">{episodeTitle}</h3>
       {/* <Image

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions",
-  description: "Terms and conditions for Huma Qureshi Novels. Content ownership, copyright protection, DMCA policy, plagiarism rules, and limitation of liability. Includes multi-author and public domain content policies.",
+  description: "Terms and conditions for Huma Qureshi Novels. Content ownership, copyright protection, DMCA policy, plagiarism rules, and limitation of liability.",
   alternates: { canonical: "https://humaqureshinovels.com/terms" },
 };
 
@@ -39,24 +39,14 @@ export default function page() {
         <div className="bg-[#FFFDF9] rounded-2xl border-2 border-[#DCCFC2] p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
           <h2 className="text-xl font-extrabold text-[#1E5D50]">Content Ownership</h2>
           <p className="leading-8">
-            This website publishes a curated collection of Urdu novels, PDF books, episodes, stories, and afsanas from multiple writers. Content is published with proper authorization from the respective authors. Some content may also belong to the public domain and is shared for free reading purposes.
+            This website is dedicated exclusively to the works of Huma Qureshi. It features her original Urdu novels, PDF books, episodic stories, and afsanas. All content published on this website belongs to Huma Qureshi and is protected under copyright law.
           </p>
           <p className="leading-8">
-            All content on this website is published and managed by the website owner. Each writer retains ownership of their original work. Unauthorized copying, reproduction, translation, republishing, hosting, or distribution of any content is strictly prohibited.
+            Unauthorized copying, reproduction, translation, republishing, hosting, or distribution of any content from this website is strictly prohibited. All rights are reserved by the author, Huma Qureshi.
           </p>
         </div>
 
-        <div className="bg-[#FFFDF9] rounded-2xl border-2 border-[#DCCFC2] p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
-          <h2 className="text-xl font-extrabold text-[#1E5D50]">Public Domain Content</h2>
-          <p className="leading-8">
-            Some content on this website may be in the public domain. Public domain works are those whose intellectual property rights have expired, been forfeited, or are inapplicable. We make such works available for free reading and educational purposes.
-          </p>
-          <p className="leading-8">
-            While public domain content is freely available, we respect the original authors and their contributions to literature. We do not claim ownership over public domain works, but we do claim the right to present and format them on this platform.
-          </p>
-        </div>
-
-        <div className="bg-[#FFFDF9] rounded-2xl border-2 border-[#DCCFC2] p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+<div className="bg-[#FFFDF9] rounded-2xl border-2 border-[#DCCFC2] p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
           <h2 className="text-xl font-extrabold text-[#1E5D50]">Fictional Disclaimer</h2>
           <p className="leading-8">
             All stories, characters, events, and places mentioned on this website are works of fiction unless clearly stated as real. Any resemblance to actual persons (living or dead), places, or incidents is purely coincidental.
@@ -126,10 +116,10 @@ export default function page() {
         <div className="bg-[#FFFDF9] rounded-2xl border-2 border-[#DCCFC2] p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
           <h2 className="text-xl font-extrabold text-[#1E5D50]">Copyright Protection &amp; DMCA Policy</h2>
           <p className="leading-8">
-            All novels, PDF books, stories, afsanas, and creative content published on this website are protected by copyright. Content is published with authorization from the respective authors or is in the public domain.
+            All novels, PDF books, stories, afsanas, and creative content published on this website are the original works of Huma Qureshi and are protected by copyright law.
           </p>
           <p className="leading-8 font-bold text-[#8B6914]">
-            If any website, platform, individual, or entity is found copying, reproducing, hosting, or distributing our content without written permission, we will take immediate DMCA takedown action and legal proceedings against them.
+            If any website, platform, individual, or entity is found copying, reproducing, hosting, or distributing our content without written permission from Huma Qureshi, we will take immediate DMCA takedown action and legal proceedings against them.
           </p>
           <p className="leading-8">
             We actively monitor the internet for unauthorized use of our content. If you find our work being used elsewhere without permission, please report it to us at{" "}
@@ -145,7 +135,7 @@ export default function page() {
         <div className="bg-[#FFFDF9] rounded-2xl border-2 border-[#DCCFC2] p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
           <h2 className="text-xl font-extrabold text-[#1E5D50]">Copyright &amp; Content Removal Requests</h2>
           <p className="leading-8">
-            All content on this website is published with proper authorization from the respective authors or is in the public domain. If you believe any content on this website infringes your copyright or has been published without proper authorization, please contact us at{" "}
+            All content on this website is the original work of Huma Qureshi and is protected by copyright. If you believe any content on this website infringes your copyright or has been published without proper authorization, please contact us at{" "}
             <Link href="mailto:humaqureshiofficial73@gmail.com" className="font-bold text-[#1E5D50] underline underline-offset-4 hover:text-[#C9A96E] transition">
               humaqureshiofficial73@gmail.com
             </Link>{" "}

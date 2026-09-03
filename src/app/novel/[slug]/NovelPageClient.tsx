@@ -17,6 +17,9 @@ import Heading from "@/app/components/Heading";
 import Heading2 from "@/app/components/Heading2";
 import AuthorNote from "@/app/components/novelPage/AuthoNote";
 import ViewsBadge from "@/app/components/ViewsBadge";
+import ReaderReviews from "@/app/components/ReaderReviews";
+import ReaderPoll from "@/app/components/homePageComponents/ReaderPoll";
+import BookmarkButton from "@/app/components/BookmarkButton";
 import { client } from "@/sanity/lib/client";
 import { formatSafeDate, isValidUrl, cleanDescriptionLong } from "@/lib/seo";
 
@@ -117,8 +120,36 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
       {episodes.length > 0 && (
       <section aria-labelledby="episodes-heading">
         <Heading name="Episodes" />
+
+        {/* New Episode alert banner */}
+        {episodes.length > 0 && (() => {
+          const latest = [...episodes].sort((a, b) => new Date(b.episodereleasedate).getTime() - new Date(a.episodereleasedate).getTime())[0];
+          if (!latest) return null;
+          return (
+            <div className="mx-2 sm:mx-6 lg:mx-20 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border-2 border-[#C9A96E] bg-gradient-to-r from-[#FFFDF9] to-[#FFF3D6] p-5 shadow-xl">
+              <div className="flex flex-col gap-1 text-center sm:text-start">
+                <span className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-[#e65564] text-white text-xs font-extrabold uppercase tracking-wide">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+                  New Episode
+                </span>
+                <span className="text-xl sm:text-2xl font-extrabold text-[#1E5D50] mt-1">{latest.name}</span>
+                <span className="text-sm text-tertiary font-medium">Latest episode is now available to read. Tap below to open it.</span>
+              </div>
+              <Link
+                href={`/novel/${slug}/${latest.episodeslug?.current}`}
+                className="shrink-0 bg-[#1E5D50] text-white font-bold px-6 py-3 rounded-full hover:bg-[#16483E] active:scale-95 transition shadow-lg"
+              >
+                Read Now
+              </Link>
+            </div>
+          );
+        })()}
+
         <div className="flex flex-wrap gap-5 justify-center lg:justify-start px-2 sm:px-6 lg:px-20 lg:gap-10">
-          {episodes.map((episode) => <Episode key={episode.episodeslug?.current || episode.name} date={formatSafeDate(episode.episodereleasedate)} href={`/novel/${slug}/${episode.episodeslug?.current}`} episodeTitle={episode.name} teaser={episode.episodeteaser} />)}
+          {episodes.map((episode) => {
+            const isLatest = episode.episodeslug?.current === [...episodes].sort((a, b) => new Date(b.episodereleasedate).getTime() - new Date(a.episodereleasedate).getTime())[0]?.episodeslug?.current;
+            return <Episode key={episode.episodeslug?.current || episode.name} isNew={isLatest} date={formatSafeDate(episode.episodereleasedate)} href={`/novel/${slug}/${episode.episodeslug?.current}`} episodeTitle={episode.name} teaser={episode.episodeteaser} />;
+          })}
         </div>
         {hasMore && <div className="flex justify-center py-5"><LoadMoreButton onclick={loadMore} /></div>}
         {loadingMore && <p className="text-center opacity-60">Loading more episodes…</p>}
@@ -132,7 +163,8 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
       )}
 
       <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-5 justify-center items-center px-4 sm:px-0">
-        {isValidUrl(novel.pdfurl) && <DownloadPDFButton pdf={novel.pdfurl} />}
+        <BookmarkButton slug={slug} title={novel.title || ""} type="novel" />
+        {isValidUrl(novel.pdfurl) && <DownloadPDFButton pdf={novel.pdfurl} slug={slug} type="novel" />}
         {isValidUrl(novel.youtubeurl) && <WatchOnYT YTurl={novel.youtubeurl} />}
       </div>
       <Tags tags={novel.tags || []} />
@@ -150,6 +182,15 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
           </div>
         </section>
       )}
+
+      <ReaderReviews storageKey={`review_novel_${novel?._id || slug}`} />
+
+      <section aria-labelledby="poll-heading" className="py-4">
+        <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
+          <Heading name="Reader Poll" />
+          <ReaderPoll />
+        </div>
+      </section>
 
       <section className="flex flex-col gap-10" aria-labelledby="comments-heading">
         <Heading name="Comments" />

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Privacy Policy for Huma Qureshi Novels. Learn how we collect, use, and protect your information. Covers Google AdSense, cookies, analytics, and data breach liability.",
+  description: "Privacy Policy for Huma Qureshi Novels. Learn how we collect, use, and protect your information when you visit our website. Covers Google AdSense, cookies, analytics, and data breach liability.",
   alternates: { canonical: "https://humaqureshinovels.com/privacypolicy" },
 };
 
