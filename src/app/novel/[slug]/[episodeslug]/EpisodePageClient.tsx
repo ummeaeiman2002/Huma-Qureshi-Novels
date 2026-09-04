@@ -13,6 +13,7 @@ import ViewsBadge from "@/app/components/ViewsBadge";
 import ReaderReviews from "@/app/components/ReaderReviews";
 import ReaderPoll from "@/app/components/homePageComponents/ReaderPoll";
 import BookmarkButton from "@/app/components/BookmarkButton";
+import Reactions from "@/app/components/Reactions";
 import ReadingStreak from "@/app/components/ReadingStreak";
 import Achievements from "@/app/components/Achievements";
 
@@ -174,6 +175,8 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
 
     <Heading name={episode.name} className="title-bright" />
 
+    <Reactions slug={`${novelSlug}/${episodeSlug}`} />
+
     {/* reading area + pagination */}
     <div className="flex flex-col gap-3">
       <div className="rounded-2xl border border-secondary/25 bg-secondary/5 shadow-xl">
@@ -195,7 +198,7 @@ export default function EpisodePageClient({ episode, initialComments }: { episod
 
     <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
       <BookmarkButton slug={`${novelSlug}/${episodeSlug}`} title={`${episode.name} — ${episode.novelparent?.title || ""}`} type="episode" />
-      <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-[#e65564] text-white font-bold text-sm sm:text-base w-full sm:w-fit self-center justify-center px-5 py-2.5 sm:px-7 sm:py-3 rounded-full shadow-lg hover:bg-[#c94050] active:scale-95 transition">
+      <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-[#e65564] text-white font-bold text-sm sm:text-base w-fit self-center justify-center px-5 py-2.5 sm:px-7 sm:py-3 rounded-full shadow-lg hover:bg-[#c94050] active:scale-95 transition">
         Read Full Novel
       </Link>
     </div>

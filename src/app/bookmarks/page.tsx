@@ -25,6 +25,7 @@ const TYPE_ICON: Record<string, string> = {
 export default function BookmarksPage() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [activeType, setActiveType] = useState<"all" | "novel" | "pdf" | "episode">("all");
 
   useEffect(() => {
     try {
@@ -38,6 +39,11 @@ export default function BookmarksPage() {
     }
     setLoaded(true);
   }, []);
+
+  const filteredBookmarks =
+    activeType === "all"
+      ? bookmarks
+      : bookmarks.filter((b) => b.type === activeType);
 
   function remove(slug: string) {
     const next = bookmarks.filter((b) => b.slug !== slug);
@@ -91,9 +97,35 @@ export default function BookmarksPage() {
       ) : (
         <section aria-labelledby="bookmarks-list" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            {(["all", "novel", "pdf", "episode"] as const).map((t) => null)}
+            {([["all", `All (${bookmarks.length})`], ["novel", `Novels (${bookmarks.filter((b) => b.type === "novel").length})`], ["pdf", `PDFs (${bookmarks.filter((b) => b.type === "pdf").length})`], ["episode", `Episodes (${bookmarks.filter((b) => b.type === "episode").length})`]] as const).map(([type, label]) => (
+              <button
+                key={type}
+                onClick={() => setActiveType(type)}
+                className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition active:scale-95 ${
+                  activeType === type
+                    ? "bg-[#1E5D50] text-white shadow"
+                    : "border-2 border-[#1E5D50]/30 text-[#1E5D50] hover:border-[#1E5D50] hover:bg-[#1E5D50]/5"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          {bookmarks.map((b) => (
+
+          {filteredBookmarks.length === 0 ? (
+            <div className="text-center py-10 bg-[#FAF7F2] rounded-3xl border-2 border-[#DCCFC2]">
+              <p className="text-4xl mb-3">🔖</p>
+              <h2 className="text-lg font-extrabold text-[#1E5D50]">
+                No {activeType === "all" ? "" : TYPE_LABEL[activeType] + " "}bookmarks here
+              </h2>
+              <p className="mt-2 text-sm opacity-70 max-w-md mx-auto">
+                {activeType === "all"
+                  ? "Everything you save will appear here."
+                  : `You have no saved ${TYPE_LABEL[activeType]}s yet. Try a different filter.`}
+              </p>
+            </div>
+          ) : (
+            filteredBookmarks.map((b) => (
             <div
               key={b.slug}
               className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 rounded-2xl border-2 border-[#1E5D50]/20 bg-[#FFFDF9] p-4 sm:p-5 hover:border-[#1E5D50]/60 hover:shadow-xl transition duration-300 overflow-hidden"
@@ -126,7 +158,8 @@ export default function BookmarksPage() {
                 </button>
               </div>
             </div>
-          ))}
+            ))
+          )}
         </section>
       )}
     </main>

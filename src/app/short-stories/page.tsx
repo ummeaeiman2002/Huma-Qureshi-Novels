@@ -1,5 +1,5 @@
 import ShortStoriesClient from './ShortStoriesClient';
-import { getShortStories } from '@/lib/sanity/queries';
+import { getShortStories, getAllMetadata } from '@/lib/sanity/queries';
 import type { Metadata } from 'next';
 import { absoluteUrl, SITE_NAME } from '@/lib/seo';
 
@@ -13,10 +13,15 @@ export const revalidate = 300;
 
 export default async function Page() {
   const shortStories = await getShortStories();
+  const { writers, genres } = await getAllMetadata();
 
   return (
     <div>
-      <ShortStoriesClient initialStories={shortStories || []} />
+      <ShortStoriesClient
+        initialStories={shortStories || []}
+        writers={writers}
+        genres={genres}
+      />
     </div>
   );
 }

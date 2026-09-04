@@ -314,7 +314,7 @@ export default async function HomePage({
               <div className="pt-1">
                 <Link
                   href="/about"
-                  className="inline-flex bg-[#1E5D50] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-3 rounded-full hover:bg-[#2F7565] active:scale-95 transition text-sm shadow"
+                  className="inline-block bg-[#1E5D50] text-white font-bold px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl sm:rounded-full hover:bg-[#2F7565] active:scale-95 transition text-sm shadow text-center leading-snug"
                 >
                   Read More About the Author
                 </Link>

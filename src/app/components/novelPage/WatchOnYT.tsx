@@ -7,7 +7,7 @@ export default function WatchOnYT({ YTurl }: { YTurl: string }) {
       href={YTurl}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex justify-center items-center gap-2 bg-[#e65564] text-white font-bold text-sm sm:text-base w-full sm:w-fit px-5 py-2.5 sm:px-6 sm:py-3 rounded-full shadow-lg hover:bg-[#c94050] hover:shadow-[0_0_16px_rgba(230,85,100,0.4)] active:scale-95 transition-all duration-300"
+      className="flex justify-center items-center gap-2 bg-[#e65564] text-white font-bold text-sm sm:text-base w-fit px-5 py-2.5 sm:px-6 sm:py-3 rounded-full shadow-lg hover:bg-[#c94050] hover:shadow-[0_0_16px_rgba(230,85,100,0.4)] active:scale-95 transition-all duration-300"
     >
       <p>Watch on YouTube</p>
       <Image

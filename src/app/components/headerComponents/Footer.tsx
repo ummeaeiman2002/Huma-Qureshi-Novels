@@ -131,8 +131,8 @@ export default function Footer() {
           © {new Date().getFullYear()} Huma Qureshi Novels. All rights reserved.
         </p>
         <div className="w-full max-w-[70vw] h-px bg-secondary/20"></div>
-        <p className="text-xs text-[#111111]/70 pt-1 text-center">
-          Built with <span className="text-[#e65564]">♥</span> by{" "}
+        <p className="text-[10px] sm:text-xs text-[#111111]/70 pt-1 text-center whitespace-nowrap">
+          Developed by{" "}
           <Link
             href="https://agentack.co"
             target="_blank"
@@ -140,8 +140,8 @@ export default function Footer() {
             className="font-bold text-[#C9A96E] hover:text-secondary hover:underline transition"
           >
             Agentack
-          </Link>{" "}
-          · Want a site like this?{" "}
+          </Link>
+          {" "}·{" "}
           <Link
             href="https://agentack.co"
             target="_blank"

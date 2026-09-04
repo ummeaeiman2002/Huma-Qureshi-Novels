@@ -57,10 +57,9 @@ export default function ReaderReviews({
 
   return (
     <section aria-labelledby="reviews-heading" className="py-4">
-      <div className="max-w-5xl mx-auto px-5 lg:px-10 flex flex-col gap-6">
-        <Heading name={heading} />
+      <Heading name={heading} />
 
-        <div className="rounded-3xl border-2 border-[#C9A96E]/40 bg-gradient-to-br from-[#FFFDF9] to-[#FFF8EC] p-6 lg:p-10 shadow-xl">
+      <div className="rounded-3xl border-2 border-[#C9A96E]/40 bg-gradient-to-br from-[#FFFDF9] to-[#FFF8EC] p-5 sm:p-6 lg:p-10 shadow-xl overflow-hidden">
           {/* Header with average rating */}
           <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 mb-8">
             <div className="flex flex-col gap-1 text-center sm:text-start">
@@ -96,9 +95,9 @@ export default function ReaderReviews({
               Write Your Review
             </span>
             <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex flex-col gap-1.5 sm:min-w-[180px] sm:max-w-[200px] shrink-0">
+              <div className="flex flex-col gap-1.5 shrink-0">
                 <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wide">Your Rating <span className="text-[#e65564]">*</span></span>
-                <div className="flex items-center gap-1" role="radiogroup" aria-label="Rating">
+                <div className="flex items-center gap-0.5 sm:gap-1" role="radiogroup" aria-label="Rating">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <button
                       key={s}
@@ -111,7 +110,7 @@ export default function ReaderReviews({
                       onMouseLeave={() => setHover(0)}
                       className="transition active:scale-90"
                     >
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill={(hover || rating) >= s ? "#C9A96E" : "none"} stroke="#C9A96E" strokeWidth="1.5" aria-hidden="true">
+                      <svg className="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 24 24" fill={(hover || rating) >= s ? "#C9A96E" : "none"} stroke="#C9A96E" strokeWidth="1.5" aria-hidden="true">
                         <path d="M12 2l2.9 6.26 6.6.6-5 4.4 1.5 6.5L12 16.9 5.9 19.8l1.5-6.5-5-4.4 6.6-.6L12 2z" />
                       </svg>
                     </button>
@@ -187,7 +186,6 @@ export default function ReaderReviews({
             </div>
           )}
         </div>
-      </div>
     </section>
   );
 }

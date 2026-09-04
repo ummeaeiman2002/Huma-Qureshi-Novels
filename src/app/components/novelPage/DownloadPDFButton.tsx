@@ -20,7 +20,7 @@ export default function DownloadPDFButton({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex justify-center items-center gap-2 bg-[#1E5D50] text-white font-bold text-sm sm:text-base w-full sm:w-fit px-5 py-2.5 sm:px-6 sm:py-3 rounded-full shadow-lg hover:bg-[#16483E] hover:shadow-[0_0_16px_rgba(30,93,80,0.4)] active:scale-95 transition-all duration-300"
+      className="flex justify-center items-center gap-2 bg-[#1E5D50] text-white font-bold text-sm sm:text-base w-fit px-5 py-2.5 sm:px-6 sm:py-3 rounded-full shadow-lg hover:bg-[#16483E] hover:shadow-[0_0_16px_rgba(30,93,80,0.4)] active:scale-95 transition-all duration-300"
     >
       <p>Download PDF</p>
       <Image

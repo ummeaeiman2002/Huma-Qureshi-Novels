@@ -20,6 +20,7 @@ import ViewsBadge from "@/app/components/ViewsBadge";
 import ReaderReviews from "@/app/components/ReaderReviews";
 import ReaderPoll from "@/app/components/homePageComponents/ReaderPoll";
 import BookmarkButton from "@/app/components/BookmarkButton";
+import Reactions from "@/app/components/Reactions";
 import { client } from "@/sanity/lib/client";
 import { formatSafeDate, isValidUrl, cleanDescriptionLong } from "@/lib/seo";
 
@@ -177,6 +178,8 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
         {isValidUrl(novel.pdfurl) && <DownloadPDFButton pdf={novel.pdfurl} slug={slug} type="novel" />}
         {isValidUrl(novel.youtubeurl) && <WatchOnYT YTurl={novel.youtubeurl} />}
       </div>
+      <Reactions slug={slug} />
+
       <Tags tags={novel.tags || []} />
 
       {related && related.length > 0 && (

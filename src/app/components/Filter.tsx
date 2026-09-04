@@ -99,7 +99,7 @@ export default function Filter({
       <div className="flex justify-center pt-1">
         <button
           onClick={onclick}
-          className="bg-[#1E5D50] text-white font-bold px-6 py-2 sm:px-8 sm:py-2.5 rounded-full text-sm hover:bg-[#16483E] hover:shadow-[0_0_18px_rgba(30,93,80,0.35)] active:scale-95 transition-all duration-300 w-full sm:w-auto"
+          className="bg-[#1E5D50] text-white font-bold px-6 py-2 sm:px-8 sm:py-2.5 rounded-full text-sm hover:bg-[#16483E] hover:shadow-[0_0_18px_rgba(30,93,80,0.35)] active:scale-95 transition-all duration-300 w-fit"
         >
           Apply Filter
         </button>
