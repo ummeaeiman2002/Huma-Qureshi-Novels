@@ -11,9 +11,9 @@ async function getUrls() {
     episodes: { novelSlug: string; episodeSlug: string }[];
   }>(
     `{
-      "novels": *[_type == "novelparent" && defined(slug.current)] { slug },
-      "pdfs": *[_type == "pdf" && defined(slug.current)] { slug },
-      "episodes": *[_type == "novel" && defined(episodeslug.current) && novelparent->slug.current != null] { "novelSlug": novelparent->slug.current, "episodeSlug": episodeslug.current }
+      "novels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi"] { slug },
+      "pdfs": *[_type == "pdf" && defined(slug.current) && writer->writername == "Huma Qureshi"] { slug },
+      "episodes": *[_type == "novel" && defined(episodeslug.current) && novelparent->slug.current != null && novelparent->writer->writername == "Huma Qureshi"] { "novelSlug": novelparent->slug.current, "episodeSlug": episodeslug.current }
     }`,
     {},
     { next: { revalidate: 3600 } },

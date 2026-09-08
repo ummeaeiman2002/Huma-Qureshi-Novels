@@ -8,6 +8,7 @@ import { pdf } from "./pdf";
 import { systemConfig } from "./systemConfig";
 import { testimonial } from "./testimonial";
 import { announcement } from "./announcement";
+import { downloadSection } from "./downloadSection";
 
 // Premium/Auth schemas
 import { user } from "./user";
@@ -27,6 +28,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     systemConfig,
     testimonial,
     announcement,
+    downloadSection,
     // Premium/Auth schemas
     user,
     premiumNovel,

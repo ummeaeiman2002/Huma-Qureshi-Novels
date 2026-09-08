@@ -16,11 +16,11 @@ export default function Latest() {
       // Fetch the latest 2 novels and 2 PDFs separately
       const query = `
       {
-        "episodic": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()]
+        "episodic": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"]
           | order(_createdAt desc) [0...5] {
             title, banner, novelreleasedate, slug, _id, genre->{genrename,_id}, writer->{writername,_id}
           },
-        "pdf": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()]
+        "pdf": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"]
           | order(_createdAt desc) [0...5] {
             title, banner, slug, pdfreleasedate, _id, genre->{genrename,_id}, writer->{writername,_id}
           }

@@ -1,11 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../Logo";
 import Link from "next/link";
 import Search from "./Search";
 
 export default function DesktopHeader() {
   const [menu, setMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <>
@@ -16,17 +24,19 @@ export default function DesktopHeader() {
         />
       )}
 
-      <header className="hidden lg:flex flex-col justify-center items-center gap-2 sticky top-0 z-50 bg-primary/85 backdrop-blur-md border-b border-secondary/15 shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 lg:px-20 pt-3 pb-4">
+      <header className={`hidden lg:flex flex-col justify-center items-center sticky top-0 z-50 bg-primary/85 backdrop-blur-md border-b border-secondary/15 shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 lg:px-20 transition-all duration-300 ${scrolled ? "gap-1 pt-1 pb-1" : "gap-2 pt-3 pb-4"}`}>
         {/* Logo and searchbar */}
         <div className="flex justify-between items-center w-full">
-          <Logo />
+          <Logo scrolled={scrolled} />
 
           <div className="flex items-center gap-4 lg:gap-6">
             <Search />
           </div>
         </div>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#1E5D50]/30 to-transparent" />
-        <nav className="flex justify-center items-center w-full gap-1.5 py-3 text-tertiary flex-wrap">
+        {!scrolled && (
+          <>
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-[#1E5D50]/30 to-transparent" />
+            <nav className="flex justify-center items-center w-full gap-1.5 py-3 text-tertiary flex-wrap overflow-hidden">
           <Link
             href={`/`}
             className="px-5 py-1.5 rounded-full border border-transparent text-[#111111] font-bold hover:text-secondary hover:bg-secondary/10 hover:border-secondary/40 transition"
@@ -70,7 +80,9 @@ export default function DesktopHeader() {
           >
             <button onClick={() => setMenu(false)}>Bookmarks</button>
           </Link>
-        </nav>
+          </nav>
+          </>
+        )}
       </header>
     </>
   );

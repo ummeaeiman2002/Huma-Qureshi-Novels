@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import Heading from "@/app/components/Heading";
+import { PortableText } from "next-sanity";
+import { client } from "@/sanity/lib/client";
 import ReaderPoll from "@/app/components/homePageComponents/ReaderPoll";
 import ReaderReviews from "@/app/components/ReaderReviews";
 
@@ -44,6 +46,15 @@ export default async function DownloadPage({
   const { pdf, type } = await searchParams;
   const pdfUrl = pdf || "";
   const validPdf = pdfUrl.indexOf("http") === 0;
+
+  const downloadSection =
+    await client.fetch<{
+      title: string;
+      body: any;
+      isUrdu?: boolean;
+    } | null>(
+      `*[_type == "downloadSection" && enabled == true] | order(_createdAt desc)[0]`
+    );
 
   return (
     <main className="flex flex-col gap-6 lg:gap-10 max-w-5xl mx-auto px-5 lg:px-10 py-5">
@@ -128,6 +139,63 @@ export default async function DownloadPage({
         </div>
       </section>
 
+      {/* WHY DOWNLOAD — helpful reader value */}
+      <section aria-labelledby="why-pdf-heading" className="flex flex-col gap-6">
+        <Heading name="Why Read Urdu Novels as PDF" />
+        <div className="rounded-3xl border-2 border-[#C9A96E]/30 bg-[#FFFDF9] p-6 lg:p-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              {
+                title: "Read Offline, Anywhere",
+                desc: "Once downloaded, your Urdu novel works without internet. Enjoy it during travel, power cuts, or bedtime reading on any device.",
+              },
+              {
+                title: "A Complete Book in One File",
+                desc: "Unlike episodic reading that waits for the next chapter, a PDF gives you the entire story at once — start and finish on your own schedule.",
+              },
+              {
+                title: "Keep Your Collection Forever",
+                desc: "Downloaded PDFs stay in your device's library. Re-read your favourite Huma Qureshi novels again and again without needing the internet.",
+              },
+              {
+                title: "Completely Free, No Sign-up",
+                desc: "Every PDF here is free. No account, no payment, no subscription — just tap download and the book is yours.",
+              },
+              {
+                title: "Clear Urdu Text on Every Screen",
+                desc: "The script, diacritics and reading flow are preserved in the PDF so the Urdu text stays clean and readable on phones, tablets and computers.",
+              },
+              {
+                title: "Share with Family and Friends",
+                desc: "A saved PDF can be easily shared with friends and family who also love reading Urdu novels — spread the joy of reading.",
+              },
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col gap-2 rounded-2xl border-2 border-[#1E5D50]/30 bg-[#FFFDF9] p-5 hover:border-[#1E5D50] hover:shadow-xl hover:-translate-y-0.5 transition duration-300">
+                <h3 className="text-lg font-extrabold text-[#1E5D50]">{item.title}</h3>
+                <p className="leading-7 text-tertiary font-medium">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* READ ON ANY DEVICE */}
+      <section aria-labelledby="devices-heading" className="flex flex-col gap-6">
+        <Heading name="Read on Any Device" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { name: "Android Phones", note: "PDFs save to the Downloads folder. Open instantly with the built-in PDF reader or Google PDF Viewer." },
+            { name: "iPhone & iPad", note: "Use the download icon, choose Save to Files, then open in Books or any PDF app. No extra account needed." },
+            { name: "Laptop & Desktop", note: "Works on Windows and Mac. Open with any browser, Adobe Reader, or your system's built-in viewer." },
+          ].map((d, i) => (
+            <div key={i} className="rounded-3xl border-2 border-[#1E5D50]/30 bg-[#FFFDF9] p-6 flex flex-col gap-3">
+              <h3 className="text-lg font-extrabold text-[#1E5D50]">{d.name}</h3>
+              <p className="leading-7 text-tertiary font-medium">{d.note}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* FAQ */}
       <section aria-labelledby="dl-faq-heading" className="py-2">
         <div className="flex flex-col gap-6">
@@ -146,6 +214,26 @@ export default async function DownloadPage({
                 q: "Can I read the PDF without internet?",
                 a: "Yes. Once the PDF is saved on your device, you can open and read it anytime, even when you are completely offline.",
               },
+              {
+                q: "What Urdu novels can I download as PDF?",
+                a: "The complete library of Huma Qureshi novels is available as free PDFs — romantic stories, family dramas and female-centric Urdu novels, all beautifully formatted.",
+              },
+              {
+                q: "Do I need to create an account to download?",
+                a: "No. There is no sign-up and no email required. Simply tap the download button and the PDF is saved directly to your device.",
+              },
+              {
+                q: "Why does the PDF open in my browser instead of downloading?",
+                a: "Some browsers preview PDFs first. Just tap the download icon in the browser's PDF viewer (usually a small arrow at the top or bottom) to save it permanently.",
+              },
+              {
+                q: "Can I share the downloaded PDF with others?",
+                a: "Yes — many readers share Urdu novels with family and friends. We only ask that you keep sharing to personal use and do not sell or republish the book.",
+              },
+              {
+                q: "Will new novels be added to the PDF library?",
+                a: "Yes, new Huma Qureshi novels are added regularly. Check back often or watch the site for new upload announcements.",
+              },
             ].map((f, i) => (
               <div key={i} className="flex flex-col gap-1">
                 <h3 className="text-lg font-extrabold text-[#1E5D50]">{f.q}</h3>
@@ -155,6 +243,90 @@ export default async function DownloadPage({
           </div>
         </div>
       </section>
+
+      {/* ABOUT — SEO content */}
+      <section aria-labelledby="about-pdf-heading" className="py-2">
+        <div className="flex flex-col gap-6">
+          <Heading name="About Huma Qureshi Urdu Novel PDFs" />
+          <div className="bg-[#FFFDF9] rounded-3xl border-2 border-[#1E5D50]/30 p-6 lg:p-10 flex flex-col gap-5">
+            <div className="leading-8 text-tertiary font-medium flex flex-col gap-4">
+              <p>
+                Urdu novels have a timeless charm, and reading them as PDF books makes
+                them even more convenient. Huma Qureshi is a beloved Urdu novelist
+                whose stories explore love, family, emotions and the everyday lives of
+                women in South Asia. Her novels are published chapter by chapter on
+                this website, and the complete books are offered as free PDF downloads.
+              </p>
+              <p>
+                A PDF copy of an Urdu novel lets readers keep the entire story in one
+                place. There is no waiting for the next episode, no need for an
+                internet connection, and no worry about losing your place. It is the
+                simplest way to build a personal library of quality Urdu literature.
+              </p>
+              <p>
+                Whether you are new to Urdu novels or a lifelong reader, the download
+                process above takes under a minute. Pick a book, tap download, and
+                enjoy an immersive reading experience on your phone, tablet or
+                computer — completely free, with no sign-up required.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SANITY-MANAGED SECTION — Urdu/English note from the CMS */}
+      {downloadSection?.title && downloadSection?.body && (
+        <section
+          aria-labelledby="editable-section-heading"
+          className="flex flex-col gap-6"
+        >
+          <Heading name={downloadSection.title} />
+          <div className="bg-[#FFFDF9] rounded-3xl border-2 border-[#C9A96E]/30 p-6 lg:p-10 leading-8 text-tertiary">
+            <div
+              dir={downloadSection.isUrdu ? "rtl" : "ltr"}
+              className={`${
+                downloadSection.isUrdu
+                  ? "font-urdu text-start"
+                  : "font-medium"
+              }`}
+            >
+              <PortableText
+                value={downloadSection.body}
+                components={{
+                  block: {
+                    h2: ({ children }: any) => (
+                      <h2 className="text-xl font-semibold mt-6 mb-3 text-[#1E5D50]">
+                        {children}
+                      </h2>
+                    ),
+                    h3: ({ children }: any) => (
+                      <h3 className="text-lg font-semibold mt-4 mb-2 text-[#1E5D50]">
+                        {children}
+                      </h3>
+                    ),
+                    normal: ({ children }: any) => (
+                      <p className="mb-4 leading-8">{children}</p>
+                    ),
+                    blockquote: ({ children }: any) => (
+                      <blockquote className="border-l-4 border-[#C9A96E] pl-4 my-4 italic opacity-80">
+                        {children}
+                      </blockquote>
+                    ),
+                  },
+                  list: {
+                    bullet: ({ children }: any) => (
+                      <ul className="list-disc pl-6 mb-4">{children}</ul>
+                    ),
+                    number: ({ children }: any) => (
+                      <ol className="list-decimal pl-6 mb-4">{children}</ol>
+                    ),
+                  },
+                }}
+              />
+            </div>
+          </div>
+        </section>
+      )}
 
       <ReaderReviews storageKey={`review_download_${slug}`} heading="Reviews" />
 

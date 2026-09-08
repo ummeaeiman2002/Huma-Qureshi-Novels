@@ -2,6 +2,10 @@
 import { client, optimizedClient } from "@/sanity/lib/client";
 import { NovelCache } from "./cache";
 
+// This website only publishes content by Huma Qureshi.
+export const HUMA_WRITER_NAME = "Huma Qureshi";
+export const HUMA_WRITER_FILTER = `writer->writername == "${HUMA_WRITER_NAME}"`;
+
 function textSummary(value: unknown): string {
   if (!value) return "";
   let text = "";
@@ -30,7 +34,7 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
   const endIndex = startIndex + limit;
 
   // Fetch novels with pagination
-  const novelsQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()] | order(_createdAt desc) [${startIndex}...${endIndex}] {
+  const novelsQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
     title,
     banner,
     _id,
@@ -100,7 +104,7 @@ export async function getAllMetadata() {
 
   // Fetch writers and genres separately for better caching
   const [writers, genres] = await Promise.all([
-    optimizedClient.fetchWithTags(`*[_type == "writer"] { writername }.writername`, ['writers']),
+    optimizedClient.fetchWithTags(`*[_type == "writer" && writername == "${HUMA_WRITER_NAME}"] { writername }.writername`, ['writers']),
     optimizedClient.fetchWithTags(`*[_type == "genre"] { genrename }.genrename`, ['genres']),
   ]);
 
@@ -120,7 +124,7 @@ export async function getAllMetadata() {
 }
 
 export async function getTotalNovelCount() {
-  const countQuery = `count(*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()])`;
+  const countQuery = `count(*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && ${HUMA_WRITER_FILTER}])`;
   const count = await client.fetch(countQuery);
   return count;
 }
@@ -131,7 +135,7 @@ export async function getShortStories() {
     return cached;
   }
 
-  const shortQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && coalesce(isShortStory, false) == true] | order(_createdAt desc) {
+  const shortQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && coalesce(isShortStory, false) == true && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) {
     title,
     banner,
     _id,
@@ -192,7 +196,7 @@ export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
   const endIndex = startIndex + limit;
 
   // Fetch PDFs with pagination
-  const pdfsQuery = `*[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()] | order(_createdAt desc) [${startIndex}...${endIndex}] {
+  const pdfsQuery = `*[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
     title,
     banner,
     _id,
@@ -223,7 +227,7 @@ export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
 }
 
 export async function getTotalPDFCount() {
-  const countQuery = `count(*[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()])`;
+  const countQuery = `count(*[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && ${HUMA_WRITER_FILTER}])`;
   const count = await client.fetch(countQuery);
   return count;
 }

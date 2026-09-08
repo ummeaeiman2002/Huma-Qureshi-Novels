@@ -15,10 +15,10 @@ type SearchParams = { writer?: string; genre?: string; sort?: string; yt?: strin
 
 async function getHomeContent() {
   const query = `{
-    "latestNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()] | order(novelreleasedate desc)[0...8] { _id, title, banner, slug, novelreleasedate, noveldescription, youtubeurl, genre->{genrename}, writer->{writername}, "views": *[_type == "novel" && references(^._id)].views, "monthlyViews": *[_type == "novel" && references(^._id)].monthlyViews },
-    "latestPdfs": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()] | order(pdfreleasedate desc)[0...4] { _id, title, banner, slug, pdfreleasedate, pdfdescription, youtubeurl, views, monthlyViews, genre->{genrename}, writer->{writername} },
-    "popularNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()] { _id, title, banner, slug, novelreleasedate, noveldescription, youtubeurl, genre->{genrename}, writer->{writername}, "views": *[_type == "novel" && references(^._id)].views, "monthlyViews": *[_type == "novel" && references(^._id)].monthlyViews },
-    "popularPdfs": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()] | order(coalesce(views,0) desc)[0...4] { _id, title, banner, slug, pdfreleasedate, pdfdescription, youtubeurl, views, monthlyViews, genre->{genrename}, writer->{writername} }
+    "latestNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(novelreleasedate desc)[0...8] { _id, title, banner, slug, novelreleasedate, noveldescription, youtubeurl, genre->{genrename}, writer->{writername}, "views": *[_type == "novel" && references(^._id)].views, "monthlyViews": *[_type == "novel" && references(^._id)].monthlyViews },
+    "latestPdfs": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(pdfreleasedate desc)[0...4] { _id, title, banner, slug, pdfreleasedate, pdfdescription, youtubeurl, views, monthlyViews, genre->{genrename}, writer->{writername} },
+    "popularNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] { _id, title, banner, slug, novelreleasedate, noveldescription, youtubeurl, genre->{genrename}, writer->{writername}, "views": *[_type == "novel" && references(^._id)].views, "monthlyViews": *[_type == "novel" && references(^._id)].monthlyViews },
+    "popularPdfs": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(coalesce(views,0) desc)[0...4] { _id, title, banner, slug, pdfreleasedate, pdfdescription, youtubeurl, views, monthlyViews, genre->{genrename}, writer->{writername} }
   }`;
   const data = await client.fetch<any>(query, {}, { next: { revalidate: 300 } });
   const sum = (v: any) =>
@@ -145,7 +145,7 @@ export default async function HomePage({
   const hasFilters =
     writer !== "" || genres.length > 0 || sort !== "" || youtubeOnly;
   const writers = await client.fetch<string[]>(
-    `*[_type == "writer"] { writername }.writername`
+    `*[_type == "writer" && writername == "Huma Qureshi"] { writername }.writername`
   );
   const allGenres = await client.fetch<string[]>(
     `*[_type == "genre"] { genrename }.genrename`

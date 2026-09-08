@@ -6,6 +6,14 @@ import Search from "./Search";
 
 export default function MobileHeader() {
   const [menu, setMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const openMenu = () => {
     setMenu(!menu);
@@ -48,10 +56,10 @@ export default function MobileHeader() {
         />
       )}
 
-      <header className="lg:hidden flex flex-col gap-3 sticky top-0 z-50 bg-primary/85 backdrop-blur-md border-b border-secondary/15 shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 pt-3 pb-4 overflow-hidden">
+      <header className={`lg:hidden flex flex-col sticky top-0 z-50 bg-primary/85 backdrop-blur-md border-b border-secondary/15 shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 overflow-hidden transition-all duration-300 ${scrolled ? "gap-1 pt-1 pb-1" : "gap-3 pt-3 pb-4"}`}>
         {/* logo and hamburger nav menu */}
         <div className="flex justify-between items-center">
-          <Logo />
+          <Logo scrolled={scrolled} />
 
           <div className="flex gap-4 items-center">
             {/* hamburger menu */}
@@ -65,10 +73,14 @@ export default function MobileHeader() {
           </div>
         </div>
 
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#1E5D50]/30 to-transparent" />
+        {!scrolled && (
+          <>
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-[#1E5D50]/30 to-transparent" />
 
-        {/* search bar */}
-        <Search />
+            {/* search bar */}
+            <Search />
+          </>
+        )}
       </header>
 
         {/* the open and close section - sidebar */}

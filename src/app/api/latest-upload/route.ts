@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const query = `
       {
-        "latestNovel": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()] | order(novelreleasedate desc) [0] {
+        "latestNovel": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(novelreleasedate desc) [0] {
           _id,
           title,
           "slug": slug.current,
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
           novelreleasedate,
           banner
         },
-        "latestEpisode": *[_type == "novel" && defined(novelreleasedate) && novelreleasedate <= now()] | order(novelreleasedate desc) [0] {
+        "latestEpisode": *[_type == "novel" && defined(novelreleasedate) && novelreleasedate <= now() && novelparent->writer->writername == "Huma Qureshi"] | order(novelreleasedate desc) [0] {
           _id,
           name,
           "episodeslug": episodeslug.current,
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
           "parentTitle": novelparent->title,
           novelreleasedate
         },
-        "latestPDF": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()] | order(pdfreleasedate desc) [0] {
+        "latestPDF": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(pdfreleasedate desc) [0] {
           _id,
           title,
           "slug": slug.current,

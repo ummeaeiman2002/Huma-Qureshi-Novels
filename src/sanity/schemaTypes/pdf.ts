@@ -79,8 +79,13 @@ export const pdf = defineType({
       name: "writer",
       type: "reference",
       title: "Writer",
+      readOnly: true,
+      initialValue: { _ref: "e261df38-9273-4bdf-bed2-6db903573be8" },
       to: {
         type: "writer",
+      },
+      options: {
+        filter: 'writername == "Huma Qureshi"',
       },
     }),
     defineField({

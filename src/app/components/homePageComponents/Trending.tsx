@@ -44,7 +44,7 @@ export default function Trending() {
 
       // -------------------- 1️⃣ NOVELS QUERY --------------------
       const novelsQuery = `
-        *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()] {
+        *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] {
           _id,
           title,
           banner,
@@ -58,7 +58,7 @@ export default function Trending() {
 
       // -------------------- 2️⃣ PDFs QUERY --------------------
       const pdfsQuery = `
-        *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()]
+        *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"]
         | order(coalesce(monthlyViews,0) desc)[0...2] {
           _id,
           title,

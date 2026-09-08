@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
       {
         "novels": *[
           _type == "novelparent" &&
+          writer->writername == "Huma Qureshi" &&
           (
             title match "${sanitizedQuery}*" ||
             title match "*${sanitizedQuery}*" ||
@@ -54,6 +55,7 @@ export async function GET(request: NextRequest) {
         },
         "pdfs": *[
           _type == "pdf" &&
+          writer->writername == "Huma Qureshi" &&
           (
             title match "${sanitizedQuery}*" ||
             title match "*${sanitizedQuery}*" ||

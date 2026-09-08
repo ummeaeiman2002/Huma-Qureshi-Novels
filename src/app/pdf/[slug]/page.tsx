@@ -23,7 +23,7 @@ export const revalidate = 300;
 type Props = { params: Promise<{ slug: string }> };
 
 async function getPdf(slug: string) {
-  const query = `*[_type == "pdf" && slug.current == $slug][0]{title, slug, pdfdescription, pdfreleasedate, descriptionlanguage, authornote, authornotelang, views, writer->{writername,_id}, genre->{genrename,_id}, banner, _id, tags, pdfurl, youtubeurl, comment[]->{name,_id,comment,_createdAt}}`;
+  const query = `*[_type == "pdf" && slug.current == $slug && writer->writername == "Huma Qureshi"][0]{title, slug, pdfdescription, pdfreleasedate, descriptionlanguage, authornote, authornotelang, views, writer->{writername,_id}, genre->{genrename,_id}, banner, _id, tags, pdfurl, youtubeurl, comment[]->{name,_id,comment,_createdAt}}`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
 }
 
@@ -31,17 +31,17 @@ async function getRelatedPdfData(pdf: any) {
   const genreName = pdf?.genre?.genrename || "";
   const writerRef = pdf?.writer?._id || "";
   const relatedQuery = `{
-    "relatedPDFs": *[_type == "pdf" && defined(slug.current) && _id != $currentId && genre->genrename == $genre] | order(coalesce(views,0) desc)[0...6] { title, banner, slug, pdfreleasedate, views, genre->{genrename}, writer->{writername} },
-    "recommendedNovels": *[_type == "novelparent" && defined(slug.current) && genre->genrename == $genre] | order(_createdAt desc)[0...6] {
+    "relatedPDFs": *[_type == "pdf" && defined(slug.current) && _id != $currentId && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(coalesce(views,0) desc)[0...6] { title, banner, slug, pdfreleasedate, views, genre->{genrename}, writer->{writername} },
+    "recommendedNovels": *[_type == "novelparent" && defined(slug.current) && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(_createdAt desc)[0...6] {
       _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
       "views": *[_type == "novel" && references(^._id)].views
     },
-    "popularNovels": *[_type == "novelparent" && defined(slug.current)] | order(_createdAt desc)[0...6] {
+    "popularNovels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi"] | order(_createdAt desc)[0...6] {
       _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
       "views": *[_type == "novel" && references(^._id)].views
     },
-    "writers": *[_type == "writer"]{writername},
-    "youtubeNovels": *[_type == "novelparent" && defined(slug.current) && defined(youtubeurl) && youtubeurl != ""][0...6] { _id, title, youtubeurl, writer->{writername} }
+    "writers": *[_type == "writer" && writername == "Huma Qureshi"]{writername},
+    "youtubeNovels": *[_type == "novelparent" && defined(slug.current) && defined(youtubeurl) && youtubeurl != "" && writer->writername == "Huma Qureshi"][0...6] { _id, title, youtubeurl, writer->{writername} }
   }`;
   const data = await client.fetch<any>(
     relatedQuery,

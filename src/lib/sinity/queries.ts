@@ -5,7 +5,7 @@ export async function getAllNovelsWithMetadata() {
   // Single comprehensive query to fetch all data at once
   const query = `
     {
-      "novels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()] | order(_createdAt desc) {
+      "novels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(_createdAt desc) {
         title,
         banner,
         _id,
@@ -25,7 +25,7 @@ export async function getAllNovelsWithMetadata() {
           | reduce(total, num) = total + (num ?: 0)
         ), 0)
       },
-      "writers": *[_type == "writer"] { writername }.writername,
+      "writers": *[_type == "writer" && writername == "Huma Qureshi"] { writername }.writername,
       "genres": *[_type == "genre"] { genrename }.genrename
     }
   `;

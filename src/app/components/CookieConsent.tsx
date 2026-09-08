@@ -23,7 +23,7 @@ export default function CookieConsent() {
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-4 pb-4">
       <div className="w-full max-w-3xl bg-[#1E5D50] text-white rounded-2xl shadow-2xl border border-[#2F7565] p-5 flex flex-col sm:flex-row items-center gap-4">
         <p className="text-sm leading-6 flex-1">
-          We use cookies and ads to improve your experience. By continuing to use this site, you agree to our use of cookies and personalized advertising. Read our{" "}
+          We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies. Read our{" "}
           <a href="/privacypolicy" className="font-bold underline underline-offset-2 hover:text-[#C9A96E] transition">
             Privacy Policy
           </a>.

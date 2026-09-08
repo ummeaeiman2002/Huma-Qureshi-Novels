@@ -9,7 +9,7 @@ export const revalidate = 300;
 type Props = { params: Promise<{ slug: string }> };
 
 async function getNovel(slug: string) {
-  const query = `*[_type == "novelparent" && slug.current == $slug][0]{_id,title,slug,noveldescription,novelreleasedate,descriptionlanguage,writer->{writername,_id},genre->{genrename,_id},authornote,authornotelang,banner,tags,pdfurl,youtubeurl,comment[]->{name,_id,comment,_createdAt}}`;
+  const query = `*[_type == "novelparent" && slug.current == $slug && writer->writername == "Huma Qureshi"][0]{_id,title,slug,noveldescription,novelreleasedate,descriptionlanguage,writer->{writername,_id},genre->{genrename,_id},authornote,authornotelang,banner,tags,pdfurl,youtubeurl,comment[]->{name,_id,comment,_createdAt}}`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
 }
 
@@ -26,7 +26,7 @@ async function getRelatedNovels(novel: any, id: string) {
   const currentGenre = novel.genre?._id || "";
   const currentWriter = novel.writer?._id || "";
   return client.fetch<any[]>(
-    `*[_type == "novelparent" && _id != $id && defined(novelreleasedate) && novelreleasedate <= now() && (genre->_id == $genre || writer->_id == $writer)][0...4] { _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername} }`,
+    `*[_type == "novelparent" && _id != $id && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && (genre->_id == $genre || writer->_id == $writer)][0...4] { _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername} }`,
     { id, genre: currentGenre, writer: currentWriter },
     { next: { revalidate: 300 } }
   );

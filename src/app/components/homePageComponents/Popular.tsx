@@ -46,7 +46,7 @@ export default function Popular() {
          1️⃣ NOVELS QUERY (NO ORDER HERE)
          =============================== */
       const novelsQuery = `
-        *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now()] {
+        *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] {
           _id,
           title,
           banner,
@@ -62,7 +62,7 @@ export default function Popular() {
          2️⃣ PDF QUERY (ORDER OK)
          =============================== */
       const pdfsQuery = `
-        *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now()]
+        *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"]
         | order(views desc)[0...5] {
           title,
           banner,
