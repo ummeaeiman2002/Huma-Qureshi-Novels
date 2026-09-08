@@ -59,7 +59,7 @@ export default function HomeFilter({
       <Filter
         dropdowns={[
           {
-            label: "Writers",
+            label: writers.length > 1 ? "Writers" : "Writer",
             options: writers,
             value: selectedWriter,
             onChange: (v: any) => setSelectedWriter(v),

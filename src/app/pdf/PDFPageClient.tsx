@@ -210,7 +210,7 @@ export default function PDFPageClient({
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{writers.length.toLocaleString()}</span>
-              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">Writers</span>
+              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">{writers.length === 1 ? "Writer" : "Writers"}</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{genres.length.toLocaleString()}</span>
@@ -234,7 +234,7 @@ export default function PDFPageClient({
           <Filter
             dropdowns={[
               {
-                label: "Writers",
+                label: writers.length > 1 ? "Writers" : "Writer",
                 options: writers,
                 value: filters.selectedWriter,
                 onChange: (value: any) =>

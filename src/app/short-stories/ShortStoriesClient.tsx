@@ -122,7 +122,7 @@ export default function ShortStoriesClient({
                 {writers.length.toLocaleString()}
               </span>
               <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">
-                Writers
+                {writers.length === 1 ? "Writer" : "Writers"}
               </span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
@@ -155,7 +155,7 @@ export default function ShortStoriesClient({
           <Filter
             dropdowns={[
               {
-                label: "Writers",
+                label: writers.length > 1 ? "Writers" : "Writer",
                 options: writers,
                 value: filters.selectedWriter,
                 onChange: (value: any) =>

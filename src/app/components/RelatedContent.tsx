@@ -80,7 +80,7 @@ export default function RelatedContent({
         </section>
       )}
 
-      {otherWriters && otherWriters.length > 0 && (
+      {otherWriters && otherWriters.length > 1 && (
         <section aria-labelledby="writers-heading" className="flex flex-col gap-6">
           <Heading name="Explore More Writers" />
           <div className="flex flex-wrap gap-3 justify-center lg:justify-start lg:px-4">

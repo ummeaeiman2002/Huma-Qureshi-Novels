@@ -5,7 +5,7 @@ import { absoluteUrl, SITE_NAME } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: `All Episodic Novels`,
-  description: `Browse and read all episodic Urdu novels by Huma Qureshi and other writers on ${SITE_NAME}.`,
+  description: `Browse and read all episodic Urdu novels by Huma Qureshi on ${SITE_NAME}.`,
   alternates: { canonical: absoluteUrl('/novel') },
 };
 

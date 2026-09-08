@@ -166,7 +166,7 @@ export default async function HomePage({
     popularPdfs.reduce((a: number, p: any) => a + (p.views || 0), 0);
   const stats = [
     { value: popularNovels.length + popularPdfs.length, label: "Novels & PDFs" },
-    { value: writers.length, label: "Writers" },
+    { value: writers.length, label: writers.length === 1 ? "Writer" : "Writers" },
     { value: genreCards.length, label: "Genres" },
     { value: totalReads, label: "Total Reads" },
   ];
@@ -380,8 +380,7 @@ export default async function HomePage({
               </p>
               <p>
                 New Urdu novels, chapters, and PDF books are added regularly. Bookmark this
-                page and check back often to catch the latest releases from your favourite
-                writers and discover fresh voices in Urdu literature.
+                page and check back often to catch the latest releases by Huma Qureshi.
               </p>
             </div>
           </div>

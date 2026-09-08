@@ -5,7 +5,7 @@ import { absoluteUrl, SITE_NAME } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: `PDF Library`,
-  description: `Download and read complete Urdu novel PDFs by Huma Qureshi and other writers from the ${SITE_NAME} PDF library.`,
+  description: `Download and read complete Urdu novel PDFs by Huma Qureshi from the ${SITE_NAME} PDF library.`,
   alternates: { canonical: absoluteUrl('/pdf') },
 };
 

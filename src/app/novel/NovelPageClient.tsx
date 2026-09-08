@@ -212,7 +212,7 @@ export default function NovelPageClient({
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{writers.length.toLocaleString()}</span>
-              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">Writers</span>
+              <span className="text-sm lg:text-base font-bold uppercase tracking-wide text-[#8B6914]">{writers.length === 1 ? "Writer" : "Writers"}</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <span className="text-3xl lg:text-5xl font-extrabold text-[#1E5D50] leading-none">{genres.length.toLocaleString()}</span>
@@ -236,7 +236,7 @@ export default function NovelPageClient({
           <Filter
             dropdowns={[
               {
-                label: "Writers",
+                label: writers.length > 1 ? "Writers" : "Writer",
                 options: writers,
                 value: filters.selectedWriter,
                 onChange: (value: any) =>
@@ -389,8 +389,8 @@ export default function NovelPageClient({
                   desc: "Open any story on your phone, tablet, or computer. The reading experience adapts to your screen so you can enjoy everywhere.",
                 },
                 {
-                  title: "Explore All Writers",
-                  desc: "Huma Qureshi's library also brings stories from other writers. Discover fresh voices across multiple Urdu fiction genres.",
+                  title: "The Complete Collection",
+                  desc: "Every novel on this site is written by Huma Qureshi. Explore her full library of complete and ongoing Urdu stories in one place.",
                 },
               ].map((item, i) => (
                 <div
