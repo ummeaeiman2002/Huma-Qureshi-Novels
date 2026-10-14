@@ -1,0 +1,43 @@
+{
+  "name": "story-landingpage",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@sanity/image-url": "^1.2.0",
+    "@sanity/vision": "^4.22.0",
+    "@vercel/kv": "^3.0.0",
+    "bcryptjs": "^3.0.3",
+    "next": "^16.1.1",
+    "next-auth": "^5.0.0-beta.30",
+    "next-sanity": "^12.0.5",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-virtualized": "^9.22.6",
+    "react-virtualized-auto-sizer": "^2.0.2",
+    "react-window": "^2.2.5",
+    "sanity": "^5.1.0",
+    "styled-components": "^6.1.19",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true,
+    "esbuild@0.27.1": true,
+    "sharp@0.34.5": true
+  }
+}

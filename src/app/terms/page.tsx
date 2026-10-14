@@ -1,0 +1,139 @@
+import React from "react";
+import Link from "next/link";
+import type { Metadata } from "next";
+import PageHero from "../components/PageHero";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description: "Terms and conditions for Huma Qureshi Novels. Content ownership, copyright protection, DMCA policy, plagiarism rules, and limitation of liability.",
+  alternates: { canonical: "https://humaqureshinovels.com/terms" },
+};
+
+export default function page() {
+  return (
+    <div className="flex flex-col gap-6 py-5 overflow-hidden">
+      {/* Hero Banner */}
+      <PageHero
+        title="Terms & Disclaimer"
+        description="Please read these terms carefully before using this website."
+      />
+
+      {/* Content */}
+      <div className="flex flex-col gap-5 max-w-4xl mx-auto">
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">General Terms</h2>
+          <p className="leading-8">
+            By accessing and using this website, you agree to the following terms and conditions. If you do not agree with any part of these terms, please refrain from using the website.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Content Ownership</h2>
+          <p className="leading-8">
+            This website is dedicated exclusively to the works of Huma Qureshi. It features her original Urdu novels, PDF books, episodic stories, and afsanas. All content published on this website belongs to Huma Qureshi and is protected under copyright law.
+          </p>
+          <p className="leading-8">
+            Unauthorized copying, reproduction, translation, republishing, hosting, or distribution of any content from this website is strictly prohibited. All rights are reserved by the author, Huma Qureshi.
+          </p>
+        </div>
+
+<div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Fictional Disclaimer</h2>
+          <p className="leading-8">
+            All stories, characters, events, and places mentioned on this website are works of fiction unless clearly stated as real. Any resemblance to actual persons (living or dead), places, or incidents is purely coincidental.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">No Plagiarism Allowed</h2>
+          <p className="leading-8 font-medium">Visitors and readers are not allowed to:</p>
+          <ul className="list-disc ps-6 flex flex-col gap-2 font-medium">
+            <li>Copy or steal written material</li>
+            <li>Use content under their name or for commercial purposes</li>
+            <li>Share full stories without credit or permission</li>
+          </ul>
+          <p className="leading-8 font-bold text-gold-dark">
+            Legal action may be taken in case of violation of content rights.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Collaborations &amp; Permissions</h2>
+          <p className="leading-8">
+            For sharing, quoting, or collaborating professionally, please contact us directly through the Contact Page or email at{" "}
+            <Link href="mailto:humaqureshiofficial73@gmail.com" className="font-bold text-brand underline underline-offset-4 hover:text-gold transition">
+              humaqureshiofficial73@gmail.com
+            </Link>
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Privacy &amp; Data Use</h2>
+          <p className="leading-8">
+            Any personal data submitted through contact forms (such as name or email) will be kept confidential and never shared with third parties without consent.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Disclaimer of Liability</h2>
+          <p className="leading-8">
+            While we try to keep all information accurate and updated, this website makes no guarantees about the completeness, reliability, or accuracy of the content.
+          </p>
+          <p className="leading-8">
+            The website owner is not liable for any misinterpretation, emotional impact, or external use of the content.
+          </p>
+          <p className="leading-8">
+            Use of any content on this website is entirely at the reader&apos;s own risk. The website owner is not responsible for any loss or damage arising from the use of this website or its content.
+          </p>
+          <p className="leading-8">
+            The website owner shall not be held liable for any data breach, unauthorized access, hacking, server failure, or loss of data caused by events beyond reasonable control. Users submit their information voluntarily and at their own risk.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">External Links Disclaimer</h2>
+          <p className="leading-8">
+            This website may contain links to external websites (e.g., YouTube, Facebook, Instagram, or PDF hosting services). We do not control the content or policies of these external websites and are not responsible for their content, privacy practices, or availability.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Download Responsibility</h2>
+          <p className="leading-8">
+            PDFs and files available for download on this website are provided for the reader&apos;s personal use. We are not responsible for how downloaded files are used, distributed, or stored by the user, or for any damage caused to devices during download.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Copyright Protection &amp; DMCA Policy</h2>
+          <p className="leading-8">
+            All novels, PDF books, stories, afsanas, and creative content published on this website are the original works of Huma Qureshi and are protected by copyright law.
+          </p>
+          <p className="leading-8 font-bold text-gold-dark">
+            If any website, platform, individual, or entity is found copying, reproducing, hosting, or distributing our content without written permission from Huma Qureshi, we will take immediate DMCA takedown action and legal proceedings against them.
+          </p>
+          <p className="leading-8">
+            We actively monitor the internet for unauthorized use of our content. If you find our work being used elsewhere without permission, please report it to us at{" "}
+            <Link href="mailto:humaqureshiofficial73@gmail.com" className="font-bold text-brand underline underline-offset-4 hover:text-gold transition">
+              humaqureshiofficial73@gmail.com
+            </Link>.
+          </p>
+          <p className="leading-8">
+            We will file DMCA takedown requests with hosting providers, search engines, and platforms to have infringing content removed. Repeat infringers may face legal action for copyright damages and intellectual property theft.
+          </p>
+        </div>
+
+        <div className="bg-surface rounded-2xl border border-line p-3 sm:p-5 lg:p-8 flex flex-col gap-4 break-words">
+          <h2 className="text-xl font-extrabold text-brand">Copyright &amp; Content Removal Requests</h2>
+          <p className="leading-8">
+            All content on this website is the original work of Huma Qureshi and is protected by copyright. If you believe any content on this website infringes your copyright or has been published without proper authorization, please contact us at{" "}
+            <Link href="mailto:humaqureshiofficial73@gmail.com" className="font-bold text-brand underline underline-offset-4 hover:text-gold transition">
+              humaqureshiofficial73@gmail.com
+            </Link>{" "}
+            with the details, and we will review and address your request promptly.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
