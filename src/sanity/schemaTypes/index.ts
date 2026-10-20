@@ -12,6 +12,7 @@ import { announcement } from "./announcement";
 import { downloadSection } from "./downloadSection";
 import { siteSettings } from "./siteSettings";
 import { reaction } from "./reaction";
+import { upcomingProject } from "./upcomingProject";
 
 // Premium/Auth schemas
 import { user } from "./user";
@@ -35,6 +36,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     downloadSection,
     siteSettings,
     reaction,
+    upcomingProject,
     // Premium/Auth schemas
     user,
     premiumNovel,

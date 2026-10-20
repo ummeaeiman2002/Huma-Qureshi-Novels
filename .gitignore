@@ -48,3 +48,6 @@ dev-server-error.log
 next-env.d.ts
 
 tmp-*.js
+
+# local docs
+docs/constitution.md

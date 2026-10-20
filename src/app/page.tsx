@@ -4,11 +4,13 @@ import Image from "next/image";
 import Novel from "./components/Cards/Novel";
 import PDF from "./components/Cards/PDF";
 import AuthorHero from "./components/AuthorHero";
+import UpcomingProjects from "./components/UpcomingProjects";
+import AboutAuthor from "./components/AboutAuthor";
 import Button from "./components/ui/Button";
 import Container from "./components/ui/Container";
 import SectionHeading from "./components/ui/SectionHeading";
 import { client } from "@/sanity/lib/client";
-import { getSiteSummary } from "@/lib/sanity/siteSettings";
+import { getSiteSummary, getSiteSettings } from "@/lib/sanity/siteSettings";
 import { cleanDescriptionLong, formatSafeDate, SITE_URL } from "@/lib/seo";
 
 export const revalidate = 300;
@@ -45,6 +47,12 @@ async function getHomeContent() {
     },
     "latestEpisodes": *[_type == "novel" && defined(episodeslug.current) && defined(episodereleasedate) && episodereleasedate <= now() && novelparent->writer->writername == "Huma Qureshi"] | order(episodereleasedate desc) {
       _id, name, episodereleasedate, "episodeSlug": episodeslug.current, "novelSlug": novelparent->slug.current, "novelTitle": novelparent->title, "novelBanner": novelparent->banner, "novelGenre": novelparent->genre->genrename
+    },
+    "upcomingProjects": *[_type == "upcomingProject"] | order(order asc, _createdAt desc) {
+      _id, title, teaser, teaserUrdu, releaseNote,
+      "cover": coverImage.asset->url,
+      "coverAlt": coverImage.alt,
+      genre->{genrename}
     }
   }`;
   const data = await client.fetch<any>(query, {}, { next: { revalidate: 300 } });
@@ -74,6 +82,16 @@ async function getHomeContent() {
     latestNovels: enrich(data.latestNovels),
     latestPdfs: enrich(data.latestPdfs),
     latestEpisodes: distinctEpisodes.slice(0, 5),
+    upcomingProjects: (data.upcomingProjects || []).map((p: any) => ({
+      id: p._id,
+      title: p.title || "",
+      cover: p.cover || "",
+      coverAlt: p.coverAlt || "",
+      genre: p.genre?.genrename || "",
+      teaser: p.teaser || "",
+      teaserUrdu: p.teaserUrdu || "",
+      releaseNote: p.releaseNote || "",
+    })),
   };
 }
 
@@ -84,6 +102,7 @@ function date(value: string) {
 export default async function HomePage() {
   const data = await getHomeContent();
   const summary = await getSiteSummary();
+  const settings = await getSiteSettings();
 
   const latestNovels = (data.latestNovels || []).map((x: any) => ({ ...x, type: "novel" }));
   const latestPdfs = (data.latestPdfs || []).map((x: any) => ({ ...x, type: "pdf" }));
@@ -414,6 +433,29 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
+
+      {/* UPCOMING PROJECTS */}
+      {data.upcomingProjects.length > 0 && (
+        <section id="upcoming" className="py-12">
+          <Container size="wide">
+            <SectionHeading
+              eyebrow="Coming Soon"
+              title="Upcoming Projects"
+              subtitle="A preview of what Huma Qureshi is working on next."
+            />
+            <div className="mt-8">
+              <UpcomingProjects projects={data.upcomingProjects} />
+            </div>
+          </Container>
+        </section>
+      )}
+
+      {/* ABOUT THE AUTHOR */}
+      <section id="about-author" className="py-12">
+        <Container size="wide">
+          <AboutAuthor image={settings.authorImage} />
+        </Container>
+      </section>
 
       {/* EXPLORE BY GENRE */}
       {stats?.genres ? (
