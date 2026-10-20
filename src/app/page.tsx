@@ -8,6 +8,7 @@ import Button from "./components/ui/Button";
 import Container from "./components/ui/Container";
 import SectionHeading from "./components/ui/SectionHeading";
 import { client } from "@/sanity/lib/client";
+import { getSiteSummary } from "@/lib/sanity/siteSettings";
 import { cleanDescriptionLong, formatSafeDate, SITE_URL } from "@/lib/seo";
 
 export const revalidate = 300;
@@ -82,6 +83,7 @@ function date(value: string) {
 
 export default async function HomePage() {
   const data = await getHomeContent();
+  const summary = await getSiteSummary();
 
   const latestNovels = (data.latestNovels || []).map((x: any) => ({ ...x, type: "novel" }));
   const latestPdfs = (data.latestPdfs || []).map((x: any) => ({ ...x, type: "pdf" }));
@@ -137,6 +139,87 @@ export default async function HomePage() {
     <main className="flex flex-col">
       {/* HERO — premium author slider (Zeela-style composition, own branding) */}
       <AuthorHero slides={heroSlides} stats={stats} />
+
+      {/* WEBSITE SUMMARY — author/website intro with portrait imagery */}
+      {(summary.title || summary.text || summary.images.length > 0) && (
+        <section id="summary" className="border-y border-line bg-cream py-14">
+          <Container size="wide">
+            <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+              <div className="flex flex-col gap-5">
+                {summary.eyebrow && (
+                  <span className="ui-eyebrow">{summary.eyebrow}</span>
+                )}
+                {summary.title && (
+                  <h2 className="heading-stylish text-balance text-3xl font-extrabold leading-tight text-brand sm:text-4xl">
+                    {summary.title}
+                  </h2>
+                )}
+                {summary.text && (
+                  <div className="flex flex-col gap-3 text-[15px] leading-relaxed text-muted">
+                    {summary.text
+                      .split(/\n{2,}|\r?\n/)
+                      .map((p) => p.trim())
+                      .filter(Boolean)
+                      .map((p, i) => (
+                        <p key={i}>{p}</p>
+                      ))}
+                  </div>
+                )}
+                {summary.titleUrdu && (
+                  <h3
+                    className="font-urdu text-2xl leading-[2] text-brand"
+                    dir="rtl"
+                    lang="ur"
+                  >
+                    {summary.titleUrdu}
+                  </h3>
+                )}
+                {summary.textUrdu && (
+                  <p
+                    className="font-urdu text-lg leading-[2.2] text-muted"
+                    dir="rtl"
+                    lang="ur"
+                  >
+                    {summary.textUrdu}
+                  </p>
+                )}
+                <div className="pt-1">
+                  <Button href="/novel" variant="primary">
+                    Explore My Novels &rarr;
+                  </Button>
+                </div>
+              </div>
+
+              {summary.images.length > 0 && (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:gap-5">
+                  {summary.images.map((img, i) => (
+                    <figure
+                      key={i}
+                      className={`group relative aspect-[5/6] overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_18px_40px_-24px_rgba(41,40,36,0.55)] ${
+                        i === 0 && summary.images.length === 3
+                          ? "col-span-2 row-span-2 sm:col-span-2"
+                          : ""
+                      }`}
+                    >
+                      <Image
+                        src={img.url}
+                        alt={img.alt || summary.title || "Huma Qureshi Urdu fiction"}
+                        fill
+                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 260px"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-gold/0 transition-all duration-500 group-hover:ring-gold/40"
+                      />
+                    </figure>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Container>
+        </section>
+      )}
 
       {/* FEATURED NOVELS */}
       {featuredNovels.length > 0 && (
