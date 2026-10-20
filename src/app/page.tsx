@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Novel from "./components/Cards/Novel";
 import PDF from "./components/Cards/PDF";
-import HeroSlider from "./components/HeroSlider";
 import HomeFilter from "./components/HomeFilter";
 import Container from "./components/ui/Container";
 import SectionHeading from "./components/ui/SectionHeading";
@@ -77,14 +76,16 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const latestPdfs = (data.latestPdfs || []).map((x: any) => ({ ...x, type: "pdf" }));
 
   const featuredNovels = popularNovels
-    .slice()
     .sort((a: any, b: any) => (b.totalViews || 0) - (a.totalViews || 0))
-    .slice(0, 8);
+    .slice(0, 6);
+  const featuredIds = new Set(featuredNovels.map((x: any) => x._id));
 
   const latest = [
     ...applyFilters(latestNovels, genres, type),
     ...applyFilters(latestPdfs, genres, type),
-  ].slice(0, 8);
+  ]
+    .filter((item: any) => !featuredIds.has(item._id))
+    .slice(0, 8);
 
   const hasFilters = genres.length > 0 || type !== "";
   const allGenres = await client.fetch<string[]>(`*[_type == "genre"] { genrename }.genrename`);
@@ -101,53 +102,20 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   const episodeDate = (v: string) => formatSafeDate(v);
 
-  const heroSlides = latestNovels.slice(0, 5).map((item: any) => ({
-    id: item._id,
-    title: item.title || "",
-    writer: item.writer?.writername || "",
-    genre: item.genre?.genrename || "",
-    summary: cleanDescriptionLong(item.noveldescription, ""),
-    href: item.slug?.current || "",
-    banner: item.banner || "",
-  }));
-
   return (
     <main className="flex flex-col">
-      {/* HERO */}
-      <section className="pt-6 lg:pt-8 pb-8" aria-labelledby="welcome-heading">
-        {heroSlides.length > 0 ? (
-          <>
-            <h1 id="welcome-heading" className="sr-only">
-              Read Urdu Novels Online
-            </h1>
-            <HeroSlider slides={heroSlides} />
-          </>
-        ) : (
-          <Container size="wide">
-            <div className="rounded-3xl bg-brand-deep p-10 text-center text-cream shadow-xl">
-              <h1 id="welcome-heading" className="font-display text-4xl font-bold">
-                Read Urdu Novels Online
-              </h1>
-              <p className="mt-3 text-cream/85">
-                Original Urdu novels, episodic stories and PDF books by Huma Qureshi.
-              </p>
-            </div>
-          </Container>
-        )}
-      </section>
-
       {/* ABOUT THE LIBRARY — original site copy */}
-      <section aria-labelledby="library-heading" className="pb-6">
+      <section aria-labelledby="welcome-heading" className="pt-6 lg:pt-8 pb-6">
         <Container size="wide">
           <div className="grid gap-7 rounded-3xl border border-line bg-surface p-6 shadow-sm lg:grid-cols-[1.7fr_1fr] lg:items-center lg:p-9">
             <div className="flex flex-col gap-4">
               <span className="ui-eyebrow">About the Library</span>
-              <h2
-                id="library-heading"
+              <h1
+                id="welcome-heading"
                 className="font-display text-2xl font-extrabold leading-tight text-brand sm:text-3xl"
               >
                 Read Urdu Novels Online, Free — Chapter by Chapter
-              </h2>
+              </h1>
               <p className="text-sm leading-7 text-ink/80 sm:text-[15px] sm:leading-8">
                 Huma Qureshi Novels is a free online library of original Urdu novels, episodic
                 stories and short afsanas written by Huma Qureshi. Every chapter is published here
@@ -194,7 +162,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                   title="Featured Novels"
                 />
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 justify-items-center lg:justify-items-start">
-                  {featuredNovels.slice(0, 6).map((item: any) => (
+                  {featuredNovels.map((item: any) => (
                     <Novel
                       key={item._id}
                       date={date(item.novelreleasedate)}
