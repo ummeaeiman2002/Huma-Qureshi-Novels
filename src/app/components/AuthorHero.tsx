@@ -105,7 +105,7 @@ export default function AuthorHero({
       onBlur={start}
     >
       <div className="relative overflow-hidden rounded-3xl bg-brand-deep shadow-2xl ring-1 ring-gold/20">
-        {/* Full-bleed dimmed backdrop = current book cover, blurred */}
+        {/* Full-bleed backdrop = current book cover, kept clearly visible */}
         {current.banner && (
           <Image
             key={`bg-${current.id}`}
@@ -114,10 +114,13 @@ export default function AuthorHero({
             aria-hidden="true"
             fill
             sizes="100vw"
-            className="scale-110 object-cover opacity-25 blur-2xl"
+            className="scale-105 object-cover opacity-40 blur-sm"
           />
         )}
-        <div aria-hidden="true" className="absolute inset-0 bg-brand-deep/80" />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-brand-deep via-brand-deep/85 to-brand-deep/55"
+        />
         <div aria-hidden="true" className="hero-pattern absolute inset-0 opacity-[0.06]" />
         <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
 
@@ -133,23 +136,23 @@ export default function AuthorHero({
                 aria-label={`${i + 1} of ${count}`}
                 className={`${
                   active ? "relative" : "pointer-events-none absolute inset-0 opacity-0"
-                } grid gap-8 px-6 py-10 transition-opacity duration-700 sm:px-10 sm:py-12 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-14 lg:px-14 lg:py-16`}
+                } grid gap-8 px-6 py-10 transition-opacity duration-700 sm:px-10 sm:py-12 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-14 lg:px-14 lg:py-16`}
               >
-                {/* Cover */}
+                {/* Cover (landscape) */}
                 <div className="order-1 flex justify-center lg:order-none lg:justify-start">
                   <Link
                     href={`/novel/${slide.slug}`}
                     aria-label={`Read ${slide.title}`}
-                    className="group relative block w-52 overflow-hidden rounded-2xl border border-gold/30 bg-surface shadow-2xl transition-transform duration-300 hover:-translate-y-1.5 sm:w-60 lg:w-72"
+                    className="group relative block w-full max-w-md overflow-hidden rounded-2xl border border-gold/30 bg-surface shadow-2xl transition-transform duration-300 hover:-translate-y-1.5"
                   >
-                    <div className="relative aspect-[3/4] w-full">
+                    <div className="relative aspect-video w-full">
                       {slide.banner ? (
                         <Image
                           src={slide.banner}
                           alt={`${slide.title} cover`}
                           fill
                           priority={i === 0}
-                          sizes="(max-width: 640px) 208px, (max-width: 1024px) 240px, 288px"
+                          sizes="(max-width: 1024px) 90vw, 520px"
                           className="object-cover"
                         />
                       ) : (
