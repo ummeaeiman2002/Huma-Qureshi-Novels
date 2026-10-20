@@ -10,8 +10,8 @@ export default function ImportantNote({
   tone?: "brand" | "warning";
 }) {
   if (!note) return null;
-  const border = tone === "warning" ? "border-[#e65564]/50" : "border-gold/50";
-  const label = tone === "warning" ? "text-[#c0363f]" : "text-gold-dark";
+  const border = tone === "warning" ? "border-error/40" : "border-gold/50";
+  const label = tone === "warning" ? "text-error" : "text-gold-dark";
 
   return (
     <section aria-label={title} className="py-2">

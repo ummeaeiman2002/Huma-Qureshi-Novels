@@ -23,7 +23,7 @@ function Stars({ rating }: { rating: number }) {
         <svg key={i} viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
           <path
             d="M12 2.5l2.95 6.02 6.55.95-4.74 4.62 1.12 6.53L12 17.98 6.12 20.62l1.12-6.53-4.74-4.62 6.55-.95z"
-            fill={i < value ? "#C9A96E" : "#DCCFC2"}
+            fill={i < value ? "#A48750" : "#DED4C5"}
           />
         </svg>
       ))}

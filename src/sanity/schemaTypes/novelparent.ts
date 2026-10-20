@@ -135,7 +135,7 @@ export const novelparent = defineType({
       name: "isShortStory",
       type: "boolean",
       title: "Is this a Short Story?",
-      description: "Turn ON if this novel is a short story / afsana to show it on the Short Stories page.",
+      description: "Turn ON if this novel is a short story / afsana to show it on the Stories page.",
       group: "basic",
       initialValue: false,
     }),

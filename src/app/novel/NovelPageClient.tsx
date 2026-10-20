@@ -2,23 +2,23 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Filter from "../components/Filter";
+import ActiveFilters, { type ActiveFilterItem } from "../components/ActiveFilters";
 import Novel from "../components/Cards/Novel";
+import PDF from "../components/Cards/PDF";
 import Heading from "../components/Heading";
 import PageHero from "../components/PageHero";
 import StatsBar from "../components/StatsBar";
 import Breadcrumbs from "../components/ui/Breadcrumbs";
-import Pagination from "../components/ui/Pagination";
 import ListingSidebar from "../components/ListingSidebar";
 import { formatSafeDate } from "@/lib/seo";
 import YouTubeSection from "../components/YouTubeSection";
+import { useSiteSettings } from "@/app/context/SiteSettingsContext";
 
 interface NovelPageProps {
   initialNovels: any[];
   writers: string[];
   genres: string[];
   totalNovelCount: number;
-  currentPage: number;
-  totalPages: number;
 }
 
 export default function NovelPageClient({
@@ -26,19 +26,15 @@ export default function NovelPageClient({
   writers,
   genres,
   totalNovelCount,
-  currentPage,
-  totalPages,
 }: NovelPageProps) {
+  const { defaultBanner } = useSiteSettings();
   const [filters, setFilters] = useState({
-    selectedWriter: "",
-    selectedSort: "",
+    selectedType: "",
     selectedGenres: [] as string[],
-    youtubeOnly: false,
   });
   const [novels, setNovels] = useState<any[]>(initialNovels || []);
   const searchParams = useSearchParams();
   const genreParam = searchParams.get("genre") || "";
-  const categoryParam = searchParams.get("category") || "";
 
   // Sync list whenever the server sends a new page of results
   useEffect(() => {
@@ -64,45 +60,27 @@ export default function NovelPageClient({
   const filteredNovels = useMemo(() => {
     let result = [...novels].filter((novel) => novel && novel._id);
 
-    if (filters.selectedWriter) {
-      result = result.filter(
-        (novel) => novel.writer?.writername === filters.selectedWriter
-      );
-    }
-
     if (filters.selectedGenres.length > 0) {
       result = result.filter((novel) =>
         filters.selectedGenres.includes(novel.genre?.genrename)
       );
     }
 
-    if (filters.youtubeOnly) {
+    if (filters.selectedType === "Episodic") {
+      result = result.filter((novel) => novel._kind !== "pdf");
+    } else if (filters.selectedType === "PDF") {
+      result = result.filter((novel) => novel._kind === "pdf");
+    } else if (filters.selectedType === "Audio Books") {
       result = result.filter(
         (novel) => novel.youtubeurl && novel.youtubeurl.trim() !== ""
       );
     }
 
-    switch (filters.selectedSort) {
-      case "Latest":
-        result = result.sort(
-          (a, b) =>
-            new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime()
-        );
-        break;
-      case "Popular":
-        result = result.sort((a, b) => (b.totalViews || 0) - (a.totalViews || 0));
-        break;
-      case "Trending":
-        result = result.sort(
-          (a, b) => (b.totalMonthlyViews || 0) - (a.totalMonthlyViews || 0)
-        );
-        break;
-      default:
-        result = result.sort(
-          (a, b) =>
-            new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime()
-        );
-    }
+    result = result.sort(
+      (a, b) =>
+        new Date(b.date || b._createdAt).getTime() -
+        new Date(a.date || a._createdAt).getTime()
+    );
 
     return result;
   }, [novels, filters]);
@@ -112,37 +90,56 @@ export default function NovelPageClient({
   }, []);
 
   const hasFilters =
-    Boolean(filters.selectedWriter) ||
-    Boolean(filters.selectedSort) ||
-    filters.selectedGenres.length > 0 ||
-    filters.youtubeOnly;
+    filters.selectedType !== "" || filters.selectedGenres.length > 0;
 
-  const paginationParams: Record<string, string> = genreParam
-    ? { genre: genreParam }
-    : {};
+  const resetFilters = useCallback(
+    () => handleFilterChange({ selectedType: "", selectedGenres: [] }),
+    [handleFilterChange]
+  );
+
+  const activeItems: ActiveFilterItem[] = [
+    ...(filters.selectedType
+      ? [
+          {
+            key: "type",
+            label: "Type",
+            value: filters.selectedType,
+            onRemove: () =>
+              handleFilterChange({ ...filters, selectedType: "" }),
+          },
+        ]
+      : []),
+    ...filters.selectedGenres.map((g) => ({
+      key: `genre-${g}`,
+      label: "Genre",
+      value: g,
+      onRemove: () =>
+        handleFilterChange({
+          ...filters,
+          selectedGenres: filters.selectedGenres.filter((x) => x !== g),
+        }),
+    })),
+  ];
 
   return (
     <div className="flex flex-col gap-6 py-5">
       <Breadcrumbs
-        items={[{ label: "Home", href: "/" }, { label: "Novels" }]}
+        items={[{ label: "Home", href: "/" }, { label: "All Novels" }]}
       />
 
       {/* Hero Banner */}
       <PageHero
         badge={`${totalNovelCount} Novels`}
-        title="Urdu Novels"
-        description="Browse Urdu novels by genre, author and other available filters. Read episodic novels online, chapter by chapter, completely free."
+        title="All Urdu Novels"
+        description="Browse every Urdu novel by genre, author and other available filters. Read episodic novels online, chapter by chapter, or open a complete PDF — all in one place."
         accent="Most stories are free to read online — pick a title and start reading from episode one."
-        actions={[
-          { label: "Download PDF Books", href: "/pdf" },
-          { label: "Short Stories", href: "/short-stories" },
-        ]}
+        actions={[{ label: "About the Author", href: "/about" }]}
       />
 
       {/* STATS BAR — social proof */}
       <StatsBar
         items={[
-          { value: totalNovelCount, label: "Episodic Novels" },
+          { value: totalNovelCount, label: "Novels" },
           { value: writers.length, label: writers.length === 1 ? "Writer" : "Writers" },
           { value: genres.length, label: "Genres" },
           {
@@ -158,74 +155,39 @@ export default function NovelPageClient({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="flex min-w-0 flex-col gap-6">
       {/* Filter Section */}
-      <section className="rounded-3xl bg-cream-soft border border-line p-6 lg:p-8">
+      <section aria-label="Filter novels" className="flex flex-col gap-4">
         <Heading name="Filter Novels" />
-        <div className="mx-auto max-w-4xl flex flex-col items-center gap-4 pt-4">
-          <p className="text-center leading-7 font-medium">
-            Filter Urdu novels by writer and genre. Choose your options and press Apply filter.
-          </p>
-          <Filter
-            dropdowns={[
-              {
-                label: writers.length > 1 ? "Writers" : "Writer",
-                options: writers,
-                value: filters.selectedWriter,
-                onChange: (value: any) =>
-                  handleFilterChange({
-                    ...filters,
-                    selectedWriter: value,
-                  }),
-              },
-              {
-                label: "Sort By",
-                options: ["Latest", "Trending", "Popular"],
-                value: filters.selectedSort,
-                onChange: (value: any) =>
-                  handleFilterChange({
-                    ...filters,
-                    selectedSort: value,
-                  }),
-              },
-            ]}
-            checkboxes={genres.map((genre) => ({
-              label: genre,
-              checked: filters.selectedGenres.includes(genre),
-              onChange: (checked: any) => {
-                const newGenres = checked
+        <Filter
+          title="Refine Your Search"
+          description="Narrow the library by genre, or switch between episodic novels, complete PDFs and audio books."
+          dropdowns={[
+            {
+              label: "Type",
+              options: ["Episodic", "PDF", "Audio Books"],
+              value: filters.selectedType,
+              onChange: (value: any) =>
+                handleFilterChange({ ...filters, selectedType: value }),
+            },
+          ]}
+          checkboxes={genres.map((genre) => ({
+            label: genre,
+            checked: filters.selectedGenres.includes(genre),
+            onChange: (checked: any) =>
+              handleFilterChange({
+                ...filters,
+                selectedGenres: checked
                   ? [...filters.selectedGenres, genre]
-                  : filters.selectedGenres.filter((g) => g !== genre);
-
-                handleFilterChange({
-                  ...filters,
-                  selectedGenres: newGenres,
-                });
-              },
-            }))}
-            toggle={{
-              label: "YouTube Novels",
-              value: filters.youtubeOnly,
-              onChange: (value: boolean) =>
-                handleFilterChange({ ...filters, youtubeOnly: value }),
-            }}
-            onclick={() => {}}
-          />
-          {hasFilters && (
-            <button
-              onClick={() =>
-                handleFilterChange({
-                  selectedWriter: "",
-                  selectedSort: "",
-                  selectedGenres: [],
-                  youtubeOnly: false,
-                })
-              }
-              className="border-2 border-line text-ink font-bold px-5 py-2 sm:px-6 text-sm rounded-full hover:border-brand hover:text-brand hover:shadow-[0_0_12px_rgba(30,93,80,0.15)] active:scale-95 transition-all duration-300"
-            >
-              Reset Filters
-            </button>
-          )}
-        </div>
+                  : filters.selectedGenres.filter((g) => g !== genre),
+              }),
+          }))}
+          onclick={() => {}}
+        />
       </section>
+
+      {/* Active filters summary */}
+      {hasFilters && (
+        <ActiveFilters items={activeItems} onClearAll={resetFilters} />
+      )}
 
       {/* Results header */}
       <div className="flex flex-wrap items-baseline justify-between gap-2 px-1">
@@ -234,45 +196,46 @@ export default function NovelPageClient({
         </h2>
         {hasFilters && (
           <p className="text-sm font-bold text-brand">
-            Showing {filteredNovels.length} on this page
+            Showing {filteredNovels.length}
           </p>
         )}
       </div>
 
-      {/* Novel Grid */}
-      <ul className="flex flex-wrap gap-5 justify-center lg:justify-start lg:px-2">
-        {filteredNovels.map((novel, index) => (
-          <Novel
-            key={`${novel._id}-${index}`}
-            date={
-              novel.novelreleasedate
-                ? formatSafeDate(novel.novelreleasedate)
-                : ""
-            }
-            href={novel?.slug?.current ? novel.slug.current : "unknown"}
-            cardBanner={novel.banner || ""}
-            novelName={novel.title || ""}
-            writer={novel.writer?.writername || ""}
-            genre={novel.genre?.genrename || ""}
-            summary={novel.summary || ""}
-          />
-        ))}
-      </ul>
+      {/* Novel + PDF Grid */}
+      <div className="flex flex-wrap gap-5 justify-center lg:justify-start lg:px-2">
+        {filteredNovels.map((item, index) =>
+          item._kind === "pdf" ? (
+            <PDF
+              key={`${item._id}-${index}`}
+              date={item.date ? formatSafeDate(item.date) : ""}
+              href={item?.slug?.current ? item.slug.current : "unknown"}
+              cardBanner={item.banner || defaultBanner}
+              novelName={item.title || ""}
+              writer={item.writer?.writername || ""}
+              genre={item.genre?.genrename || ""}
+              summary={item.summary || ""}
+              format={item.downloadformat || ""}
+              size={item.downloadsize || ""}
+            />
+          ) : (
+            <Novel
+              key={`${item._id}-${index}`}
+              date={item.date ? formatSafeDate(item.date) : ""}
+              href={item?.slug?.current ? item.slug.current : "unknown"}
+              cardBanner={item.banner || ""}
+              novelName={item.title || ""}
+              writer={item.writer?.writername || ""}
+              genre={item.genre?.genrename || ""}
+              summary={item.summary || ""}
+            />
+          )
+        )}
+      </div>
 
       {filteredNovels.length === 0 && (
         <p className="text-center py-6 font-bold text-brand">
           No novels match your filters.
         </p>
-      )}
-
-      {/* Numbered pagination */}
-      {!hasFilters && !categoryParam && (
-        <Pagination
-          current={currentPage}
-          total={totalPages}
-          basePath="/novel"
-          params={paginationParams}
-        />
       )}
       </div>
 

@@ -10,7 +10,6 @@ import CommentForm from "@/app/components/novelPage/CommentForm";
 import Comment from "@/app/components/novelPage/Comment";
 import Heading from "@/app/components/Heading";
 import ViewsBadge from "@/app/components/ViewsBadge";
-import BookmarkButton from "@/app/components/BookmarkButton";
 import Reactions from "@/app/components/Reactions";
 import { useSiteSettings } from "@/app/context/SiteSettingsContext";
 
@@ -51,7 +50,7 @@ function paginateText(text: string, wordsPerPage: number): string[] {
 
 export default function EpisodePageClient({ episode, initialComments, prevEpisode, nextEpisode, reviewsSlot }: { episode: any; initialComments: CommentItem[]; prevEpisode?: EpisodeSibling | null; nextEpisode?: EpisodeSibling | null; reviewsSlot?: ReactNode }) {
   const { defaultBanner } = useSiteSettings();
-  const [comments, setComments] = useState(initialComments || []);
+  const [comments] = useState(initialComments || []);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,10 +138,9 @@ export default function EpisodePageClient({ episode, initialComments, prevEpisod
     if (!commentName.trim() || !commentText.trim() || isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const created = await addCommentAction(episode._id, commentName.trim(), commentText.trim());
-      setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
+      await addCommentAction(episode._id, commentName.trim(), commentText.trim());
       setCommentName(""); setCommentText("");
-      alert("Your comment has been posted. Thank you!");
+      alert("Thank you! Your comment has been submitted and will appear after review.");
     } catch (err) {
       console.error("Comment submission failed:", err);
       alert("Sorry, your comment could not be posted. Please try again.");
@@ -167,7 +165,7 @@ export default function EpisodePageClient({ episode, initialComments, prevEpisod
           <ViewsBadge views={episode.views} />
         </div>
         <div className="rounded-2xl overflow-hidden border border-secondary/30 shadow-2xl">
-          <Image src={episode.novelparent?.banner || defaultBanner} alt={`${episode.novelparent?.title || "Novel"} banner`} width={1920} height={1080} priority quality={85} className="w-full h-auto object-cover" />
+          <Image src={episode.novelparent?.banner || defaultBanner} alt={`${episode.novelparent?.title || "Novel"} banner`} width={0} height={0} sizes="(max-width: 1024px) 100vw, 900px" priority quality={85} style={{ width: "100%", height: "auto" }} />
         </div>
       </div>
     </section>
@@ -213,8 +211,7 @@ export default function EpisodePageClient({ episode, initialComments, prevEpisod
     )}
 
     <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
-      <BookmarkButton slug={`${novelSlug}/${episodeSlug}`} title={`${episode.name} — ${episode.novelparent?.title || ""}`} type="episode" />
-      <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-[#e65564] text-white font-bold text-sm sm:text-base w-fit self-center justify-center px-5 py-2.5 sm:px-7 sm:py-3 rounded-full shadow-lg hover:bg-[#c94050] active:scale-95 transition">
+      <Link href={`/novel/${episode.novelparent?.slug?.current}`} className="flex items-center gap-2 bg-gold-dark text-white font-bold text-sm sm:text-base w-fit self-center justify-center px-5 py-2.5 sm:px-7 sm:py-3 rounded-full shadow-lg hover:bg-brand active:scale-95 transition">
         Read Full Novel
       </Link>
     </div>

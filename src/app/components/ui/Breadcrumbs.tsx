@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import Link from "next/link";
 import type { Route } from "next";
 
@@ -23,7 +23,7 @@ export default function Breadcrumbs({
       "@type": "ListItem",
       position: i + 1,
       name: item.label,
-      ...(item.href ? { item: item.href } : {}),
+      ...(item.href ? { item: `https://humaqureshinovels.com${item.href.startsWith("/") ? item.href : "/" + item.href}` } : {}),
     })),
   };
 

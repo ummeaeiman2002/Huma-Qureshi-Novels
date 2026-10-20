@@ -9,32 +9,28 @@ a {
 }
 
 /* ===================================
-   DEFAULT THEME (CREAM + DEEP EMERALD)
-   ===================================
-   OLD COLORS (revert here if needed):
-     --color-primary: #111111;
-     --color-secondary: #6495ED;
-     --color-tertiary: #E5E5E5;
+   THEME — WARM PAPER + CHARCOAL + ANTIQUE GOLD
+   (premium literary boutique palette)
    =================================== */
 @theme {
-    /* Light Theme - Deep Emerald + Warm Cream */
-    --color-primary: #F3EAE0;
-    --color-secondary: #1E5D50;
-    --color-tertiary: #111111;
+    --color-primary: #F5EFE5;      /* primary background */
+    --color-secondary: #746044;    /* deep antique gold accent */
+    --color-tertiary: #292824;     /* primary text */
 
-    /* ---- Design system tokens (UI image: deep emerald + warm cream + muted gold) ---- */
-    --color-brand: #1E5D50;        /* primary emerald */
-    --color-brand-dark: #16483E;   /* hover / darker emerald */
-    --color-brand-deep: #0B3B34;   /* header + footer band */
-    --color-brand-soft: #2F7565;   /* soft emerald accent */
-    --color-gold: #C9A96E;         /* muted gold accent */
-    --color-gold-dark: #8B6914;    /* gold text on cream */
-    --color-cream: #F3EAE0;        /* page background */
-    --color-cream-soft: #FAF7F2;   /* section background */
-    --color-surface: #FFFDF9;      /* cards */
-    --color-line: #DCCFC2;         /* borders */
-    --color-ink: #111111;          /* primary text */
-    --color-muted: #5C6B66;        /* secondary text */
+    /* ---- Design system tokens ---- */
+    --color-brand: #292824;        /* primary text + primary buttons */
+    --color-brand-dark: #454139;   /* primary button hover */
+    --color-brand-deep: #292824;   /* dark bands: top bar + footer */
+    --color-brand-soft: #A48750;   /* soft antique-gold accent */
+    --color-gold: #A48750;         /* antique gold accent */
+    --color-gold-dark: #746044;    /* deep antique gold (readable) */
+    --color-cream: #F5EFE5;        /* page background */
+    --color-cream-soft: #E8DDCC;   /* alternate section background */
+    --color-surface: #FFFCF7;      /* cards / content panels */
+    --color-line: #DED4C5;         /* borders / separators */
+    --color-ink: #292824;          /* primary text */
+    --color-muted: #625D54;        /* secondary text */
+    --color-error: #8C3028;        /* muted brick red for warnings */
 
     /* Screens */
     --breakpoint-lg: 900px;
@@ -45,17 +41,17 @@ a {
     --font-display: var(--font-heading), Georgia, serif;
 }
 
-/* Stylish heading for Summary / Author's Note (deep green for cream bg) */
+/* Stylish heading for Summary / Author's Note (deep antique gold for cream bg) */
 .heading-stylish {
     font-family: var(--font-heading), Georgia, serif;
-    color: #8B6914;
+    color: var(--color-gold-dark);
     letter-spacing: 0.02em;
 }
 
-/* Bright title with emerald glow (dark text for light bg) */
+/* Bright title with warm gold glow (dark text for light bg) */
 .title-bright {
-    color: #111111;
-    text-shadow: 0 0 8px rgba(30, 93, 80, 0.4), 0 0 20px rgba(30, 93, 80, 0.2);
+    color: #292824;
+    text-shadow: 0 0 8px rgba(164, 135, 80, 0.45), 0 0 20px rgba(164, 135, 80, 0.22);
 }
 
 /* Standard word gap for Urdu text to improve readability */
@@ -63,10 +59,10 @@ a {
     word-spacing: 0.1em;
 }
 
-/* Stylish colorful title for novel/episode names (deep emerald gradient) */
+/* Stylish title for novel/episode names (charcoal → antique-gold gradient) */
 .title-gradient {
-    color: var(--color-secondary, #1E5D50);
-    background-image: linear-gradient(90deg, #1E5D50 0%, #2F7565 55%, #16483E 100%);
+    color: var(--color-ink, #292824);
+    background-image: linear-gradient(90deg, #292824 0%, #746044 55%, #292824 100%);
     -webkit-background-clip: text;
     background-clip: text;
 }
@@ -77,63 +73,6 @@ a {
     }
 }
 
-/* ===================================
-   PREMIUM DARK THEME
-   (Same as default, but separate variables for customization)
-   =================================== */
-[data-premium-theme="dark"] {
-    --color-primary-premium: #111111;
-    --color-secondary-premium: #6495ED;
-    --color-tertiary-premium: #E5E5E5;
-}
-
-/* ===================================
-   PREMIUM LIGHT THEME
-   (New light theme for premium users)
-   =================================== */
-[data-premium-theme="light"] {
-    --color-primary-premium: #F3EAE0;
-    --color-secondary-premium: #111111;
-    --color-tertiary-premium: #1E5D50;
-}
-
-/* ===================================
-   THEME UTILITIES
-   =================================== */
-
-/* Dark theme classes (default) */
-.bg-primary-dark { background-color: var(--color-primary); }
-.bg-secondary-dark { background-color: var(--color-secondary); }
-.bg-tertiary-dark { background-color: var(--color-tertiary); }
-.text-primary-dark { color: var(--color-primary); }
-.text-secondary-dark { color: var(--color-secondary); }
-.text-tertiary-dark { color: var(--color-tertiary); }
-.border-primary-dark { border-color: var(--color-primary); }
-.border-secondary-dark { border-color: var(--color-secondary); }
-.border-tertiary-dark { border-color: var(--color-tertiary); }
-
-/* Light theme classes (premium) */
-.bg-primary-light { background-color: var(--color-primary-premium); }
-.bg-secondary-light { background-color: var(--color-secondary-premium); }
-.bg-tertiary-light { background-color: var(--color-tertiary-premium); }
-.text-primary-light { color: var(--color-primary-premium); }
-.text-secondary-light { color: var(--color-secondary-premium); }
-.text-tertiary-light { color: var(--color-tertiary-premium); }
-.border-primary-light { border-color: var(--color-primary-premium); }
-.border-secondary-light { border-color: var(--color-secondary-premium); }
-.border-tertiary-light { border-color: var(--color-tertiary-premium); }
-
-/* Premium theme classes (auto-switch based on data attribute) */
-.bg-primary-premium { background-color: var(--color-primary-premium, var(--color-primary)); }
-.bg-secondary-premium { background-color: var(--color-secondary-premium, var(--color-secondary)); }
-.bg-tertiary-premium { background-color: var(--color-tertiary-premium, var(--color-tertiary)); }
-.text-primary-premium { color: var(--color-primary-premium, var(--color-primary)); }
-.text-secondary-premium { color: var(--color-secondary-premium, var(--color-secondary)); }
-.text-tertiary-premium { color: var(--color-tertiary-premium, var(--color-tertiary)); }
-.border-primary-premium { border-color: var(--color-primary-premium, var(--color-primary)); }
-.border-secondary-premium { border-color: var(--color-secondary-premium, var(--color-secondary)); }
-.border-tertiary-premium { border-color: var(--color-tertiary-premium, var(--color-tertiary)); }
-
 /*  */
 /* HTML: <div class="loader"></div> */
 .loader {
@@ -143,9 +82,9 @@ a {
   font-weight: bold;
   text-transform: uppercase;
   color: #0000;
-  -webkit-text-stroke: 1px #111111;
+  -webkit-text-stroke: 1px var(--color-ink);
   background: 
-    linear-gradient(-60deg,#0000 45%,#111111 0 55%,#0000 0) 
+    linear-gradient(-60deg,#0000 45%,var(--color-ink) 0 55%,#0000 0) 
     0/300% 100% no-repeat text;
   animation: l3 2s linear infinite;
 }
@@ -244,7 +183,7 @@ textarea:focus-visible,
 
 /* Decorative dot grid used inside dark page heroes */
 .hero-pattern {
-  background-image: radial-gradient(rgba(201, 169, 110, 0.55) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(164, 135, 80, 0.55) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: center;
 }

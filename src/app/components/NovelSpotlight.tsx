@@ -54,14 +54,13 @@ export default async function NovelSpotlight({
       <div className="mx-2 overflow-hidden rounded-3xl border-2 border-gold/30 bg-surface shadow-xl sm:mx-6 lg:mx-20">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <div className="flex items-center justify-center p-6 lg:p-8">
-            <div className="relative h-[112px] w-[200px] overflow-hidden rounded-lg">
+            <div className="relative aspect-video w-full max-w-[320px] overflow-hidden rounded-lg">
               <Image
                 src={image}
                 alt={`${novel.title || "Novel"} preview`}
-                width={320}
-                height={180}
-                sizes="200px"
-                className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                fill
+                sizes="(max-width: 1024px) 90vw, 320px"
+                className="object-cover transition-transform duration-500 hover:scale-110"
               />
               {novel.genre?.genrename && (
                 <span className="absolute left-1.5 top-1.5 rounded-full bg-gold px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-brand-deep shadow">

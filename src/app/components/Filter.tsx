@@ -25,85 +25,149 @@ interface FilterProps {
   toggle?: ToggleProps | null;
   // onclick?: (...args: any) => void
   onclick?: (...args: any[]) => void | Promise<void>;
+  /** Optional card heading shown above the controls. */
+  title?: string;
+  /** Optional helper line shown under the heading. */
+  description?: string;
+  /** Label for the checkbox group (defaults to "Genres"). */
+  checkboxesLabel?: string;
 }
+
+const labelClass = "ui-eyebrow";
+
+const selectClass =
+  "w-full appearance-none rounded-xl border border-line bg-surface px-4 py-2.5 pr-10 text-sm font-semibold text-tertiary shadow-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15";
 
 export default function Filter({
   dropdowns = [],
   checkboxes = [],
   toggle = null,
   onclick,
+  title,
+  description,
+  checkboxesLabel = "Genres",
 }: FilterProps) {
   return (
-    <div className="w-full lg:w-fit border border-secondary rounded-lg p-4 bg-white/5 backdrop-blur-sm space-y-6">
-      {/* Dropdowns */}
-      {dropdowns.length > 0 && (
-        <div className="flex flex-wrap gap-3">
-          {dropdowns.map((dropdown, i) => (
-            <div key={i} className="flex flex-col">
-              <label className="text-sm font-bold mb-1 text-secondary">
-                {dropdown.label}
-              </label>
-              <select
-                value={dropdown.value}
-                onChange={(e) => dropdown.onChange(e.target.value)}
-                className="bg-primary border border-secondary rounded-lg px-3 py-2 text-sm text-tertiary focus:outline-none"
-              >
-                <option value="">Select {dropdown.label}</option>
-                {dropdown.options.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
+    <section
+      aria-label={title || "Filters"}
+      className="w-full rounded-3xl border border-line bg-surface p-5 shadow-sm lg:p-7"
+    >
+      {(title || description) && (
+        <div className="mb-6 flex flex-col gap-1.5">
+          {title && (
+            <h3 className="font-display text-xl font-extrabold text-brand lg:text-2xl">
+              {title}
+            </h3>
+          )}
+          {description && (
+            <p className="text-sm font-medium leading-6 text-muted">{description}</p>
+          )}
+          <span
+            aria-hidden="true"
+            className="mt-1 h-1 w-16 rounded-full bg-gradient-to-r from-gold to-transparent"
+          />
         </div>
       )}
 
-      {/* Checkboxes */}
-      {checkboxes.length > 0 && (
-        <div className="flex flex-wrap gap-3">
-          {checkboxes.map((cb, i) => (
-            <label
-              key={i}
-              className="flex items-center gap-2 text-sm text-tertiary"
-            >
+      <div className="flex flex-col gap-6">
+        {/* Dropdowns */}
+        {dropdowns.length > 0 && (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {dropdowns.map((dropdown, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <label htmlFor={`filter-dd-${i}`} className={labelClass}>
+                  {dropdown.label}
+                </label>
+                <div className="relative">
+                  <select
+                    id={`filter-dd-${i}`}
+                    value={dropdown.value}
+                    onChange={(e) => dropdown.onChange(e.target.value)}
+                    className={selectClass}
+                  >
+                    <option value="">All {dropdown.label}</option>
+                    {dropdown.options.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-muted"
+                  >
+                    ▼
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Checkbox chips (genres) */}
+        {checkboxes.length > 0 && (
+          <div className="flex flex-col gap-2.5">
+            <span className={labelClass}>{checkboxesLabel}</span>
+            <div className="flex flex-wrap gap-2">
+              {checkboxes.map((cb, i) => (
+                <label
+                  key={i}
+                  className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 active:scale-95 ${
+                    cb.checked
+                      ? "border-gold bg-gold/15 text-brand"
+                      : "border-line bg-surface text-muted hover:border-brand/40 hover:text-brand"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={cb.checked}
+                    onChange={(e) => cb.onChange(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className={`flex h-4 w-4 items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${
+                      cb.checked
+                        ? "border-gold bg-gold text-brand-deep"
+                        : "border-line text-transparent"
+                    }`}
+                  >
+                    ✓
+                  </span>
+                  {cb.label}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Toggle */}
+        {toggle && (
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-line bg-cream-soft px-4 py-3">
+            <span className="text-sm font-bold text-brand">{toggle.label}</span>
+            <label className="relative inline-flex cursor-pointer items-center">
               <input
                 type="checkbox"
-                checked={cb.checked}
-                onChange={(e) => cb.onChange(e.target.checked)}
-                className="accent-primary"
+                checked={toggle.value}
+                onChange={(e) => toggle.onChange(e.target.checked)}
+                className="peer sr-only"
               />
-              {cb.label}
+              <span className="h-6 w-11 rounded-full bg-line transition-colors peer-checked:bg-gold" />
+              <span className="absolute left-[2px] top-[2px] h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
             </label>
-          ))}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
-      {/* Toggle */}
-      {toggle && (
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-bold text-secondary">{toggle.label}</span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={toggle.value}
-              onChange={(e) => toggle.onChange(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-checked:bg-primary rounded-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
-          </label>
-        </div>
-      )}
-
-      <div className="flex justify-center pt-1">
+      <div className="mt-6 flex justify-stretch sm:justify-end">
         <button
+          type="button"
           onClick={onclick}
-          className="bg-brand text-white font-bold px-6 py-2 sm:px-8 sm:py-2.5 rounded-full text-sm hover:bg-brand-dark hover:shadow-[0_0_18px_rgba(30,93,80,0.35)] active:scale-95 transition-all duration-300 w-fit"
+          className="w-full rounded-full bg-gold px-8 py-2.5 text-sm font-bold text-brand-deep shadow-md transition-all duration-300 hover:bg-gold-dark hover:text-cream hover:shadow-[0_0_18px_rgba(164,135,80,0.4)] active:scale-95 sm:w-fit"
         >
-          Apply Filter
+          Apply Filters
         </button>
       </div>
-    </div>
+    </section>
   );
 }

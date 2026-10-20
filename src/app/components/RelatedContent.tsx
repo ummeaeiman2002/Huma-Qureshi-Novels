@@ -86,7 +86,7 @@ export default function RelatedContent({
             {otherWriters.slice(0, 8).map((w, i) => (
               <a
                 key={i}
-                href={`/novel?writer=${encodeURIComponent(w)}`}
+                href="/novel"
                 className="px-5 py-2 rounded-full border-2 border-brand/30 text-brand font-bold hover:border-brand hover:bg-brand/5 active:scale-95 transition"
               >
                 {w}

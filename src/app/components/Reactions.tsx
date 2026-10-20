@@ -1,32 +1,59 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface ReactionsProps {
   slug: string;
 }
 
 const REACTIONS = [
-  { key: "like", label: "Like", emoji: "👍", color: "#1E5D50" },
-  { key: "heart", label: "Love", emoji: "❤️", color: "#e65564" },
-  { key: "wow", label: "Wow", emoji: "😮", color: "#C9A96E" },
-  { key: "sad", label: "Sad", emoji: "😢", color: "#5B7C99" },
-  { key: "fire", label: "Fire", emoji: "🔥", color: "#e65564" },
+  { key: "like", label: "Like", emoji: "👍", color: "#746044" },
+  { key: "heart", label: "Love", emoji: "❤️", color: "#A48750" },
+  { key: "wow", label: "Wow", emoji: "😮", color: "#A48750" },
+  { key: "sad", label: "Sad", emoji: "😢", color: "#625D54" },
+  { key: "fire", label: "Fire", emoji: "🔥", color: "#746044" },
 ];
 
 const STORAGE_PREFIX = "hq_reactions_";
 
-function loadCounts(slug: string) {
+function readLocalCounts(slug: string): Record<string, number> {
   try {
     const raw = localStorage.getItem(STORAGE_PREFIX + slug);
-    const data = raw ? JSON.parse(raw) : {};
-    if (data && typeof data === "object") {
-      return { counts: data, userReacted: null as string | null };
+    const data = raw ? JSON.parse(raw) : null;
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      const counts: Record<string, number> = {};
+      for (const key of Object.keys(data)) {
+        const n = Number(data[key]);
+        if (Number.isFinite(n) && n > 0) counts[key] = Math.floor(n);
+      }
+      return counts;
     }
   } catch {
     /* ignore */
   }
-  return { counts: {}, userReacted: null as string | null };
+  return {};
+}
+
+function readLocalChoice(slug: string): string | null {
+  try {
+    const raw = localStorage.getItem(`${STORAGE_PREFIX}${slug}_user`);
+    const value = raw ? JSON.parse(raw) : null;
+    if (typeof value === "string" && REACTIONS.some((r) => r.key === value)) {
+      return value;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function saveLocal(slug: string, counts: Record<string, number>, choice: string | null) {
+  try {
+    localStorage.setItem(STORAGE_PREFIX + slug, JSON.stringify(counts));
+    localStorage.setItem(`${STORAGE_PREFIX}${slug}_user`, JSON.stringify(choice));
+  } catch {
+    /* ignore */
+  }
 }
 
 export default function Reactions({ slug }: ReactionsProps) {
@@ -34,37 +61,64 @@ export default function Reactions({ slug }: ReactionsProps) {
   const [userReacted, setUserReacted] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // Restore this device's state instantly, then replace it with the global counts
   useEffect(() => {
-    const { counts: c, userReacted: u } = loadCounts(slug);
-    setCounts(c);
-    setUserReacted(u);
+    let cancelled = false;
+
+    setCounts(readLocalCounts(slug));
+    setUserReacted(readLocalChoice(slug));
     setLoaded(true);
+
+    fetch(`/api/reactions?slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: any) => {
+        if (!cancelled && data?.success && data.counts) setCounts(data.counts);
+      })
+      .catch(() => {
+        /* offline — keep local counts */
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
+  const sync = useCallback(
+    (key: string, delta: 1 | -1) => {
+      fetch("/api/reactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, key, delta }),
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: any) => {
+          // Server is the source of truth — adopt its totals
+          if (data?.success && data.counts) setCounts(data.counts);
+        })
+        .catch(() => {
+          /* keep the optimistic count if the network dropped */
+        });
+    },
+    [slug]
+  );
+
   function react(key: string) {
+    const removing = userReacted === key;
     const nextCounts = { ...counts };
+    const previous = userReacted;
 
-    if (userReacted === key) {
-      // Remove existing reaction
-      nextCounts[key] = Math.max(0, (nextCounts[key] || 1) - 1);
-      setUserReacted(null);
+    if (removing) {
+      nextCounts[key] = Math.max(0, (nextCounts[key] || 0) - 1);
     } else {
-      // Remove previous reaction if any
-      if (userReacted) {
-        nextCounts[userReacted] = Math.max(0, (nextCounts[userReacted] || 1) - 1);
-      }
-      // Add new reaction
+      if (previous) nextCounts[previous] = Math.max(0, (nextCounts[previous] || 0) - 1);
       nextCounts[key] = (nextCounts[key] || 0) + 1;
-      setUserReacted(key);
     }
 
+    const nextChoice = removing ? null : key;
     setCounts(nextCounts);
-    try {
-      localStorage.setItem(STORAGE_PREFIX + slug, JSON.stringify(nextCounts));
-      localStorage.setItem(STORAGE_PREFIX + slug + "_user", JSON.stringify(userReacted === key ? null : key));
-    } catch {
-      /* ignore */
-    }
+    setUserReacted(nextChoice);
+    saveLocal(slug, nextCounts, nextChoice);
+    sync(key, removing ? -1 : 1);
   }
 
   if (!loaded) {

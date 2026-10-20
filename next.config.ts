@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   turbopack: { root: __dirname },
   images: {
     formats: ["image/webp", "image/avif"],
+    qualities: [75, 85],
     remotePatterns: [
       {
         protocol: "https",
@@ -40,6 +41,12 @@ const nextConfig: NextConfig = {
   compiler: {
     // Enables the styled-components SWC transform
     styledComponents: true,
+  },
+  async redirects() {
+    return [
+      // PDF library merged into the unified "All Novels" page.
+      { source: "/pdf", destination: "/novel", permanent: true },
+    ];
   },
   async headers() {
     return [

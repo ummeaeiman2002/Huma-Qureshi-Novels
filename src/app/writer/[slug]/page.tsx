@@ -124,12 +124,11 @@ export default async function Page({ params }: Props) {
 
       {stories.length > 0 && (
         <section aria-labelledby="author-stories-heading" className="flex flex-col gap-4">
-          <Heading name={`Short Stories by ${writer.writername}`} />
+          <Heading name={`Stories by ${writer.writername}`} />
           <div className="flex flex-wrap gap-5 justify-center lg:justify-start lg:px-2">
             {stories.map((item: any) => (
               <Novel
                 key={item._id}
-                hrefBase="/short-stories"
                 cta="Read More"
                 date={formatSafeDate(item.novelreleasedate)}
                 href={item.slug?.current || "unknown"}

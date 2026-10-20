@@ -11,6 +11,7 @@ import { testimonial } from "./testimonial";
 import { announcement } from "./announcement";
 import { downloadSection } from "./downloadSection";
 import { siteSettings } from "./siteSettings";
+import { reaction } from "./reaction";
 
 // Premium/Auth schemas
 import { user } from "./user";
@@ -33,6 +34,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     announcement,
     downloadSection,
     siteSettings,
+    reaction,
     // Premium/Auth schemas
     user,
     premiumNovel,

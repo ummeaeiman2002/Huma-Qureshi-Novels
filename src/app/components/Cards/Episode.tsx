@@ -16,10 +16,10 @@ export default function Episode({
 
   const colors = [
     { cls: "border-gold" },
-    { cls: "border-[#fec7a9]" },
-    { cls: "border-[#f1d5ec]" },
-    { cls: "border-[#c4e5b6]" },
-    { cls: "border-[#ccf7f0]" },
+    { cls: "border-gold-dark" },
+    { cls: "border-secondary" },
+    { cls: "border-brand-soft" },
+    { cls: "border-line" },
   ];
 
   let hash = 0;
@@ -34,10 +34,10 @@ export default function Episode({
       href={href}
       onCopy={blockCopy}
       onCut={blockCopy}
-      className={`group relative border-2 ${bg} rounded-2xl flex flex-col justify-start items-start py-4 px-2 gap-3 shadow-xl text-tertiary w-full max-w-[200px] min-h-[300px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(30,93,80,0.3)] active:scale-[1.06] bg-secondary/5`}
+      className={`group relative border-2 ${bg} rounded-2xl flex flex-col justify-start items-start py-4 px-2 gap-3 shadow-xl text-tertiary w-full max-w-[200px] min-h-[300px] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(164,135,80,0.3)] active:scale-[1.06] bg-secondary/5`}
     >
       {isNew && (
-        <span className="absolute -top-2 -right-2 z-10 px-3 py-1 rounded-full bg-[#e65564] text-white text-[10px] font-extrabold uppercase tracking-wide shadow-lg animate-pulse">
+        <span className="absolute -top-2 -right-2 z-10 px-3 py-1 rounded-full bg-gold-dark text-white text-[10px] font-extrabold uppercase tracking-wide shadow-lg animate-pulse">
           New
         </span>
       )}

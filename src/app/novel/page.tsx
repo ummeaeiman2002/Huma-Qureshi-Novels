@@ -1,56 +1,53 @@
 import NovelPageClient from './NovelPageClient';
-import { getPaginatedNovels, getAllMetadata, getTotalNovelCount, prefetchPages, getNovelsByCategory } from '@/lib/sanity/queries';
+import { getAllNovels, getAllPDFs, getAllMetadata } from '@/lib/sanity/queries';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { absoluteUrl } from '@/lib/seo';
+import { absoluteUrl, SITE_NAME } from '@/lib/seo';
+import { DEFAULT_SITE_IMAGES } from '@/lib/siteDefaults';
+
+const TITLE = "All Urdu Novels";
+const DESCRIPTION =
+  "Browse all Urdu novels by Huma Qureshi in one place — read episodic novels online free and download complete PDF books.";
 
 export const metadata: Metadata = {
-  title: `Urdu Novels`,
-  description: `Browse and read all episodic Urdu novels by Huma Qureshi. Filter by genre and author, read online, or download complete PDFs.`,
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: absoluteUrl('/novel') },
+  openGraph: {
+    type: "website",
+    title: `${TITLE} | ${SITE_NAME}`,
+    description: DESCRIPTION,
+    url: absoluteUrl('/novel'),
+    siteName: SITE_NAME,
+    images: [{ url: DEFAULT_SITE_IMAGES.defaultBanner, alt: `${TITLE} — ${SITE_NAME}` }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${TITLE} | ${SITE_NAME}`,
+    description: DESCRIPTION,
+    images: [DEFAULT_SITE_IMAGES.defaultBanner],
+  },
 };
 
-const PAGE_SIZE = 20;
+export default async function Page() {
+  const [novels, pdfs, meta] = await Promise.all([
+    getAllNovels(),
+    getAllPDFs(),
+    getAllMetadata(),
+  ]);
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string; category?: string }>;
-}) {
-  const sp = await searchParams;
-  const categorySlug = typeof sp?.category === 'string' ? sp.category : '';
-  const parsed = Number.parseInt(sp?.page || '1', 10);
-  const currentPage = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
-  const pageIndex = currentPage - 1;
-
-  // When arriving from a category link (?category=...), show that category's novels.
-  const { initialNovels, totalNovelCount, totalPages } = categorySlug
-    ? await (async () => {
-        const novels = await getNovelsByCategory(categorySlug);
-        return { initialNovels: novels, totalNovelCount: novels.length, totalPages: 1 };
-      })()
-    : await (async () => {
-        const novels = await getPaginatedNovels(pageIndex, PAGE_SIZE);
-        const count = await getTotalNovelCount();
-        const pages = Math.max(1, Math.ceil((count || 0) / PAGE_SIZE));
-        if (pageIndex + 1 < pages) {
-          void prefetchPages(pageIndex + 1, 1).catch(() => {});
-        }
-        return { initialNovels: novels, totalNovelCount: count, totalPages: pages };
-      })();
-
-  const { writers, genres } = await getAllMetadata();
+  const all = [...novels, ...pdfs].sort(
+    (a, b) => new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime()
+  );
 
   return (
     <div>
       <Suspense fallback={null}>
         <NovelPageClient
-          initialNovels={initialNovels}
-          writers={writers}
-          genres={genres}
-          totalNovelCount={totalNovelCount}
-          currentPage={Math.min(currentPage, totalPages)}
-          totalPages={totalPages}
+          initialNovels={all}
+          writers={meta.writers}
+          genres={meta.genres}
+          totalNovelCount={all.length}
         />
       </Suspense>
     </div>

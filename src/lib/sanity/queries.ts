@@ -293,6 +293,25 @@ export async function getTotalPDFCount() {
   return count;
 }
 
+// Combined listing helpers — fetch every item (no pagination) for the unified "All Novels" page.
+export async function getAllNovels() {
+  const novels = await getPaginatedNovels(0, 1000);
+  return (Array.isArray(novels) ? novels : []).map((novel: any) => ({
+    ...novel,
+    _kind: "novel" as const,
+    date: novel.novelreleasedate,
+  }));
+}
+
+export async function getAllPDFs() {
+  const pdfs = await getPaginatedPDFs(0, 1000);
+  return (Array.isArray(pdfs) ? pdfs : []).map((pdf: any) => ({
+    ...pdf,
+    _kind: "pdf" as const,
+    date: pdf.pdfreleasedate,
+  }));
+}
+
 // Prefetch utility for common pages
 export async function prefetchPages(startPage: number, pageCount: number = 3) {
   const promises = [];

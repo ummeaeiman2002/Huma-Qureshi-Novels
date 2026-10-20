@@ -31,7 +31,7 @@ async function getNovel(slug: string) {
     writer->{writername,_id,writerslug,writerbio,writerbiofull,writercardimageurl,"writerimage":writerimage.asset->url,sociallinks[]{_key,label,url}},
     relatednovels[]->{_id,title,banner,slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
     relatedstories[]->{_id,title,banner,slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
-    comment[]->{name,_id,comment,_createdAt}
+    "comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}
   }`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
 }
@@ -58,17 +58,25 @@ async function getRelatedNovels(novel: any, id: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const novel = await getNovel(slug);
-  if (!novel) return { title: "Novel not found | Huma Qureshi Novels" };
+  if (!novel) return { title: "Novel not found | Huma Qureshi Novels", robots: { index: false, follow: true } };
   const description =
     novel.seodescription ||
     cleanDescription(novel.noveldescription, `Read ${novel.title} by ${novel.writer?.writername || "the author"} on ${SITE_NAME}.`);
   const url = absoluteUrl(`/novel/${novel.slug?.current || slug}`);
+  const episodeCount = await client.fetch<number>(
+    `count(*[_type == "novel" && references($id) && (!defined(episodereleasedate) || episodereleasedate <= now())])`,
+    { id: novel._id }
+  );
+  const hasBody = Boolean(
+    novel.noveldescription || novel.aboutnovel || novel.storyintro || novel.tagline
+  );
+  const isThin = !hasBody && !episodeCount;
   return {
     title: novel.seotitle || `${novel.title} by ${novel.writer?.writername || "Author"}`,
     description,
     alternates: { canonical: url },
     openGraph: { title: novel.title, description, url, type: "article", images: novel.banner ? [{ url: novel.banner, alt: `${novel.title} cover` }] : [] },
-    robots: { index: true, follow: true },
+    robots: isThin ? { index: false, follow: true } : { index: true, follow: true },
   };
 }
 

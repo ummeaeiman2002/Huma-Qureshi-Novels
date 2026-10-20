@@ -9,6 +9,7 @@ export async function addCommentAction(novelId: string, name: string, commentTex
     _type: "comment",
     name,
     comment: commentText,
+    approved: false,
     _createdAt: new Date().toISOString(),
   });
 

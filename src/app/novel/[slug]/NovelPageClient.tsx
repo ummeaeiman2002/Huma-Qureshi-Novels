@@ -16,7 +16,6 @@ import Heading from "@/app/components/Heading";
 import Heading2 from "@/app/components/Heading2";
 import AuthorNote from "@/app/components/novelPage/AuthoNote";
 import ViewsBadge from "@/app/components/ViewsBadge";
-import BookmarkButton from "@/app/components/BookmarkButton";
 import Reactions from "@/app/components/Reactions";
 import AboutAuthor from "@/app/components/novelPage/AboutAuthor";
 import ImportantNote from "@/app/components/novelPage/ImportantNote";
@@ -42,7 +41,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [comments, setComments] = useState<CommentItem[]>(initialNovel.comment || []);
+  const [comments] = useState<CommentItem[]>(initialNovel.comment || []);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,10 +80,9 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
     if (!commentName.trim() || !commentText.trim() || isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const created = await addCommentAction(novel._id, commentName.trim(), commentText.trim());
-      setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
+      await addCommentAction(novel._id, commentName.trim(), commentText.trim());
       setCommentName(""); setCommentText("");
-      alert("Your comment has been posted. Thank you!");
+      alert("Thank you! Your comment has been submitted and will appear after review.");
     } catch (err) {
       console.error("Comment submission failed:", err);
       alert("Sorry, your comment could not be posted. Please try again.");
@@ -118,7 +116,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
             <ViewsBadge views={views} />
           </div>
           <div className="rounded-2xl overflow-hidden border border-secondary/30 shadow-2xl">
-            <Image src={novel.banner || defaultBanner} alt={`${novel.title} banner`} width={1920} height={1080} priority quality={85} className="w-full h-auto object-cover" />
+            <Image src={novel.banner || defaultBanner} alt={`${novel.title} banner`} width={0} height={0} sizes="(max-width: 1024px) 100vw, 900px" priority quality={85} style={{ width: "100%", height: "auto" }} />
           </div>
         </div>
       </section>
@@ -169,7 +167,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
           return (
             <div className="mx-2 sm:mx-6 lg:mx-20 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border-2 border-gold bg-gradient-to-r from-surface to-gold/15 p-5 shadow-xl">
               <div className="flex flex-col gap-1 text-center sm:text-start">
-                <span className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-[#e65564] text-white text-xs font-extrabold uppercase tracking-wide">
+                <span className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-gold-dark text-white text-xs font-extrabold uppercase tracking-wide">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" /></svg>
                   New Episode
                 </span>
@@ -204,7 +202,6 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
       )}
 
       <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-5 justify-center items-center px-4 sm:px-0">
-        <BookmarkButton slug={slug} title={novel.title || ""} type="novel" />
         <ShareButton title={novel.title || ""} />
         {isValidUrl(novel.youtubeurl) && <WatchOnYT YTurl={novel.youtubeurl} />}
       </div>

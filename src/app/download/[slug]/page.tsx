@@ -132,8 +132,8 @@ export default async function DownloadPage({
           <p className="mt-2 text-sm opacity-70 max-w-md mx-auto">
             This novel&apos;s PDF could not be prepared. Please go back and try another title from the library.
           </p>
-          <Link href="/pdf" className="inline-block mt-6 px-6 py-2 sm:px-6 sm:py-2.5 rounded-full bg-brand text-white font-bold text-sm sm:text-base hover:bg-brand-dark transition">
-            Browse PDF Library
+          <Link href="/novel" className="inline-block mt-6 px-6 py-2 sm:px-6 sm:py-2.5 rounded-full bg-brand text-white font-bold text-sm sm:text-base hover:bg-brand-dark transition">
+            Browse All Novels
           </Link>
         </section>
       ) : (
@@ -150,15 +150,15 @@ export default async function DownloadPage({
               href={pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-brand text-white font-bold text-sm sm:text-base lg:text-lg px-6 py-3 sm:px-7 sm:py-3.5 rounded-full shadow-lg hover:bg-brand-dark hover:shadow-[0_0_20px_rgba(30,93,80,0.4)] active:scale-95 transition-all duration-300"
+              className="inline-flex items-center gap-3 bg-brand text-white font-bold text-sm sm:text-base lg:text-lg px-6 py-3 sm:px-7 sm:py-3.5 rounded-full shadow-lg hover:bg-brand-dark hover:shadow-[0_0_20px_rgba(164,135,80,0.4)] active:scale-95 transition-all duration-300"
             >
                 <svg width="18" height="18" className="sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
                 <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Download PDF
             </a>
-            <Link href="/pdf" className="text-sm font-bold text-brand hover:underline transition">
-              Or browse more PDFs
+            <Link href="/novel" className="text-sm font-bold text-brand hover:underline transition">
+              Or browse all novels
             </Link>
           </section>
         </>

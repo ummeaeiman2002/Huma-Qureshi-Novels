@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 import { client } from "@/sanity/lib/client";
 import { SITE_URL } from "@/lib/seo";
 
@@ -21,7 +21,7 @@ async function getUrls() {
     { next: { revalidate: 3600 } },
   );
 
-  const staticPages = ["", "/about", "/contact", "/privacypolicy", "/terms", "/novel", "/pdf", "/short-stories"];
+  const staticPages = ["", "/about", "/contact", "/privacypolicy", "/terms", "/novel"];
   const urls: MetadataRoute.Sitemap = staticPages.map((path) => ({
     url: `${SITE_URL}${path}`,
     changeFrequency: path === "" ? "daily" : "monthly",

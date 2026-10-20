@@ -8,7 +8,7 @@ import Comment from "@/app/components/novelPage/Comment";
 type CommentItem = { _id: string; name: string; comment: string; _createdAt: string };
 
 export default function PDFComments({ pdfId, initialComments }: { pdfId: string; initialComments: CommentItem[] }) {
-  const [comments, setComments] = useState<CommentItem[]>(initialComments || []);
+  const [comments] = useState<CommentItem[]>(initialComments || []);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,11 +25,10 @@ export default function PDFComments({ pdfId, initialComments }: { pdfId: string;
     if (!commentName.trim() || !commentText.trim() || isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const created = await addCommentAction(pdfId, commentName.trim(), commentText.trim());
-      setComments((old) => [...old, { _id: created._id, name: commentName.trim(), comment: commentText.trim(), _createdAt: created._createdAt }]);
+      await addCommentAction(pdfId, commentName.trim(), commentText.trim());
       setCommentName("");
       setCommentText("");
-      alert("Your comment has been posted. Thank you!");
+      alert("Thank you! Your comment has been submitted and will appear after review.");
     } catch (err) {
       console.error("Comment submission failed:", err);
       alert("Sorry, your comment could not be posted. Please try again.");

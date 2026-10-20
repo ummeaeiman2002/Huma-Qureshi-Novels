@@ -3,72 +3,74 @@
 import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "./Filter";
+import ActiveFilters, { type ActiveFilterItem } from "./ActiveFilters";
 
-export default function HomeFilter({
-  writers,
-  genres,
-}: {
-  writers: string[];
-  genres: string[];
-}) {
+export default function HomeFilter({ genres }: { genres: string[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [selectedWriter, setSelectedWriter] = useState(
-    searchParams.get("writer") || ""
-  );
-  const [selectedSort, setSelectedSort] = useState(
-    searchParams.get("sort") || ""
+  const [selectedType, setSelectedType] = useState(
+    searchParams.get("type") || ""
   );
   const [selectedGenres, setSelectedGenres] = useState<string[]>(
     searchParams.get("genre")?.split(",").filter(Boolean) || []
   );
-  const [youtubeOnly, setYoutubeOnly] = useState(
-    searchParams.get("yt") === "1"
+
+  const hasFilters = selectedType !== "" || selectedGenres.length > 0;
+
+  // Update state and push the new query string (used by Apply and chip removal)
+  const commit = useCallback(
+    (overrides: { type?: string; genres?: string[] }) => {
+      const t = overrides.type ?? selectedType;
+      const g = overrides.genres ?? selectedGenres;
+
+      setSelectedType(t);
+      setSelectedGenres(g);
+
+      const params = new URLSearchParams();
+      if (t) params.set("type", t);
+      if (g.length > 0) params.set("genre", g.join(","));
+
+      const qs = params.toString();
+      router.push(qs ? `/?${qs}` : "/", { scroll: false });
+    },
+    [selectedType, selectedGenres, router]
   );
 
-  const hasFilters =
-    selectedWriter !== "" ||
-    selectedSort !== "" ||
-    selectedGenres.length > 0 ||
-    youtubeOnly;
-
-  const applyFilters = useCallback(() => {
-    const params = new URLSearchParams();
-    if (selectedWriter) params.set("writer", selectedWriter);
-    if (selectedSort) params.set("sort", selectedSort);
-    if (selectedGenres.length > 0)
-      params.set("genre", selectedGenres.join(","));
-    if (youtubeOnly) params.set("yt", "1");
-    const qs = params.toString();
-    router.push(qs ? `/?${qs}` : "/");
-    router.refresh();
-  }, [router, selectedWriter, selectedSort, selectedGenres, youtubeOnly]);
-
   const clearFilters = useCallback(() => {
-    setSelectedWriter("");
-    setSelectedSort("");
-    setSelectedGenres([]);
-    setYoutubeOnly(false);
-    router.push("/");
-    router.refresh();
-  }, [router]);
+    commit({ type: "", genres: [] });
+  }, [commit]);
+
+  const activeItems: ActiveFilterItem[] = [
+    ...(selectedType
+      ? [
+          {
+            key: "type",
+            label: "Type",
+            value: selectedType,
+            onRemove: () => commit({ type: "" }),
+          },
+        ]
+      : []),
+    ...selectedGenres.map((g) => ({
+      key: `genre-${g}`,
+      label: "Genre",
+      value: g,
+      onRemove: () => commit({ genres: selectedGenres.filter((x) => x !== g) }),
+    })),
+  ];
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex w-full flex-col items-center gap-4">
       <Filter
+        title="Find Your Next Read"
+        description="Filter Urdu novels by genre, or switch between episodic novels, complete PDFs and audio books."
         dropdowns={[
           {
-            label: writers.length > 1 ? "Writers" : "Writer",
-            options: writers,
-            value: selectedWriter,
-            onChange: (v: any) => setSelectedWriter(v),
-          },
-          {
-            label: "Sort By",
-            options: ["Latest", "Trending", "Popular"],
-            value: selectedSort,
-            onChange: (v: any) => setSelectedSort(v),
+            label: "Type",
+            options: ["Episodic", "PDF", "Audio Books"],
+            value: selectedType,
+            onChange: (v: any) => setSelectedType(v),
           },
         ]}
         checkboxes={genres.map((genre) => ({
@@ -79,20 +81,15 @@ export default function HomeFilter({
               checked ? [...prev, genre] : prev.filter((g) => g !== genre)
             ),
         }))}
-        toggle={{
-          label: "YouTube Novels",
-          value: youtubeOnly,
-          onChange: (value: boolean) => setYoutubeOnly(value),
-        }}
-        onclick={applyFilters}
+        onclick={() => commit({})}
       />
+
       {hasFilters && (
-        <button
-          onClick={clearFilters}
-          className="border-2 border-line text-ink font-bold px-5 py-2 sm:px-6 text-sm rounded-full hover:border-brand hover:text-brand hover:shadow-[0_0_12px_rgba(30,93,80,0.15)] active:scale-95 transition-all duration-300"
-        >
-          Clear Filters
-        </button>
+        <ActiveFilters
+          items={activeItems}
+          onClearAll={clearFilters}
+          className="w-full justify-center sm:justify-start"
+        />
       )}
     </div>
   );

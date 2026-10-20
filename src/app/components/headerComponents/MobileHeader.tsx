@@ -1,13 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Logo from "../Logo";
 import Search from "./Search";
-import { NAV_LINKS, BOOKMARKS_LINK } from "./navLinks";
+import { NAV_LINKS } from "./navLinks";
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function MobileHeader() {
   const [menu, setMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -45,21 +52,43 @@ export default function MobileHeader() {
 
   return (
     <>
-      <header className="lg:hidden sticky top-0 z-50 bg-surface/95 backdrop-blur text-brand border-b border-line shadow-[0_2px_14px_rgba(11,59,52,0.08)]">
-        <div className={`flex items-center justify-between px-5 transition-all duration-300 ${scrolled ? "py-1.5" : "py-2.5"}`}>
-          <Logo scrolled={scrolled} invert />
+      <header className="sticky top-0 z-50 border-b border-gold/15 bg-brand-deep/95 backdrop-blur-md text-cream lg:hidden">
+        {/* Gold crown line */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-gold/70 to-transparent"
+        />
+
+        <div
+          className={`flex items-center justify-between px-5 transition-all duration-300 ${
+            scrolled ? "py-1.5" : "py-2.5"
+          }`}
+        >
+          <Logo scrolled={scrolled} />
 
           <button
             onClick={() => setMenu(!menu)}
             aria-expanded={menu}
             aria-controls="mobile-nav"
             aria-label={menu ? "Close menu" : "Open menu"}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-brand/10 transition-colors"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/25 bg-white/5 transition-colors hover:border-gold/50"
           >
             <span className="flex flex-col gap-1.5">
-              <span className={`block w-6 h-0.5 bg-brand rounded-full transition-all duration-300 ${menu ? "translate-y-2 rotate-45" : ""}`} />
-              <span className={`block w-6 h-0.5 bg-brand rounded-full transition-all duration-300 ${menu ? "opacity-0" : "opacity-100"}`} />
-              <span className={`block w-6 h-0.5 bg-brand rounded-full transition-all duration-300 ${menu ? "-translate-y-2 -rotate-45" : ""}`} />
+              <span
+                className={`block h-0.5 w-6 rounded-full bg-gold transition-all duration-300 ${
+                  menu ? "translate-y-2 rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`block h-0.5 w-6 rounded-full bg-gold transition-all duration-300 ${
+                  menu ? "opacity-0" : "opacity-100"
+                }`}
+              />
+              <span
+                className={`block h-0.5 w-6 rounded-full bg-gold transition-all duration-300 ${
+                  menu ? "-translate-y-2 -rotate-45" : ""
+                }`}
+              />
             </span>
           </button>
         </div>
@@ -73,7 +102,7 @@ export default function MobileHeader() {
 
       {menu && (
         <div
-          className="lg:hidden fixed inset-0 top-0 bg-black/40 z-40"
+          className="fixed inset-0 top-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setMenu(false)}
           aria-hidden="true"
         />
@@ -82,27 +111,46 @@ export default function MobileHeader() {
       <nav
         id="mobile-nav"
         aria-label="Mobile"
-        className={`lg:hidden fixed top-0 right-0 h-full w-[80%] max-w-[320px] bg-surface border-l border-line shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col pt-24 px-6 pb-8 overflow-y-auto ${
+        className={`fixed inset-y-0 right-0 z-50 flex w-[82%] max-w-[330px] flex-col border-l border-gold/20 bg-brand-deep px-6 pb-8 pt-24 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
           menu ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex flex-col gap-2">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenu(false)}
-              className="px-4 py-3 rounded-xl text-base font-bold text-brand hover:text-brand-deep hover:bg-brand/8 transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <span className="ui-eyebrow text-gold">Menu</span>
+
+        <div className="mt-5 flex flex-col gap-1">
+          {NAV_LINKS.map((link) => {
+            const active = isActivePath(pathname, link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenu(false)}
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-bold transition-colors duration-200 ${
+                  active
+                    ? "bg-gold/10 text-gold"
+                    : "text-cream/80 hover:bg-white/5 hover:text-cream"
+                }`}
+              >
+                {link.label}
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 rounded-full bg-gold"
+                  />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="mt-auto border-t border-cream/10 pt-6">
           <Link
-            href={BOOKMARKS_LINK.href}
+            href="/novel"
             onClick={() => setMenu(false)}
-            className="mt-2 px-4 py-3 rounded-xl text-base font-bold border border-gold/60 text-gold-dark hover:bg-gold hover:text-brand-deep transition-colors text-center"
+            className="flex w-full items-center justify-center rounded-full border border-gold/40 bg-gold/10 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gold transition-all duration-200 hover:bg-gold hover:text-brand-deep"
           >
-            {BOOKMARKS_LINK.label}
+            Read Now
           </Link>
         </div>
       </nav>

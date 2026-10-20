@@ -120,10 +120,10 @@ export default function Search() {
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className={`flex items-center gap-2 w-full lg:w-[260px] rounded-full border-2 px-4 py-2.5 bg-surface transition-all duration-300 ${
+        className={`flex items-center gap-2 w-full lg:w-[260px] rounded-full border px-4 py-2.5 bg-white/5 transition-all duration-300 ${
           focused
-            ? "border-brand shadow-[0_0_16px_rgba(30,93,80,0.25)]"
-            : "border-line hover:border-brand/50 shadow-sm"
+            ? "border-gold shadow-[0_0_18px_rgba(164,135,80,0.28)]"
+            : "border-cream/20 hover:border-gold/50"
         }`}
       >
         {/* Search icon */}
@@ -132,12 +132,14 @@ export default function Search() {
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={focused ? "#1E5D50" : "#71817B"}
+          stroke="currentColor"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="shrink-0 transition-colors duration-300"
           aria-hidden="true"
+          className={`shrink-0 transition-colors duration-300 ${
+            focused ? "text-gold" : "text-cream/60"
+          }`}
         >
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
@@ -154,7 +156,7 @@ export default function Search() {
           aria-label="Search novels and PDFs"
           aria-autocomplete="list"
           aria-controls="search-listbox"
-          className="flex-1 text-sm text-ink bg-transparent focus:outline-none placeholder:text-[#71817B] font-medium"
+          className="flex-1 text-sm text-cream bg-transparent focus:outline-none placeholder:text-cream/45 font-medium"
         />
 
         {/* Clear button */}
@@ -167,7 +169,7 @@ export default function Search() {
               setResults([]);
               inputRef.current?.focus();
             }}
-            className="shrink-0 w-5 h-5 rounded-full bg-line flex items-center justify-center hover:bg-brand hover:text-white text-[#71817B] transition-all duration-200"
+            className="shrink-0 w-5 h-5 rounded-full bg-cream/10 flex items-center justify-center hover:bg-gold hover:text-brand-deep text-cream/70 transition-all duration-200"
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -184,22 +186,22 @@ export default function Search() {
           role="listbox"
           aria-label="Search results"
           style={{ position: "fixed", top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
-          className="rounded-2xl max-h-80 overflow-y-auto z-[9999] border-2 border-line bg-surface shadow-[0_8px_32px_rgba(30,93,80,0.15)]"
+          className="rounded-2xl max-h-80 overflow-y-auto z-[9999] border-2 border-line bg-surface shadow-[0_8px_32px_rgba(164,135,80,0.15)]"
         >
           {loading && (
             <div className="flex items-center gap-3 p-4">
               <div className="w-4 h-4 border-2 border-brand border-t-transparent rounded-full animate-spin" />
-              <span className="text-sm text-[#71817B] font-medium">Searching...</span>
+              <span className="text-sm text-[#625D54] font-medium">Searching...</span>
             </div>
           )}
 
           {!loading && results.length === 0 && (
             <div className="flex flex-col items-center gap-2 p-6">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DCCFC2" strokeWidth="1.5" strokeLinecap="round">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DED4C5" strokeWidth="1.5" strokeLinecap="round">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
-              <p className="text-sm text-[#71817B] font-medium">No results found</p>
+              <p className="text-sm text-[#625D54] font-medium">No results found</p>
             </div>
           )}
 
@@ -227,7 +229,7 @@ export default function Search() {
                     />
                   ) : (
                     <div className="w-11 h-11 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1E5D50" strokeWidth="2" strokeLinecap="round">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#292824" strokeWidth="2" strokeLinecap="round">
                         <path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 010-5H20" />
                       </svg>
                     </div>
@@ -255,7 +257,7 @@ export default function Search() {
                   </div>
 
                   {/* Arrow */}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={idx === activeIndex ? "#1E5D50" : "#DCCFC2"} strokeWidth="2" strokeLinecap="round" className="shrink-0 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={idx === activeIndex ? "#292824" : "#DED4C5"} strokeWidth="2" strokeLinecap="round" className="shrink-0 transition-colors">
                     <path d="M9 18l6-6-6-6" />
                   </svg>
                 </li>

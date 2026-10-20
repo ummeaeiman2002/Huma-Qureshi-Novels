@@ -4,12 +4,10 @@ import "./globals.css";
 import Footer from "./components/headerComponents/Footer";
 import MobileHeader from "./components/headerComponents/MobileHeader";
 import DesktopHeader from "./components/headerComponents/DesktopHeader";
-import TopUtilityBar from "./components/headerComponents/TopUtilityBar";
 import Up from "./components/headerComponents/Up";
 import Script from "next/script";
 import AuthProvider from "./components/AuthProvider";
 import CookieConsent from "./components/CookieConsent";
-import { PremiumThemeProvider } from "./components/PremiumThemeProvider";
 import { UserIdProvider } from "./context/UserIdContext";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import { getSiteSettings } from "@/lib/sanity/siteSettings";
@@ -37,13 +35,14 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const siteImages = await getSiteSettings();
   return <html lang="en"><body className={`bg-cream text-ink ${nastaliq.variable} ${playfair.variable} ${geistMono.variable} ${geistSans.variable} ${inter.variable}`}>
-    <SiteSettingsProvider value={siteImages}><AuthProvider><PremiumThemeProvider><UserIdProvider><TopUtilityBar /><MobileHeader /><DesktopHeader /><div className="px-5 lg:px-20 overflow-x-hidden">{children}</div><Footer /></UserIdProvider>
+    <SiteSettingsProvider value={siteImages}><AuthProvider><UserIdProvider><MobileHeader /><DesktopHeader /><div className="px-5 lg:px-20 overflow-x-hidden">{children}</div><Footer /></UserIdProvider>
       <Up />
       <CookieConsent />
       <NewUploadAlert />
+      <Script id="consent-mode-default" strategy="beforeInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});`}</Script>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-X7F51SY5RZ" strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-X7F51SY5RZ');`}</Script>
       {ADSENSE_ID && <Script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`} strategy="beforeInteractive" crossOrigin="anonymous" />}
-    </PremiumThemeProvider></AuthProvider></SiteSettingsProvider>
+    </AuthProvider></SiteSettingsProvider>
   </body></html>;
 }

@@ -10,8 +10,6 @@ interface PageHeroProps {
   description?: string;
   accent?: string;
   badge?: string;
-  /** Small trust/value pills shown under the intro text. */
-  chips?: string[];
   /** Optional stat tiles shown in the side panel (overrides the default quick links). */
   highlights?: Highlight[];
   /** Optional call-to-action buttons. */
@@ -22,32 +20,16 @@ interface PageHeroProps {
   children?: React.ReactNode;
 }
 
-const DEFAULT_CHIPS = [
-  "100% Free to Read",
-  "No Sign-up Needed",
-  "Read Online & Offline",
-];
-
 const DEFAULT_LINKS: Action[] = [
-  { label: "Episodic Novels", href: "/novel" },
-  { label: "PDF Library", href: "/pdf" },
-  { label: "Short Stories", href: "/short-stories" },
+  { label: "All Novels", href: "/novel" },
+  { label: "About the Author", href: "/about" },
 ];
-
-function CheckIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true" className="shrink-0 text-gold">
-      <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 export default function PageHero({
   title,
   description,
   accent,
   badge,
-  chips = DEFAULT_CHIPS,
   highlights,
   actions,
   aside,
@@ -96,20 +78,6 @@ export default function PageHero({
             <p className="max-w-2xl text-base leading-8 font-semibold text-gold lg:text-lg">
               {accent}
             </p>
-          )}
-
-          {chips.length > 0 && (
-            <ul className={`mt-1 flex flex-wrap gap-2 ${centered ? "justify-center" : ""}`}>
-              {chips.map((chip) => (
-                <li
-                  key={chip}
-                  className="flex items-center gap-1.5 rounded-full border border-cream/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-cream/90"
-                >
-                  <CheckIcon />
-                  {chip}
-                </li>
-              ))}
-            </ul>
           )}
 
           {actions && actions.length > 0 && (

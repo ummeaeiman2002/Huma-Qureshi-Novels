@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 
 interface UserIdContextType {
   userId: string | null;
-  isPremium: boolean;
   isLoading: boolean;
 }
 
@@ -14,7 +13,6 @@ const UserIdContext = createContext<UserIdContextType | undefined>(undefined);
 export function UserIdProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [userId, setUserId] = useState<string | null>(null);
-  const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -24,17 +22,15 @@ export function UserIdProvider({ children }: { children: React.ReactNode }) {
 
     if (session?.user?.id && session.user.paymentStatus === "completed") {
       setUserId(session.user.id);
-      setIsPremium(true);
     } else {
       setUserId(null);
-      setIsPremium(false);
     }
 
     setIsLoading(false);
   }, [session, status]);
 
   return (
-    <UserIdContext.Provider value={{ userId, isPremium, isLoading }}>
+    <UserIdContext.Provider value={{ userId, isLoading }}>
       {children}
     </UserIdContext.Provider>
   );

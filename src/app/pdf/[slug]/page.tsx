@@ -12,7 +12,6 @@ import PDFComments from "./PDFComments";
 import ViewsBadge from "@/app/components/ViewsBadge";
 import RelatedContent from "@/app/components/RelatedContent";
 import YouTubeSection from "@/app/components/YouTubeSection";
-import BookmarkButton from "@/app/components/BookmarkButton";
 import DownloadSection from "@/app/components/novelPage/DownloadSection";
 import Characters from "@/app/components/novelPage/Characters";
 import ReaderHighlights from "@/app/components/novelPage/ReaderHighlights";
@@ -29,7 +28,7 @@ export const revalidate = 300;
 type Props = { params: Promise<{ slug: string }> };
 
 async function getPdf(slug: string) {
-  const query = `*[_type == "pdf" && slug.current == $slug && writer->writername == "Huma Qureshi"][0]{title, englishtitle, slug, pdfdescription, pdfshortdescription, pdfreleasedate, descriptionlanguage, authornote, authornotelang, language, views, writer->{writername,_id}, genre->{genrename,_id}, banner, _id, tags, themes, characterintro, "characters": characters[]{_key, name, role, description, "imageUrl": image.asset->url}, readerhighlightintro, "readerhighlights": readerhighlights[]{_key, title, description}, "sneakPeeks": sneakPeeks[]{_key, "imageUrl": image.asset->url, scene, sceneIsUrdu, caption, chapterReference, order}, pdfurl, youtubeurl, downloadfile{asset->{url,size}}, downloadtitle, downloaddescription, downloadformat, downloadsize, pdfnumberofpages, externaldownloadurl, downloadbuttonlabel, seotitle, seodescription, comment[]->{name,_id,comment,_createdAt}}`;
+  const query = `*[_type == "pdf" && slug.current == $slug && writer->writername == "Huma Qureshi"][0]{title, englishtitle, slug, pdfdescription, pdfshortdescription, pdfreleasedate, descriptionlanguage, authornote, authornotelang, language, views, writer->{writername,_id}, genre->{genrename,_id}, banner, _id, tags, themes, characterintro, "characters": characters[]{_key, name, role, description, "imageUrl": image.asset->url}, readerhighlightintro, "readerhighlights": readerhighlights[]{_key, title, description}, "sneakPeeks": sneakPeeks[]{_key, "imageUrl": image.asset->url, scene, sceneIsUrdu, caption, chapterReference, order}, pdfurl, youtubeurl, downloadfile{asset->{url,size}}, downloadtitle, downloaddescription, downloadformat, downloadsize, pdfnumberofpages, externaldownloadurl, downloadbuttonlabel, seotitle, seodescription, "comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}}`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
 }
 
@@ -138,7 +137,7 @@ export default async function Page({ params }: Props) {
     <main className="flex flex-col py-5 gap-6 lg:gap-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "PDF", href: "/pdf" }, { label: pdf.title || "PDF" }]} />
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "All Novels", href: "/novel" }, { label: pdf.title || "PDF" }]} />
 
       {/* HERO — book detail */}
       <section className="relative overflow-hidden rounded-3xl border border-line bg-cream-soft shadow-xl">
@@ -181,14 +180,11 @@ export default async function Page({ params }: Props) {
                 </span>
               ) : null}
             </div>
-            <div className="flex flex-wrap gap-3 justify-center lg:justify-start pt-2">
-              <BookmarkButton slug={pdf.slug?.current || ""} title={pdf.title || ""} type="pdf" />
-            </div>
             <Link
-              href="/pdf"
+              href="/novel"
               className="inline-flex w-fit mx-auto lg:mx-0 items-center gap-1 text-sm font-bold text-brand hover:underline"
             >
-              ← Back to PDF Library
+              ← Back to All Novels
             </Link>
           </div>
           <div className="order-1 lg:order-2">
@@ -196,11 +192,12 @@ export default async function Page({ params }: Props) {
               <Image
                 src={pdf.banner || siteImages.defaultBanner}
                 alt={`${pdf.title} cover`}
-                width={1920}
-                height={1080}
+                width={0}
+                height={0}
+                sizes="(max-width: 1024px) 100vw, 700px"
                 priority
                 quality={85}
-                className="w-full h-auto object-cover"
+                style={{ width: "100%", height: "auto" }}
               />
             </div>
           </div>
