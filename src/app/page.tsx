@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import Novel from "./components/Cards/Novel";
 import PDF from "./components/Cards/PDF";
 import AuthorHero from "./components/AuthorHero";
@@ -42,7 +43,7 @@ async function getHomeContent() {
       genre->{genrename}, writer->{writername}
     },
     "latestEpisodes": *[_type == "novel" && defined(episodeslug.current) && defined(episodereleasedate) && episodereleasedate <= now() && novelparent->writer->writername == "Huma Qureshi"] | order(episodereleasedate desc) {
-      _id, name, episodereleasedate, "episodeSlug": episodeslug.current, "novelSlug": novelparent->slug.current, "novelTitle": novelparent->title
+      _id, name, episodereleasedate, "episodeSlug": episodeslug.current, "novelSlug": novelparent->slug.current, "novelTitle": novelparent->title, "novelBanner": novelparent->banner, "novelGenre": novelparent->genre->genrename
     }
   }`;
   const data = await client.fetch<any>(query, {}, { next: { revalidate: 300 } });
@@ -211,33 +212,122 @@ export default async function HomePage() {
         <section id="episodes" className="py-12">
           <Container size="wide">
             <SectionHeading eyebrow="Just Added" title="Latest Episodes" />
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 flex flex-wrap gap-5 justify-center lg:justify-start">
               {data.latestEpisodes.map((ep: any) => (
-                <li key={ep._id}>
+                <article
+                  key={ep._id}
+                  className="group relative flex w-full max-w-[260px] flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_2px_12px_rgba(41,40,36,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-[0_22px_44px_-22px_rgba(164,135,80,0.6)] active:scale-[0.99]"
+                >
                   <Link
                     href={`/novel/${ep.novelSlug}/${ep.episodeSlug}`}
-                    className="group flex items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4 transition-all duration-300 hover:border-brand hover:shadow-md"
-                  >
-                    <span className="flex min-w-0 flex-col gap-0.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wide text-gold-dark">
-                        {date(ep.episodereleasedate)}
+                    aria-label={`Read ${ep.name || ep.novelTitle} episode`}
+                    className="absolute inset-0 z-10 rounded-3xl"
+                  />
+
+                  {ep.novelBanner ? (
+                    <div className="relative aspect-video w-full overflow-hidden">
+                      <Image
+                        src={ep.novelBanner}
+                        alt={`${ep.novelTitle} cover`}
+                        fill
+                        sizes="(max-width: 640px) 90vw, 240px"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 bg-gradient-to-t from-brand-deep/85 via-brand-deep/5 to-transparent"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent"
+                      />
+                      <span className="absolute left-3 top-3 rounded-full border border-gold/30 bg-brand-deep/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-gold backdrop-blur-sm">
+                        Episode
                       </span>
-                      <span className="line-clamp-2 font-extrabold leading-snug text-brand">
-                        {ep.name || ep.novelTitle}
-                      </span>
-                      {ep.novelTitle && (
-                        <span className="truncate text-xs font-medium text-muted">
-                          From {ep.novelTitle}
+                      {ep.episodereleasedate && (
+                        <span className="absolute right-3 top-3 rounded-full border border-gold/30 bg-brand-deep/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-gold backdrop-blur-sm">
+                          {date(ep.episodereleasedate)}
                         </span>
                       )}
-                    </span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-brand transition-transform group-hover:translate-x-0.5" aria-hidden="true">
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </Link>
-                </li>
+                    </div>
+                  ) : (
+                    <div
+                      aria-hidden="true"
+                      className="hero-pattern relative flex aspect-video w-full items-center justify-center overflow-hidden bg-brand-deep"
+                    >
+                      <span className="font-display text-3xl font-extrabold text-gold/70">
+                        {(ep.name || ep.novelTitle).trim().charAt(0).toUpperCase() || "E"}
+                      </span>
+                      <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
+                    </div>
+                  )}
+
+                  <div className="flex flex-1 flex-col gap-3 px-4 pb-4 pt-3.5">
+                    {!ep.novelBanner && ep.episodereleasedate && (
+                      <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted">
+                        {date(ep.episodereleasedate)}
+                      </span>
+                    )}
+
+                    <h3 className="line-clamp-2 font-display text-lg font-extrabold leading-snug text-balance text-brand transition-colors duration-300 group-hover:text-gold-dark">
+                      {ep.name || ep.novelTitle}
+                    </h3>
+
+                    {ep.novelTitle && (
+                      <p className="line-clamp-1 text-xs font-semibold text-muted">
+                        From {ep.novelTitle}
+                      </p>
+                    )}
+
+                    <dl className="mt-auto flex flex-col gap-1.5 border-t border-line pt-2.5">
+                      <div className="flex items-baseline gap-2">
+                        <dt className="shrink-0 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-dark">
+                          Novel
+                        </dt>
+                        <span aria-hidden="true" className="h-px min-w-3 flex-1 bg-line" />
+                        <dd className="max-w-[62%] truncate text-right text-xs font-semibold text-brand">
+                          {ep.novelTitle}
+                        </dd>
+                      </div>
+                      {ep.novelGenre && (
+                        <div className="flex items-baseline gap-2">
+                          <dt className="shrink-0 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-dark">
+                            Genre
+                          </dt>
+                          <span aria-hidden="true" className="h-px min-w-3 flex-1 bg-line" />
+                          <dd className="max-w-[62%] truncate text-right text-xs font-semibold text-brand">
+                            {ep.novelGenre}
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+
+                    <div className="flex items-center justify-between gap-2 pt-2">
+                      <span className="rounded-full bg-brand px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-all duration-300 group-hover:bg-brand-dark">
+                        Read Episode
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-line text-muted transition-all duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-brand-deep"
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </article>
               ))}
-            </ul>
+            </div>
           </Container>
         </section>
       )}
