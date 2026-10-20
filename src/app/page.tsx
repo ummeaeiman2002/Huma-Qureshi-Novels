@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Novel from "./components/Cards/Novel";
 import PDF from "./components/Cards/PDF";
+import AuthorHero from "./components/AuthorHero";
 import Button from "./components/ui/Button";
 import Container from "./components/ui/Container";
 import SectionHeading from "./components/ui/SectionHeading";
@@ -86,13 +87,32 @@ export default async function HomePage() {
 
   // Featured: prefer curated "featured" flag; otherwise fall back to the most
   // viewed published novels. Never label every book as featured.
-  const featuredNovels =
+  const featuredRanked =
     data.featuredFromFlag.length > 0
       ? data.featuredFromFlag
       : [...data.popularNovels]
           .sort((a: any, b: any) => (b.totalViews || 0) - (a.totalViews || 0))
-          .slice(0, 4);
-  const featuredIds = new Set(featuredNovels.map((x: any) => x._id));
+          .slice(0, 5);
+
+  // Hero: showcase the single strongest real book. It is then excluded from the
+  // sections below so no cover is repeated (constitution §12.7 / §3).
+  const heroSource = featuredRanked[0] || null;
+  const heroBook = heroSource
+    ? {
+        title: heroSource.title || "",
+        slug: heroSource.slug?.current || "",
+        banner: heroSource.banner || "",
+        genre: heroSource.genre?.genrename || "",
+      }
+    : null;
+  const heroId = heroSource?._id;
+
+  const featuredNovels = featuredRanked
+    .filter((x: any) => x._id !== heroId)
+    .slice(0, 4);
+  const featuredIds = new Set(
+    (heroId ? [{ _id: heroId }] : []).concat(featuredNovels).map((x: any) => x._id)
+  );
 
   // Latest uploads: genuinely recent published items, excluding those already
   // shown as featured (only overlap if there is not enough distinct content).
@@ -114,48 +134,8 @@ export default async function HomePage() {
 
   return (
     <main className="flex flex-col">
-      {/* INTRODUCTION */}
-      <section aria-labelledby="welcome-heading" className="pt-6 lg:pt-8 pb-6">
-        <Container size="wide">
-          <div className="grid gap-7 rounded-3xl border border-line bg-surface p-6 shadow-sm lg:grid-cols-[1.7fr_1fr] lg:items-center lg:p-9">
-            <div className="flex flex-col gap-4">
-              <span className="ui-eyebrow">About the Library</span>
-              <h1
-                id="welcome-heading"
-                className="font-display text-2xl font-extrabold leading-tight text-brand sm:text-3xl"
-              >
-                Read Urdu Novels by Huma Qureshi Online
-              </h1>
-              <p className="text-sm leading-7 text-ink/80 sm:text-[15px] sm:leading-8">
-                Welcome to Huma Qureshi Novels, the online home of Pakistani Urdu
-                writer Huma Qureshi. Discover original Urdu fiction, explore
-                different genres, and find complete novels and episodic stories to
-                read — with complete books also available as downloadable PDFs.
-              </p>
-            </div>
-
-            <dl className="grid grid-cols-3 gap-3">
-              {[
-                { label: "Novels", value: stats?.novels ?? 0 },
-                { label: "PDF Books", value: stats?.pdfs ?? 0 },
-                { label: "Genres", value: stats?.genres ?? 0 },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="flex flex-col items-center gap-1 rounded-2xl border border-gold/25 bg-brand-deep px-3 py-5 text-center"
-                >
-                  <dd className="font-display text-2xl font-extrabold tabular-nums text-gold sm:text-3xl">
-                    {item.value.toLocaleString("en-GB")}
-                  </dd>
-                  <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-cream/70">
-                    {item.label}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </Container>
-      </section>
+      {/* HERO — premium author introduction */}
+      <AuthorHero book={heroBook} stats={stats} />
 
       {/* FEATURED NOVELS */}
       {featuredNovels.length > 0 && (
