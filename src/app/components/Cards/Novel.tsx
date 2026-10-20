@@ -25,8 +25,11 @@ export default function Novel({
   cardBanner,
   date,
   summary,
+  status,
+  language,
+  episodes,
   hrefBase = "/novel",
-  cta = "Read",
+  cta = "Read Novel",
 }: {
   href: string;
   novelName: string;
@@ -35,14 +38,13 @@ export default function Novel({
   cardBanner: string;
   date: string;
   summary?: string;
+  status?: string;
+  language?: string;
+  episodes?: number;
   hrefBase?: string;
   cta?: string;
 }) {
-  const summaryText =
-    (summary || "").trim() ||
-    `${novelName} — complete Urdu ${genre || "novel"} by ${
-      writer || "Huma Qureshi"
-    }. Read all episodes online free and download the PDF where available.`;
+  const summaryText = (summary || "").trim();
 
   return (
     <article className="group relative flex w-full max-w-[260px] flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_2px_12px_rgba(41,40,36,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-[0_22px_44px_-22px_rgba(164,135,80,0.6)] active:scale-[0.99]">
@@ -89,17 +91,33 @@ export default function Novel({
           {novelName}
         </h3>
 
-        {/* Summary */}
-        <div className="flex flex-col gap-1.5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-dark">
-            Summary
-          </p>
-          <p className="line-clamp-4 text-xs leading-5 text-ink/80">{summaryText}</p>
-        </div>
+        {status && (
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-gold/35 bg-gold/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-dark">
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-gold" />
+            {status}
+          </span>
+        )}
+
+        {/* Summary — real synopsis only, nothing fabricated */}
+        {summaryText && (
+          <div className="flex flex-col gap-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-dark">
+              Summary
+            </p>
+            <p className="line-clamp-4 text-xs leading-5 text-ink/80">{summaryText}</p>
+          </div>
+        )}
 
         {/* Details */}
         <dl className="flex flex-col gap-1.5 border-t border-line pt-2.5">
           <DetailRow label="Writer" value={writer} />
+          {typeof episodes === "number" && episodes > 0 && (
+            <DetailRow
+              label="Episodes"
+              value={`${episodes} ${episodes === 1 ? "episode" : "episodes"}`}
+            />
+          )}
+          {language && <DetailRow label="Language" value={language} />}
           <DetailRow
             label="Genre"
             value={

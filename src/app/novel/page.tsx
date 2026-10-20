@@ -1,13 +1,13 @@
-import NovelPageClient from './NovelPageClient';
-import { getAllNovels, getAllPDFs, getAllMetadata } from '@/lib/sanity/queries';
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import { absoluteUrl, SITE_NAME } from '@/lib/seo';
-import { DEFAULT_SITE_IMAGES } from '@/lib/siteDefaults';
+import NovelPageClient from "./NovelPageClient";
+import { getAllNovels, getAllPDFs, getAllMetadata } from "@/lib/sanity/queries";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { absoluteUrl, SITE_NAME } from "@/lib/seo";
+import { DEFAULT_SITE_IMAGES } from "@/lib/siteDefaults";
 
-const TITLE = "All Urdu Novels";
+const TITLE = "All Urdu Novels by Huma Qureshi";
 const DESCRIPTION =
-  "Browse all Urdu novels by Huma Qureshi in one place — read episodic novels online free and download complete PDF books.";
+  "Discover original Urdu fiction by Huma Qureshi. Explore novels across different genres, discover new stories, and continue reading your favourite characters and episodes.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,18 +37,15 @@ export default async function Page() {
   ]);
 
   const all = [...novels, ...pdfs].sort(
-    (a, b) => new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime()
+    (a, b) =>
+      new Date(b.date || b._createdAt).getTime() -
+      new Date(a.date || a._createdAt).getTime()
   );
 
   return (
     <div>
       <Suspense fallback={null}>
-        <NovelPageClient
-          initialNovels={all}
-          writers={meta.writers}
-          genres={meta.genres}
-          totalNovelCount={all.length}
-        />
+        <NovelPageClient initialNovels={all} genres={meta.genres} />
       </Suspense>
     </div>
   );

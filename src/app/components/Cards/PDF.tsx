@@ -26,6 +26,8 @@ export default function PDF({
   summary,
   format,
   size,
+  language,
+  pages,
 }: {
   href: string;
   novelName: string;
@@ -36,12 +38,10 @@ export default function PDF({
   summary?: string;
   format?: string;
   size?: string;
+  language?: string;
+  pages?: number;
 }) {
-  const summaryText =
-    (summary || "").trim() ||
-    `${novelName} — complete Urdu ${
-      genre || "novel"
-    } PDF book by ${writer || "Huma Qureshi"}. Download and read it online free on Huma Qureshi Novels.`;
+  const summaryText = (summary || "").trim();
 
   return (
     <article className="group relative flex w-full max-w-[260px] flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_2px_12px_rgba(41,40,36,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-[0_22px_44px_-22px_rgba(164,135,80,0.6)] active:scale-[0.99]">
@@ -91,17 +91,26 @@ export default function PDF({
           {novelName}
         </h3>
 
-        {/* Summary */}
-        <div className="flex flex-col gap-1.5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-dark">
-            Summary
-          </p>
-          <p className="line-clamp-4 text-xs leading-5 text-ink/80">{summaryText}</p>
-        </div>
+        {/* Summary — real synopsis only, nothing fabricated */}
+        {summaryText && (
+          <div className="flex flex-col gap-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold-dark">
+              Summary
+            </p>
+            <p className="line-clamp-4 text-xs leading-5 text-ink/80">{summaryText}</p>
+          </div>
+        )}
 
         {/* Details */}
         <dl className="flex flex-col gap-1.5 border-t border-line pt-2.5">
           <DetailRow label="Writer" value={writer} />
+          {typeof pages === "number" && pages > 0 && (
+            <DetailRow
+              label="Pages"
+              value={`${pages} ${pages === 1 ? "page" : "pages"}`}
+            />
+          )}
+          {language && <DetailRow label="Language" value={language} />}
           <DetailRow
             label="Genre"
             value={

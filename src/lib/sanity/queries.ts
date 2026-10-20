@@ -44,6 +44,8 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
     novelreleasedate,
     noveldescription,
     shortdescription,
+    novelstatus,
+    "isShortStory": coalesce(isShortStory, false),
     youtubeurl,
     tags,
     genre->{genrename},
@@ -84,6 +86,7 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
       return {
         ...novel,
         summary: novel.shortdescription || textSummary(novel.noveldescription),
+        episodeCount: novelEpisodes.length,
         totalViews,
         totalMonthlyViews,
       };
