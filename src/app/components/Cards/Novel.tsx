@@ -78,7 +78,22 @@ export default function Novel({
             </span>
           )}
         </div>
-      ) : null}
+      ) : (
+        <div
+          aria-hidden="true"
+          className="hero-pattern relative flex aspect-video w-full items-center justify-center overflow-hidden bg-brand-deep"
+        >
+          <span className="font-display text-3xl font-extrabold text-gold/70">
+            {novelName.trim().charAt(0).toUpperCase() || "H"}
+          </span>
+          <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
+          {date && (
+            <span className="absolute left-3 top-3 rounded-full border border-gold/30 bg-brand-deep/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-gold backdrop-blur-sm">
+              {date}
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col gap-3 px-4 pb-4 pt-3.5">
         {!cardBanner && date && (

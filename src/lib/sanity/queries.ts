@@ -33,8 +33,9 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
   const startIndex = page * limit;
   const endIndex = startIndex + limit;
 
-  // Fetch novels with pagination
-  const novelsQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
+  // Fetch novels with pagination. Publication date is optional: novels without a
+  // release date are still shown (they sort by creation date instead).
+  const novelsQuery = `*[_type == "novelparent" && (!defined(novelreleasedate) || novelreleasedate <= now()) && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
     title,
     englishtitle,
     banner,
@@ -192,7 +193,7 @@ export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
   const endIndex = startIndex + limit;
 
   // Fetch PDFs with pagination
-  const pdfsQuery = `*[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
+  const pdfsQuery = `*[_type == "pdf" && (!defined(pdfreleasedate) || pdfreleasedate <= now()) && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
     title,
     banner,
     _id,
