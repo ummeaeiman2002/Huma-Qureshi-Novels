@@ -114,12 +114,12 @@ export default function AuthorHero({
             aria-hidden="true"
             fill
             sizes="100vw"
-            className="scale-105 object-cover opacity-40 blur-sm"
+            className="scale-105 object-cover opacity-90"
           />
         )}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-brand-deep via-brand-deep/85 to-brand-deep/55"
+          className="absolute inset-0 bg-gradient-to-r from-brand-deep/95 via-brand-deep/80 to-brand-deep/40"
         />
         <div aria-hidden="true" className="hero-pattern absolute inset-0 opacity-[0.06]" />
         <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
