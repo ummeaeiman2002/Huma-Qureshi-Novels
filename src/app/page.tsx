@@ -92,26 +92,26 @@ export default async function HomePage() {
       ? data.featuredFromFlag
       : [...data.popularNovels]
           .sort((a: any, b: any) => (b.totalViews || 0) - (a.totalViews || 0))
-          .slice(0, 5);
+          .slice(0, 9);
 
-  // Hero: showcase the single strongest real book. It is then excluded from the
-  // sections below so no cover is repeated (constitution §12.7 / §3).
-  const heroSource = featuredRanked[0] || null;
-  const heroBook = heroSource
-    ? {
-        title: heroSource.title || "",
-        slug: heroSource.slug?.current || "",
-        banner: heroSource.banner || "",
-        genre: heroSource.genre?.genrename || "",
-      }
-    : null;
-  const heroId = heroSource?._id;
+  // Hero slider: showcase up to 4 real published books (title + cover + synopsis).
+  // These ids are then excluded from the sections below so no cover repeats
+  // (constitution §12.7 / §3). No fabricated featured/popularity claims are made.
+  const heroSlides = featuredRanked.slice(0, 4).map((n: any) => ({
+    id: n._id,
+    title: n.title || "",
+    slug: n.slug?.current || "",
+    banner: n.banner || "",
+    genre: n.genre?.genrename || "",
+    summary: n.summary || "",
+  }));
+  const heroIds = new Set(heroSlides.map((s: any) => s.id));
 
   const featuredNovels = featuredRanked
-    .filter((x: any) => x._id !== heroId)
+    .filter((x: any) => !heroIds.has(x._id))
     .slice(0, 4);
   const featuredIds = new Set(
-    (heroId ? [{ _id: heroId }] : []).concat(featuredNovels).map((x: any) => x._id)
+    heroSlides.map((s: any) => s.id).concat(featuredNovels.map((x: any) => x._id))
   );
 
   // Latest uploads: genuinely recent published items, excluding those already
@@ -134,8 +134,8 @@ export default async function HomePage() {
 
   return (
     <main className="flex flex-col">
-      {/* HERO — premium author introduction */}
-      <AuthorHero book={heroBook} stats={stats} />
+      {/* HERO — premium author slider (Zeela-style composition, own branding) */}
+      <AuthorHero slides={heroSlides} stats={stats} />
 
       {/* FEATURED NOVELS */}
       {featuredNovels.length > 0 && (
