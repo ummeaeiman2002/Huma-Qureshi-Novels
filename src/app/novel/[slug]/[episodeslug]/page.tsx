@@ -10,7 +10,7 @@ export const revalidate = 300;
 type Props = { params: Promise<{ slug: string; episodeslug: string }> };
 
 async function getEpisode(slug: string, episodeslug: string) {
-  const data = await client.fetch<any>(`*[_type == "novel" && episodeslug.current == $episodeSlug && novelparent->slug.current == $slug && novelparent->writer->writername == "Huma Qureshi" && (!defined(episodereleasedate) || episodereleasedate <= now())][0]{name,episodeslug,_id,body,views,novelparent->{title,slug,banner,"totalEpisodes": count(*[_type == "novel" && novelparent._ref == ^._id])},genre->{genrename,_id},writer->{writername,_id},episodereleasedate,tags,"comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}}`, { slug, episodeSlug: episodeslug }, { next: { revalidate: 300 } });
+  const data = await client.fetch<any>(`*[_type == "novel" && episodeslug.current == $episodeSlug && novelparent->slug.current == $slug && novelparent->writer->writername == "Huma Qureshi" && (!defined(episodereleasedate) || episodereleasedate <= now())][0]{name,episodeslug,_id,body,views,novelparent->{title,slug,"banner": coalesce(bannerImage.asset->url, banner),"totalEpisodes": count(*[_type == "novel" && novelparent._ref == ^._id])},genre->{genrename,_id},writer->{writername,_id},episodereleasedate,tags,"comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}}`, { slug, episodeSlug: episodeslug }, { next: { revalidate: 300 } });
   return data;
 }
 
@@ -36,7 +36,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!episode) return { title: `Episode not found | ${SITE_NAME}` };
   const title = `${episode.novelparent?.title} — ${episode.name}`;
   const description = `Read ${episode.name} of ${episode.novelparent?.title} by ${episode.writer?.writername || "the author"} on ${SITE_NAME}.`;
-  return { title, description, alternates: { canonical: absoluteUrl(`/novel/${slug}/${episodeslug}`) }, openGraph: { title, description, url: absoluteUrl(`/novel/${slug}/${episodeslug}`), type: "article", images: episode.novelparent?.banner ? [{ url: episode.novelparent.banner, alt: `${episode.novelparent.title} banner` }] : [] }, robots: { index: true, follow: true } };
+  const url = absoluteUrl(`/novel/${slug}/${episodeslug}`);
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: SITE_NAME,
+      type: "article",
+      images: episode.novelparent?.banner
+        ? [{ url: episode.novelparent.banner, width: 1200, height: 630, alt: `${episode.novelparent.title} banner` }]
+        : [{ url: "/icon", width: 512, height: 512, alt: SITE_NAME }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: episode.novelparent?.banner ? [episode.novelparent.banner] : ["/icon"],
+    },
+    robots: { index: true, follow: true },
+  };
 }
 
 export default async function Page({ params }: Props) {

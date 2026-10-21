@@ -56,11 +56,11 @@ export default function Novel({
       />
 
       {cardBanner ? (
-        <div className="relative aspect-video w-full overflow-hidden">
+        <div className="relative aspect-[5/6] w-full overflow-hidden">
           <Image
             alt={`${novelName} cover`}
             fill
-            sizes="(max-width: 640px) 90vw, 240px"
+            sizes="(max-width: 640px) 90vw, 260px"
             src={cardBanner}
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
@@ -81,9 +81,9 @@ export default function Novel({
       ) : (
         <div
           aria-hidden="true"
-          className="hero-pattern relative flex aspect-video w-full items-center justify-center overflow-hidden bg-brand-deep"
+          className="hero-pattern relative flex aspect-[5/6] w-full items-center justify-center overflow-hidden bg-brand-deep"
         >
-          <span className="font-display text-3xl font-extrabold text-gold/70">
+          <span className="font-display text-4xl font-extrabold text-gold/70">
             {novelName.trim().charAt(0).toUpperCase() || "H"}
           </span>
           <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />

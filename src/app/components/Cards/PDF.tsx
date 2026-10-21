@@ -53,11 +53,11 @@ export default function PDF({
       />
 
       {cardBanner ? (
-        <div className="relative aspect-video w-full overflow-hidden">
+        <div className="relative aspect-[5/6] w-full overflow-hidden">
           <Image
             alt={`${novelName} cover`}
             fill
-            sizes="(max-width: 640px) 90vw, 240px"
+            sizes="(max-width: 640px) 90vw, 260px"
             src={cardBanner}
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />

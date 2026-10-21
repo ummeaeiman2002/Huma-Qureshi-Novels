@@ -29,7 +29,7 @@ export default function DownloadSection({
   const title = data?.downloadtitle || heading;
   const label = data?.downloadbuttonlabel || "Download PDF";
 
-  const href = `/download/${slug}?type=${type}&pdf=${encodeURIComponent(pdfUrl)}`;
+  const href = `/download/${slug}`;
 
   return (
     <section aria-labelledby="download-pdf-heading" className="py-2">

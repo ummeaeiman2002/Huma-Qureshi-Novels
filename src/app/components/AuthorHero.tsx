@@ -138,21 +138,21 @@ export default function AuthorHero({
                   active ? "relative" : "pointer-events-none absolute inset-0 opacity-0"
                 } grid gap-8 px-6 py-10 transition-opacity duration-700 sm:px-10 sm:py-12 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-14 lg:px-14 lg:py-16`}
               >
-                {/* Cover (landscape) */}
+                {/* Cover (portrait 5:6 to match novel cards) */}
                 <div className="order-1 flex justify-center lg:order-none lg:justify-start">
                   <Link
                     href={`/novel/${slide.slug}`}
                     aria-label={`Read ${slide.title}`}
-                    className="group relative block w-full max-w-md overflow-hidden rounded-2xl border border-gold/30 bg-surface shadow-2xl transition-transform duration-300 hover:-translate-y-1.5"
+                    className="group relative block w-full max-w-[300px] overflow-hidden rounded-2xl border border-gold/30 bg-surface shadow-2xl transition-transform duration-300 hover:-translate-y-1.5"
                   >
-                    <div className="relative aspect-video w-full">
+                    <div className="relative aspect-[5/6] w-full">
                       {slide.banner ? (
                         <Image
                           src={slide.banner}
                           alt={`${slide.title} cover`}
                           fill
                           priority={i === 0}
-                          sizes="(max-width: 1024px) 90vw, 520px"
+                          sizes="(max-width: 1024px) 60vw, 300px"
                           className="object-cover"
                         />
                       ) : (

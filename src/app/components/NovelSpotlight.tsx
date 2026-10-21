@@ -54,7 +54,7 @@ export default async function NovelSpotlight({
       <div className="mx-2 overflow-hidden rounded-3xl border-2 border-gold/30 bg-surface shadow-xl sm:mx-6 lg:mx-20">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <div className="flex items-center justify-center p-6 lg:p-8">
-            <div className="relative aspect-video w-full max-w-[320px] overflow-hidden rounded-lg">
+            <div className="relative aspect-[5/6] w-full max-w-[300px] overflow-hidden rounded-lg">
               <Image
                 src={image}
                 alt={`${novel.title || "Novel"} preview`}

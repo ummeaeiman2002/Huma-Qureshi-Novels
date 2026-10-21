@@ -38,7 +38,7 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
   const novelsQuery = `*[_type == "novelparent" && (!defined(novelreleasedate) || novelreleasedate <= now()) && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
     title,
     englishtitle,
-    banner,
+    "banner": coalesce(bannerImage.asset->url, banner),
     _id,
     _createdAt,
     slug,
@@ -103,7 +103,7 @@ export async function getNovelsByCategory(categorySlug: string) {
   const novelsQuery = `*[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && ${HUMA_WRITER_FILTER} && category->categoryslug.current == $categorySlug] | order(_createdAt desc) {
     title,
     englishtitle,
-    banner,
+    "banner": coalesce(bannerImage.asset->url, banner),
     _id,
     _createdAt,
     slug,
@@ -195,7 +195,7 @@ export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
   // Fetch PDFs with pagination
   const pdfsQuery = `*[_type == "pdf" && (!defined(pdfreleasedate) || pdfreleasedate <= now()) && ${HUMA_WRITER_FILTER}] | order(_createdAt desc) [${startIndex}...${endIndex}] {
     title,
-    banner,
+    "banner": coalesce(bannerImage.asset->url, banner),
     _id,
     _createdAt,
     slug,
@@ -313,7 +313,7 @@ export async function getNovelsByWriter(writerId: string, limit: number = 60) {
   const query = `*[_type == "novelparent" && writer._ref == $writerId && defined(novelreleasedate) && novelreleasedate <= now()] | order(_createdAt desc) [0...$limit] {
     title,
     englishtitle,
-    banner,
+    "banner": coalesce(bannerImage.asset->url, banner),
     _id,
     _createdAt,
     slug,

@@ -25,28 +25,28 @@ export const metadata: Metadata = {
 async function getHomeContent() {
   const query = `{
     "featuredNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && featured == true] | order(novelreleasedate desc)[0...4] {
-      _id, title, banner, slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
       "episodeCount": count(*[_type == "novel" && references(^._id)]),
       "views": *[_type == "novel" && references(^._id)].views,
       genre->{genrename}, writer->{writername}
     },
     "popularNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(novelreleasedate desc) {
-      _id, title, banner, slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
       "episodeCount": count(*[_type == "novel" && references(^._id)]),
       "views": *[_type == "novel" && references(^._id)].views,
       genre->{genrename}, writer->{writername}
     },
     "latestNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(novelreleasedate desc)[0...8] {
-      _id, title, banner, slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
       "episodeCount": count(*[_type == "novel" && references(^._id)]),
       genre->{genrename}, writer->{writername}
     },
     "latestPdfs": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(pdfreleasedate desc)[0...4] {
-      _id, title, banner, slug, pdfreleasedate, pdfdescription, downloadformat, downloadsize, pdfnumberofpages,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, pdfdescription, downloadformat, downloadsize, pdfnumberofpages,
       genre->{genrename}, writer->{writername}
     },
     "latestEpisodes": *[_type == "novel" && defined(episodeslug.current) && defined(episodereleasedate) && episodereleasedate <= now() && novelparent->writer->writername == "Huma Qureshi"] | order(episodereleasedate desc) {
-      _id, name, episodereleasedate, "episodeSlug": episodeslug.current, "novelSlug": novelparent->slug.current, "novelTitle": novelparent->title, "novelBanner": novelparent->banner, "novelGenre": novelparent->genre->genrename
+      _id, name, episodereleasedate, "episodeSlug": episodeslug.current, "novelSlug": novelparent->slug.current, "novelTitle": novelparent->title, "novelBanner": coalesce(novelparent->bannerImage.asset->url, novelparent->banner), "novelGenre": novelparent->genre->genrename
     },
     "upcomingProjects": *[_type == "upcomingProject"] | order(order asc, _createdAt desc) {
       _id, title, teaser, teaserUrdu, releaseNote,
@@ -327,12 +327,12 @@ export default async function HomePage() {
                   />
 
                   {ep.novelBanner ? (
-                    <div className="relative aspect-video w-full overflow-hidden">
+                    <div className="relative aspect-[5/6] w-full overflow-hidden">
                       <Image
                         src={ep.novelBanner}
                         alt={`${ep.novelTitle} cover`}
                         fill
-                        sizes="(max-width: 640px) 90vw, 240px"
+                        sizes="(max-width: 640px) 90vw, 260px"
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                       <div
@@ -355,9 +355,9 @@ export default async function HomePage() {
                   ) : (
                     <div
                       aria-hidden="true"
-                      className="hero-pattern relative flex aspect-video w-full items-center justify-center overflow-hidden bg-brand-deep"
+                      className="hero-pattern relative flex aspect-[5/6] w-full items-center justify-center overflow-hidden bg-brand-deep"
                     >
-                      <span className="font-display text-3xl font-extrabold text-gold/70">
+                      <span className="font-display text-4xl font-extrabold text-gold/70">
                         {(ep.name || ep.novelTitle).trim().charAt(0).toUpperCase() || "E"}
                       </span>
                       <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />

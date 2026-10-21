@@ -28,7 +28,7 @@ export const revalidate = 300;
 type Props = { params: Promise<{ slug: string }> };
 
 async function getPdf(slug: string) {
-  const query = `*[_type == "pdf" && slug.current == $slug && writer->writername == "Huma Qureshi"][0]{title, englishtitle, slug, pdfdescription, pdfshortdescription, pdfreleasedate, descriptionlanguage, authornote, authornotelang, language, views, writer->{writername,_id}, genre->{genrename,_id}, banner, _id, tags, themes, characterintro, "characters": characters[]{_key, name, role, description, "imageUrl": image.asset->url}, readerhighlightintro, "readerhighlights": readerhighlights[]{_key, title, description}, "sneakPeeks": sneakPeeks[]{_key, "imageUrl": image.asset->url, scene, sceneIsUrdu, caption, chapterReference, order}, pdfurl, youtubeurl, downloadfile{asset->{url,size}}, downloadtitle, downloaddescription, downloadformat, downloadsize, pdfnumberofpages, externaldownloadurl, downloadbuttonlabel, seotitle, seodescription, "comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}}`;
+  const query = `*[_type == "pdf" && slug.current == $slug && writer->writername == "Huma Qureshi"][0]{title, englishtitle, slug, pdfdescription, pdfshortdescription, pdfreleasedate, descriptionlanguage, authornote, authornotelang, language, views, writer->{writername,_id}, genre->{genrename,_id}, "banner": coalesce(bannerImage.asset->url, banner), _id, tags, themes, characterintro, "characters": characters[]{_key, name, role, description, "imageUrl": image.asset->url}, readerhighlightintro, "readerhighlights": readerhighlights[]{_key, title, description}, "sneakPeeks": sneakPeeks[]{_key, "imageUrl": image.asset->url, scene, sceneIsUrdu, caption, chapterReference, order}, pdfurl, youtubeurl, downloadfile{asset->{url,size}}, downloadtitle, downloaddescription, downloadformat, downloadsize, pdfnumberofpages, externaldownloadurl, downloadbuttonlabel, seotitle, seodescription, "comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}}`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
 }
 
@@ -36,13 +36,13 @@ async function getRelatedPdfData(pdf: any) {
   const genreName = pdf?.genre?.genrename || "";
   const writerRef = pdf?.writer?._id || "";
   const relatedQuery = `{
-    "relatedPDFs": *[_type == "pdf" && defined(slug.current) && _id != $currentId && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(coalesce(views,0) desc)[0...6] { title, banner, slug, pdfreleasedate, views, genre->{genrename}, writer->{writername} },
+    "relatedPDFs": *[_type == "pdf" && defined(slug.current) && _id != $currentId && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(coalesce(views,0) desc)[0...6] { title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, views, genre->{genrename}, writer->{writername} },
     "recommendedNovels": *[_type == "novelparent" && defined(slug.current) && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(_createdAt desc)[0...6] {
-      _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
       "views": *[_type == "novel" && references(^._id)].views
     },
     "popularNovels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi"] | order(_createdAt desc)[0...6] {
-      _id, title, banner, slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
       "views": *[_type == "novel" && references(^._id)].views
     },
     "writers": *[_type == "writer" && writername == "Huma Qureshi"]{writername},
@@ -105,8 +105,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: pdf.title,
       description,
       url,
+      siteName: SITE_NAME,
       type: "article",
-      images: pdf.banner ? [{ url: pdf.banner, alt: `${pdf.title} cover` }] : [],
+      images: pdf.banner
+        ? [{ url: pdf.banner, width: 1200, height: 630, alt: `${pdf.title} cover` }]
+        : [{ url: "/icon", width: 512, height: 512, alt: SITE_NAME }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: pdf.title,
+      description,
+      images: pdf.banner ? [pdf.banner] : ["/icon"],
     },
     robots: { index: true, follow: true },
   };

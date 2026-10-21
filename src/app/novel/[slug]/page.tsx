@@ -18,7 +18,7 @@ async function getNovel(slug: string) {
     characterintro,"characters": characters[]{_key, name, role, description, "imageUrl": image.asset->url},
     readerhighlightintro,"readerhighlights": readerhighlights[]{_key, title, description},
     authornote,authornotelang,contentwarning,importantnote,
-    banner,tags,themes,pdfurl,youtubeurl,
+    "banner": coalesce(bannerImage.asset->url, banner),tags,themes,pdfurl,youtubeurl,
     language,novelstatus,
     numberofpages,numberofchapters,fileformat,filesize,readingavailability,
     featured,trending,
@@ -29,8 +29,8 @@ async function getNovel(slug: string) {
     genre->{genrename,_id},
     additionalgenres[]->{genrename,_id},
     writer->{writername,_id,writerslug,writerbio,writerbiofull,writercardimageurl,"writerimage":writerimage.asset->url,sociallinks[]{_key,label,url}},
-    relatednovels[]->{_id,title,banner,slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
-    relatedstories[]->{_id,title,banner,slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
+    relatednovels[]->{_id,title,"banner": coalesce(bannerImage.asset->url, banner),slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
+    relatedstories[]->{_id,title,"banner": coalesce(bannerImage.asset->url, banner),slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
     "comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}
   }`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
@@ -49,7 +49,7 @@ async function getRelatedNovels(novel: any, id: string) {
   const currentGenre = novel.genre?._id || "";
   const currentWriter = novel.writer?._id || "";
   return client.fetch<any[]>(
-    `*[_type == "novelparent" && _id != $id && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && (genre->_id == $genre || writer->_id == $writer)][0...4] { _id, title, banner, slug, novelreleasedate, noveldescription, shortdescription, genre->{genrename}, writer->{writername} }`,
+    `*[_type == "novelparent" && _id != $id && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && (genre->_id == $genre || writer->_id == $writer)][0...4] { _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, shortdescription, genre->{genrename}, writer->{writername} }`,
     { id, genre: currentGenre, writer: currentWriter },
     { next: { revalidate: 300 } }
   );
@@ -75,7 +75,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: novel.seotitle || `${novel.title} by ${novel.writer?.writername || "Author"}`,
     description,
     alternates: { canonical: url },
-    openGraph: { title: novel.title, description, url, type: "article", images: novel.banner ? [{ url: novel.banner, alt: `${novel.title} cover` }] : [] },
+    openGraph: {
+      title: novel.title,
+      description,
+      url,
+      siteName: SITE_NAME,
+      type: "article",
+      images: novel.banner
+        ? [{ url: novel.banner, width: 1200, height: 630, alt: `${novel.title} cover` }]
+        : [{ url: "/icon", width: 512, height: 512, alt: SITE_NAME }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: novel.title,
+      description,
+      images: novel.banner ? [novel.banner] : ["/icon"],
+    },
     robots: isThin ? { index: false, follow: true } : { index: true, follow: true },
   };
 }

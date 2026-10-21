@@ -15,9 +15,7 @@ export default function DownloadPDFButton({
 }) {
   const { downloadIcon } = useSiteSettings();
   const href =
-    slug && pdf
-      ? `/download/${slug}?type=${type}&pdf=${encodeURIComponent(pdf)}`
-      : pdf;
+    slug && pdf ? `/download/${slug}` : pdf;
 
   return (
     <a

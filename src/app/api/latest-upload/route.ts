@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
           "slug": slug.current,
           "type": "novel",
           novelreleasedate,
-          banner
+          "banner": coalesce(bannerImage.asset->url, banner)
         },
         "latestEpisode": *[_type == "novel" && defined(novelreleasedate) && novelreleasedate <= now() && novelparent->writer->writername == "Huma Qureshi"] | order(novelreleasedate desc) [0] {
           _id,

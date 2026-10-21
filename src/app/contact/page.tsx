@@ -22,6 +22,13 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: "https://humaqureshinovels.com/contact",
     siteName: SITE_NAME,
+    images: [{ url: "/icon", width: 512, height: 512, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary",
+    title: `${TITLE} | ${SITE_NAME}`,
+    description: DESCRIPTION,
+    images: ["/icon"],
   },
 };
 

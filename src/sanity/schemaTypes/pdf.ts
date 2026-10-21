@@ -97,10 +97,20 @@ export const pdf = defineType({
       },
     }),
     defineField({
+      name: "bannerImage",
+      type: "image",
+      title: "Banner Image (Upload)",
+      group: "basic",
+      options: { hotspot: true },
+      description:
+        "Upload the cover directly. Portrait, recommended 2500 x 3000 (5:6). If both this and Banner URL are set, this upload is used first.",
+    }),
+    defineField({
       name: "banner",
       type: "string",
-      title: "BannerUrl",
+      title: "Banner URL (External)",
       group: "basic",
+      description: "Optional external image URL. Used only when no Banner Image is uploaded.",
     }),
     defineField({
       name: "tags",

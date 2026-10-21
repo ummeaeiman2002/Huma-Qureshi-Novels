@@ -29,7 +29,24 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   alternates: { canonical: SITE_URL },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
-  openGraph: { type: "website", siteName: SITE_NAME, url: SITE_URL, title: "Read Urdu Novels Online Free | Huma Qureshi Novels", description: "Original Urdu novels, episodic stories and complete PDF books by Huma Qureshi." },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    url: SITE_URL,
+    title: "Read Urdu Novels Online Free | Huma Qureshi Novels",
+    description: "Original Urdu novels, episodic stories and complete PDF books by Huma Qureshi.",
+    images: [{ url: "/icon", width: 512, height: 512, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Read Urdu Novels Online Free | Huma Qureshi Novels",
+    description: "Original Urdu novels, episodic stories and complete PDF books by Huma Qureshi.",
+    images: ["/icon"],
+  },
+  icons: {
+    icon: [{ url: "/icon", type: "image/png", sizes: "512x512" }],
+    apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
+  },
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

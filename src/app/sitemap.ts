@@ -40,6 +40,12 @@ async function getUrls() {
   for (const writer of data?.writers || []) {
     urls.push({ url: `${SITE_URL}/writer/${writer.slug}`, changeFrequency: "monthly", priority: 0.7 });
   }
+  const downloadSlugs = new Set<string>();
+  for (const novel of data?.novels || []) downloadSlugs.add(novel.slug.current);
+  for (const pdf of data?.pdfs || []) downloadSlugs.add(pdf.slug.current);
+  for (const slug of downloadSlugs) {
+    if (slug) urls.push({ url: `${SITE_URL}/download/${slug}`, changeFrequency: "weekly", priority: 0.6 });
+  }
 
   return urls;
 }

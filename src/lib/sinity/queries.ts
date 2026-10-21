@@ -7,7 +7,7 @@ export async function getAllNovelsWithMetadata() {
     {
       "novels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(_createdAt desc) {
         title,
-        banner,
+        "banner": coalesce(bannerImage.asset->url, banner),
         _id,
         _createdAt,
         slug,
