@@ -1,10 +1,11 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Heading from "@/app/components/Heading";
 import { PortableText } from "next-sanity";
 import { client } from "@/sanity/lib/client";
-import { absoluteUrl, resolveSummary } from "@/lib/seo";
+import { absoluteUrl, cleanDescription, resolveSummary, SITE_NAME } from "@/lib/seo";
 import RelatedContent from "@/app/components/RelatedContent";
 import NovelSpotlight from "@/app/components/NovelSpotlight";
 
@@ -14,12 +15,51 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const target = await getDownloadTarget(slug);
+  const fallbackTitle = slug.replace(/-/g, " ");
+
+  if (!target) {
+    return {
+      title: `Download not found | ${SITE_NAME}`,
+      robots: { index: false, follow: true },
+    };
+  }
+
+  const title = target.title || fallbackTitle;
+  const author = target.writer?.writername || "Huma Qureshi";
+  const downloadUrl = resolveDownloadUrl(target);
+  const description = cleanDescription(
+    target.seodescription || resolveSummary(target),
+    `Download ${title} by ${author} as a free PDF. Follow the step-by-step guide to save and read it offline on phone, tablet, or computer.`,
+  );
+  const url = absoluteUrl(`/download/${target.slug?.current || slug}`);
+  const image = target.banner;
+  const ogTitle = `Download ${title} PDF`;
+
   return {
-    title: "Download Your Novel PDF",
-    description:
-      "Step-by-step guide to download and read your Urdu novel PDF on any device — phone, tablet, or computer. Free no-sign-up needed.",
-    alternates: { canonical: absoluteUrl(`/download/${slug}`) },
-    robots: { index: true, follow: true },
+    title: ogTitle,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: ogTitle,
+      description,
+      url,
+      siteName: SITE_NAME,
+      type: "article",
+      images: image
+        ? [{ url: image, width: 1200, height: 630, alt: `${title} cover` }]
+        : [{ url: "/icon", width: 512, height: 512, alt: SITE_NAME }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description,
+      images: image ? [image] : ["/icon"],
+    },
+    robots:
+      downloadUrl && !target.noIndex
+        ? { index: true, follow: true }
+        : { index: false, follow: true },
   };
 }
 
@@ -62,9 +102,24 @@ async function getDownloadSuggestions() {
   return client.fetch<any>(query, {}, { next: { revalidate: 300 } });
 }
 
-async function resolvePdfUrl(slug: string) {
-  const doc = await client.fetch<any>(
+async function getDownloadTarget(slug: string) {
+  return client.fetch<any>(
     `*[slug.current == $slug && _type in ["novelparent", "pdf"]][0]{
+      _id,
+      _type,
+      title,
+      englishtitle,
+      slug,
+      seodescription,
+      summary,
+      shortdescription,
+      noveldescription,
+      pdfshortdescription,
+      pdfdescription,
+      tagline,
+      "banner": coalesce(bannerImage.asset->url, banner),
+      writer->{writername},
+      noIndex,
       "fileUrl": downloadfile.asset->url,
       externaldownloadurl,
       pdfurl,
@@ -73,6 +128,9 @@ async function resolvePdfUrl(slug: string) {
     { slug },
     { next: { revalidate: 300 } }
   );
+}
+
+function resolveDownloadUrl(doc: any) {
   if (!doc || doc.pdfAvailability === "unavailable") return "";
   const legacy = doc.pdfurl || "";
   return (
@@ -91,7 +149,9 @@ export default async function DownloadPage({
 }) {
   const { slug } = await params;
   const { pdf, type } = await searchParams;
-  const resolvedUrl = await resolvePdfUrl(slug);
+  const target = await getDownloadTarget(slug);
+  if (!target) notFound();
+  const resolvedUrl = resolveDownloadUrl(target);
   const pdfUrl = resolvedUrl || pdf || "";
   const validPdf = pdfUrl.indexOf("http") === 0;
 
@@ -120,8 +180,12 @@ export default async function DownloadPage({
       }
     : undefined;
 
-  const novelTitle = (suggestions?.spotlight?.title as string) || (suggestions?.novels?.[0]?.title as string) || slug.replace(/-/g, " ");
-  const novelBanner = (suggestions?.spotlight?.banner as any) || (suggestions?.novels?.[0]?.banner as any);
+  const novelTitle = target.title || slug.replace(/-/g, " ");
+  const novelBanner = target.banner;
+  const novelSummary = cleanDescription(
+    resolveSummary(target),
+    "Complete Urdu novel in PDF format",
+  );
 
   return (
     <main className="flex flex-col gap-6 lg:gap-8 mx-auto w-full max-w-5xl py-5 px-4 sm:px-0">
@@ -153,7 +217,7 @@ export default async function DownloadPage({
               <div className="flex-1 text-center sm:text-left">
                 <p className="text-xs uppercase tracking-wider text-gold-dark font-bold">Free PDF Download</p>
                 <h1 className="text-lg sm:text-xl font-extrabold text-brand mt-1">{novelTitle}</h1>
-                <p className="text-sm text-tertiary mt-1">Complete Urdu novel in PDF format</p>
+                <p className="text-sm text-tertiary mt-1">{novelSummary}</p>
               </div>
               <a
                 href={pdfUrl}

@@ -10,12 +10,14 @@ async function getUrls() {
     pdfs: { slug: { current: string } }[];
     episodes: { novelSlug: string; episodeSlug: string }[];
     writers: { slug: string }[];
+    downloadables: { slug: string }[];
   }>(
     `{
       "novels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi" && !coalesce(noIndex, false)] { slug },
       "pdfs": *[_type == "pdf" && defined(slug.current) && writer->writername == "Huma Qureshi"] { slug },
       "episodes": *[_type == "novel" && defined(episodeslug.current) && novelparent->slug.current != null && novelparent->writer->writername == "Huma Qureshi" && !coalesce(novelparent->noIndex, false)] { "novelSlug": novelparent->slug.current, "episodeSlug": episodeslug.current },
-      "writers": *[_type == "writer" && defined(writerslug.current) && (count(*[_type == "novelparent" && references(^._id)]) > 0 || count(*[_type == "pdf" && references(^._id)]) > 0)] { "slug": writerslug.current }
+      "writers": *[_type == "writer" && defined(writerslug.current) && (count(*[_type == "novelparent" && references(^._id)]) > 0 || count(*[_type == "pdf" && references(^._id)]) > 0)] { "slug": writerslug.current },
+      "downloadables": *[(_type == "novelparent" || _type == "pdf") && defined(slug.current) && writer->writername == "Huma Qureshi" && !coalesce(noIndex, false) && (defined(downloadfile.asset) || defined(externaldownloadurl) || (defined(pdfurl) && string::startsWith(pdfurl, "http"))) && coalesce(pdfAvailability, "available") != "unavailable"] { "slug": slug.current }
     }`,
     {},
     { next: { revalidate: 3600 } },
@@ -40,11 +42,12 @@ async function getUrls() {
   for (const writer of data?.writers || []) {
     urls.push({ url: `${SITE_URL}/writer/${writer.slug}`, changeFrequency: "monthly", priority: 0.7 });
   }
-  const downloadSlugs = new Set<string>();
-  for (const novel of data?.novels || []) downloadSlugs.add(novel.slug.current);
-  for (const pdf of data?.pdfs || []) downloadSlugs.add(pdf.slug.current);
-  for (const slug of downloadSlugs) {
-    if (slug) urls.push({ url: `${SITE_URL}/download/${slug}`, changeFrequency: "weekly", priority: 0.6 });
+  const seenDownload = new Set<string>();
+  for (const item of data?.downloadables || []) {
+    const s = item.slug;
+    if (!s || seenDownload.has(s)) continue;
+    seenDownload.add(s);
+    urls.push({ url: `${SITE_URL}/download/${s}`, changeFrequency: "weekly", priority: 0.6 });
   }
 
   return urls;
