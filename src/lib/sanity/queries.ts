@@ -279,7 +279,9 @@ export async function getWriterBySlug(slug: string) {
     writerbio,
     writerbiofull,
     writerslug,
-    sociallinks[]{_key, label, url}
+    sociallinks[]{_key, label, url},
+    "novelCount": count(*[_type == "novelparent" && references(^._id)]),
+    "pdfCount": count(*[_type == "pdf" && references(^._id)])
   }`;
   return optimizedClient.fetchWithTags(query, [`writer-${slug}`, "writers"], { slug });
 }

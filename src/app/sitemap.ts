@@ -15,7 +15,7 @@ async function getUrls() {
       "novels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi" && !coalesce(noIndex, false)] { slug },
       "pdfs": *[_type == "pdf" && defined(slug.current) && writer->writername == "Huma Qureshi"] { slug },
       "episodes": *[_type == "novel" && defined(episodeslug.current) && novelparent->slug.current != null && novelparent->writer->writername == "Huma Qureshi" && !coalesce(novelparent->noIndex, false)] { "novelSlug": novelparent->slug.current, "episodeSlug": episodeslug.current },
-      "writers": *[_type == "writer" && defined(writerslug.current)] { "slug": writerslug.current }
+      "writers": *[_type == "writer" && defined(writerslug.current) && (count(*[_type == "novelparent" && references(^._id)]) > 0 || count(*[_type == "pdf" && references(^._id)]) > 0)] { "slug": writerslug.current }
     }`,
     {},
     { next: { revalidate: 3600 } },

@@ -23,10 +23,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     `Read Urdu novels and short stories by ${writer.writername} on ${SITE_NAME}.`;
   const url = absoluteUrl(`/writer/${slug}`);
   const image = settings.authorImage || writer.writerimage || writer.writercardimageurl;
+  const hasBooks = (writer.novelCount ?? 0) + (writer.pdfCount ?? 0) > 0;
+  const isThin = !hasBooks && !writer.writerbio && !writer.writerbiofull;
   return {
     title: `${writer.writername} — Author`,
     description,
     alternates: { canonical: url },
+    robots: isThin
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
     openGraph: {
       title: `${writer.writername} — Author`,
       description,
