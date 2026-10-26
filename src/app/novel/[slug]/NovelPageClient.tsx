@@ -56,6 +56,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
   const mainCharacters = Array.isArray(novel.mainCharacters) ? novel.mainCharacters : [];
   const sideCharacters = Array.isArray(novel.sideCharacters) ? novel.sideCharacters : [];
   const hasNewSummary = Boolean(novel.summary?.ur || novel.summary?.en);
+  const fallbackSummary = novel.shortdescription || novel.seodescription || "";
   const hasNewAuthorNote = Boolean(novel.authorNote?.ur?.length || novel.authorNote?.en?.length);
   const hasNewSneakPeek = Boolean(novel.sneakPeek?.ur?.length || novel.sneakPeek?.en?.length);
   const fullStoryContent = Array.isArray(novel.fullStoryContent) && novel.fullStoryContent.length > 0
@@ -146,9 +147,9 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
         <LocalizedTextSection value={novel.summary} heading="Summary" />
       ) : novel.noveldescription ? (
         <NovelDescription descText={novel.noveldescription} font={novel.descriptionlanguage ? "font-urdu" : ""} dir={novel.descriptionlanguage ? "rtl" : "ltr"} />
-      ) : novel.shortdescription ? (
+      ) : fallbackSummary ? (
         <LocalizedTextSection
-          legacy={novel.shortdescription}
+          legacy={fallbackSummary}
           legacyIsUrdu={novel.descriptionlanguage}
           heading="Summary"
         />
