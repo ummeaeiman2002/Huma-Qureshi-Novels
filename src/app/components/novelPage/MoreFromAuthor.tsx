@@ -1,6 +1,6 @@
 import Heading from "@/app/components/Heading";
 import Novel from "@/app/components/Cards/Novel";
-import { formatSafeDate, cleanDescriptionLong } from "@/lib/seo";
+import { formatSafeDate, resolveSummary } from "@/lib/seo";
 
 export default function MoreFromAuthor({
   novels,
@@ -24,7 +24,7 @@ export default function MoreFromAuthor({
             novelName={item.title || ""}
             writer={item.writer?.writername || ""}
             genre={item.genre?.genrename || ""}
-            summary={item.shortdescription || cleanDescriptionLong(item.noveldescription, "")}
+            summary={resolveSummary(item)}
           />
         ))}
       </div>

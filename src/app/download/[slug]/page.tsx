@@ -4,7 +4,7 @@ import Link from "next/link";
 import Heading from "@/app/components/Heading";
 import { PortableText } from "next-sanity";
 import { client } from "@/sanity/lib/client";
-import { cleanDescriptionLong, absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, resolveSummary } from "@/lib/seo";
 import RelatedContent from "@/app/components/RelatedContent";
 import NovelSpotlight from "@/app/components/NovelSpotlight";
 
@@ -49,13 +49,13 @@ const STEPS = [
 async function getDownloadSuggestions() {
   const query = `{
     "novels": *[_type == "novelparent" && defined(slug.current) && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && coalesce(isShortStory, false) != true] | order(novelreleasedate desc)[0...6] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, shortdescription, genre->{genrename}, writer->{writername}
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, shortdescription, summary, seodescription, tagline, genre->{genrename}, writer->{writername}
     },
     "pdfs": *[_type == "pdf" && defined(slug.current) && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(pdfreleasedate desc)[0...3] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, pdfdescription, pdfshortdescription, genre->{genrename}, writer->{writername}
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, pdfdescription, pdfshortdescription, seodescription, genre->{genrename}, writer->{writername}
     },
     "spotlight": *[_type == "novelparent" && defined(slug.current) && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(novelreleasedate desc)[0] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, shortdescription, noveldescription, genre->{genrename}, writer->{writername},
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, shortdescription, summary, noveldescription, seodescription, tagline, genre->{genrename}, writer->{writername},
       "sneakPeeks": sneakPeeks[]{_key, "imageUrl": image.asset->url, scene, sceneIsUrdu, caption, chapterReference, order}
     }
   }`;
@@ -67,12 +67,13 @@ async function resolvePdfUrl(slug: string) {
     `*[slug.current == $slug && _type in ["novelparent", "pdf"]][0]{
       "fileUrl": downloadfile.asset->url,
       externaldownloadurl,
-      pdfurl
+      pdfurl,
+      pdfAvailability
     }`,
     { slug },
     { next: { revalidate: 300 } }
   );
-  if (!doc) return "";
+  if (!doc || doc.pdfAvailability === "unavailable") return "";
   const legacy = doc.pdfurl || "";
   return (
     doc.fileUrl ||
@@ -106,18 +107,16 @@ export default async function DownloadPage({
   const suggestions = await getDownloadSuggestions();
   const suggestedNovels = (suggestions?.novels || []).map((n: any) => ({
     ...n,
-    summary: n.shortdescription || cleanDescriptionLong(n.noveldescription, ""),
+    summary: resolveSummary(n),
   }));
   const suggestedPdfs = (suggestions?.pdfs || []).map((p: any) => ({
     ...p,
-    summary: p.pdfshortdescription || cleanDescriptionLong(p.pdfdescription, ""),
+    summary: resolveSummary(p),
   }));
   const spotlight = suggestions?.spotlight
     ? {
         ...suggestions.spotlight,
-        shortdescription:
-          suggestions.spotlight.shortdescription ||
-          cleanDescriptionLong(suggestions.spotlight.noveldescription, ""),
+        shortdescription: resolveSummary(suggestions.spotlight),
       }
     : undefined;
 

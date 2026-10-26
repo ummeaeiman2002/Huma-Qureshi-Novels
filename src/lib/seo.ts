@@ -70,3 +70,48 @@ export function cleanDescriptionLong(value: unknown, fallback: string) {
   const lastSpace = truncated.lastIndexOf(" ");
   return (lastSpace > 100 ? truncated.slice(0, lastSpace) : truncated) + "...";
 }
+
+type SummaryFields = {
+  summary?: unknown;
+  shortdescription?: unknown;
+  pdfshortdescription?: unknown;
+  noveldescription?: unknown;
+  pdfdescription?: unknown;
+  seodescription?: unknown;
+  tagline?: unknown;
+};
+
+function localizedText(value: unknown): unknown {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const record = value as Record<string, unknown>;
+    for (const key of ["en", "ur", "urdu", "english"]) {
+      if (cleanDescriptionLong(record[key], "")) return record[key];
+    }
+    return "";
+  }
+  return value;
+}
+
+/**
+ * Resolves the best available card summary for a novel or PDF, supporting both
+ * the newer Sanity fields (summary / SEO description / tagline) and legacy
+ * rich-text descriptions. Never fabricates content — returns "" when nothing
+ * is available.
+ */
+export function resolveSummary(source: SummaryFields | null | undefined, fallback = ""): string {
+  if (!source) return fallback;
+  const candidates = [
+    source.summary,
+    source.shortdescription,
+    source.pdfshortdescription,
+    source.noveldescription,
+    source.pdfdescription,
+    source.seodescription,
+    source.tagline,
+  ];
+  for (const candidate of candidates) {
+    const text = cleanDescriptionLong(localizedText(candidate), "");
+    if (text) return text;
+  }
+  return fallback;
+}

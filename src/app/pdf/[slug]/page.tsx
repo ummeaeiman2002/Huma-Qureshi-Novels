@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { client } from "@/sanity/lib/client";
-import { absoluteUrl, cleanDescription, SITE_NAME } from "@/lib/seo";
+import { absoluteUrl, cleanDescription, resolveSummary, SITE_NAME } from "@/lib/seo";
 import Image from "next/image";
 import Heading from "@/app/components/Heading";
 import NovelDescription from "@/app/components/novelPage/NovelDescription";
@@ -36,13 +36,13 @@ async function getRelatedPdfData(pdf: any) {
   const genreName = pdf?.genre?.genrename || "";
   const writerRef = pdf?.writer?._id || "";
   const relatedQuery = `{
-    "relatedPDFs": *[_type == "pdf" && defined(slug.current) && _id != $currentId && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(coalesce(views,0) desc)[0...6] { title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, views, genre->{genrename}, writer->{writername} },
+    "relatedPDFs": *[_type == "pdf" && defined(slug.current) && _id != $currentId && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(coalesce(views,0) desc)[0...6] { _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, pdfdescription, pdfshortdescription, seodescription, views, genre->{genrename}, writer->{writername} },
     "recommendedNovels": *[_type == "novelparent" && defined(slug.current) && genre->genrename == $genre && writer->writername == "Huma Qureshi"] | order(_createdAt desc)[0...6] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, shortdescription, summary, seodescription, tagline, genre->{genrename}, writer->{writername},
       "views": *[_type == "novel" && references(^._id)].views
     },
     "popularNovels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi"] | order(_createdAt desc)[0...6] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, genre->{genrename}, writer->{writername},
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, shortdescription, summary, seodescription, tagline, genre->{genrename}, writer->{writername},
       "views": *[_type == "novel" && references(^._id)].views
     },
     "writers": *[_type == "writer" && writername == "Huma Qureshi"]{writername},
@@ -59,9 +59,7 @@ async function getRelatedPdfData(pdf: any) {
   const enrich = (list: any[]) =>
     (list || []).filter((n: any) => n && n.slug?.current).map((n: any) => ({
       ...n,
-      summary: n.noveldescription
-        ? String(n.noveldescription).replace(/\s+/g, " ").trim().slice(0, 160)
-        : "",
+      summary: resolveSummary(n),
       totalViews: sumViews(n.views),
     }));
 
@@ -77,7 +75,10 @@ async function getRelatedPdfData(pdf: any) {
   }
 
   return {
-    relatedPDFs: data?.relatedPDFs || [],
+    relatedPDFs: (data?.relatedPDFs || []).map((p: any) => ({
+      ...p,
+      summary: resolveSummary(p),
+    })),
     relatedNovels: combined.slice(0, 6),
     otherWriters: (data?.writers || []).map((w: any) => w.writername).filter(Boolean),
     youtubeNovels: data?.youtubeNovels || [],

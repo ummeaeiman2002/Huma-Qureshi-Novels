@@ -5,6 +5,7 @@ import Heading from "@/app/components/Heading";
 
 export default function AboutAuthor({
   writer,
+  image: authorImage,
 }: {
   writer?: {
     writername?: string;
@@ -13,9 +14,10 @@ export default function AboutAuthor({
     writerbio?: string;
     writerslug?: { current?: string };
   } | null;
+  image?: string;
 }) {
   if (!writer?.writername) return null;
-  const image = writer.writerimage || writer.writercardimageurl || "";
+  const image = authorImage || writer.writerimage || writer.writercardimageurl || "";
   const slug = writer.writerslug?.current;
 
   return (

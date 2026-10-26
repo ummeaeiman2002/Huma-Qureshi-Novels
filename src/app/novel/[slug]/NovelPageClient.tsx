@@ -22,20 +22,26 @@ import ImportantNote from "@/app/components/novelPage/ImportantNote";
 import SneakPeeks from "@/app/components/novelPage/SneakPeeks";
 import Characters from "@/app/components/novelPage/Characters";
 import ReaderHighlights from "@/app/components/novelPage/ReaderHighlights";
-import Themes from "@/app/components/novelPage/Themes";
+import TropesAndThemes from "@/app/components/novelPage/TropesAndThemes";
 import NovelDetails from "@/app/components/novelPage/NovelDetails";
 import DownloadSection from "@/app/components/novelPage/DownloadSection";
+import FullStoryContent from "@/app/components/novelPage/FullStoryContent";
 import MoreFromAuthor from "@/app/components/novelPage/MoreFromAuthor";
 import ShareButton from "@/app/components/novelPage/ShareButton";
+import {
+  LocalizedNovelTitle,
+  LocalizedRichTextSection,
+  LocalizedTextSection,
+} from "@/app/components/localized/LocalizedContent";
 import { useSiteSettings } from "@/app/context/SiteSettingsContext";
 import { client } from "@/sanity/lib/client";
-import { formatSafeDate, isValidUrl, cleanDescriptionLong } from "@/lib/seo";
+import { formatSafeDate, isValidUrl, resolveSummary } from "@/lib/seo";
 
 type EpisodeItem = { name: string; episodereleasedate: string; episodeteaser: string; episodeslug: { current: string } };
 type CommentItem = { _id: string; name: string; comment: string; _createdAt: string };
 
 export default function NovelPageClient({ novel: initialNovel, episodes: initialEpisodes, hasMore: initialHasMore, slug, views, related, moreFromAuthor, fullStory, reviewsSlot }: { novel: any; episodes: EpisodeItem[]; hasMore: boolean; slug: string; views?: number; related?: any[]; moreFromAuthor?: any[]; fullStory?: ReactNode; reviewsSlot?: ReactNode }) {
-  const { defaultBanner } = useSiteSettings();
+  const { defaultBanner, authorImage } = useSiteSettings();
   const [novel] = useState(initialNovel);
   const [episodes, setEpisodes] = useState(initialEpisodes || []);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -47,6 +53,17 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
   const [isSubmitting, setIsSubmitting] = useState(false);
   const limit = 4;
   const onlineReadingEnabled = novel.enableonlinereading !== false;
+  const mainCharacters = Array.isArray(novel.mainCharacters) ? novel.mainCharacters : [];
+  const sideCharacters = Array.isArray(novel.sideCharacters) ? novel.sideCharacters : [];
+  const hasNewSummary = Boolean(novel.summary?.ur || novel.summary?.en);
+  const hasNewAuthorNote = Boolean(novel.authorNote?.ur?.length || novel.authorNote?.en?.length);
+  const hasNewSneakPeek = Boolean(novel.sneakPeek?.ur?.length || novel.sneakPeek?.en?.length);
+  const fullStoryContent = Array.isArray(novel.fullStoryContent) && novel.fullStoryContent.length > 0
+    ? novel.fullStoryContent
+    : Array.isArray(novel.storycontent) && novel.storycontent.length > 0
+      ? novel.storycontent
+      : null;
+  const isCompleteNovel = novel.contentFormat === "complete" && Boolean(fullStoryContent);
 
   const [lastRead, setLastRead] = useState<{ episodeSlug: string; name: string; page: number; ts: number } | null>(null);
 
@@ -98,11 +115,15 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
         <div aria-hidden="true" className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-secondary/15 blur-3xl"></div>
         <div aria-hidden="true" className="absolute -bottom-28 -left-20 w-80 h-80 rounded-full bg-gold/10 blur-3xl"></div>
         <div className="relative flex flex-col gap-6">
-          <h1 className="text-2xl lg:text-4xl font-bold text-center lg:text-start title-bright">
-            {novel.title}{novel.writer?.writername ? ` by ${novel.writer.writername}` : ""}
-          </h1>
-          {novel.englishtitle && (
-            <p className="text-center lg:text-start -mt-3 text-lg font-medium opacity-70">{novel.englishtitle}</p>
+          <LocalizedNovelTitle
+            value={novel.titleLocalized}
+            fallback={novel.title}
+            englishFallback={novel.englishtitle}
+          />
+          {novel.writer?.writername && (
+            <p className="text-center text-base font-medium opacity-80 lg:text-start">
+              by {novel.writer.writername}
+            </p>
           )}
           {novel.tagline && (
             <p className="text-center lg:text-start text-base italic opacity-80">{novel.tagline}</p>
@@ -116,26 +137,69 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
             <ViewsBadge views={views} />
           </div>
           <div className="rounded-2xl overflow-hidden border border-secondary/30 shadow-2xl">
-            <Image src={novel.banner || defaultBanner} alt={`${novel.title} banner`} width={0} height={0} sizes="(max-width: 1024px) 100vw, 900px" priority quality={85} style={{ width: "100%", height: "auto" }} />
+            <Image src={novel.banner || defaultBanner} alt={novel.coverImageAlt || `${novel.title} cover`} width={0} height={0} sizes="(max-width: 1024px) 100vw, 900px" priority quality={85} style={{ width: "100%", height: "auto" }} />
           </div>
         </div>
       </section>
 
-      {novel.storyintro && (
-        <section aria-label="Story introduction" className="px-5 sm:px-10 lg:px-24">
-          <p className="whitespace-pre-wrap text-start text-[19px] leading-9 text-tertiary">{novel.storyintro}</p>
-        </section>
+      {hasNewSummary ? (
+        <LocalizedTextSection value={novel.summary} heading="Summary" />
+      ) : novel.noveldescription ? (
+        <NovelDescription descText={novel.noveldescription} font={novel.descriptionlanguage ? "font-urdu" : ""} dir={novel.descriptionlanguage ? "rtl" : "ltr"} />
+      ) : novel.shortdescription ? (
+        <LocalizedTextSection
+          legacy={novel.shortdescription}
+          legacyIsUrdu={novel.descriptionlanguage}
+          heading="Summary"
+        />
+      ) : null}
+
+      {(novel.storyIntroduction?.ur || novel.storyIntroduction?.en || novel.storyintro) && (
+        <LocalizedTextSection
+          value={novel.storyIntroduction}
+          legacy={novel.storyintro}
+          legacyIsUrdu={novel.descriptionlanguage}
+          heading="Story Introduction"
+        />
       )}
-      {novel.noveldescription && <NovelDescription descText={novel.noveldescription} font={novel.descriptionlanguage ? "font-urdu" : ""} dir={novel.descriptionlanguage ? "rtl" : "ltr"} />}
-      {novel.aboutnovel && <NovelDescription descText={novel.aboutnovel} font={novel.descriptionlanguage ? "font-urdu" : ""} dir={novel.descriptionlanguage ? "rtl" : "ltr"} />}
-      <ReaderHighlights intro={novel.readerhighlightintro} highlights={novel.readerhighlights} />
-      <Characters intro={novel.characterintro} characters={novel.characters} />
-      <AboutAuthor writer={novel.writer} />
-      {novel.authornote && <AuthorNote note={novel.authornote} font={novel.authornotelang ? "font-urdu" : ""} dir={novel.authornotelang ? "rtl" : "ltr"} />}
+
+      {novel.aboutnovel && (
+        <NovelDescription
+          descText={novel.aboutnovel}
+          font={novel.descriptionlanguage ? "font-urdu" : ""}
+          dir={novel.descriptionlanguage ? "rtl" : "ltr"}
+          title="About This Novel"
+        />
+      )}
+
+      {mainCharacters.length > 0 ? (
+        <Characters characters={mainCharacters} heading="Main Characters" />
+      ) : (
+        <Characters intro={novel.characterintro} characters={novel.characters} heading="Characters" />
+      )}
+      {sideCharacters.length > 0 && (
+        <Characters characters={sideCharacters} heading="Side Characters" />
+      )}
+
+      <TropesAndThemes tropes={novel.tropesAndThemes} themes={novel.themes} />
+
+      {hasNewAuthorNote ? (
+        <LocalizedRichTextSection value={novel.authorNote} heading="Author's Note" />
+      ) : novel.authornote ? (
+        <AuthorNote note={novel.authornote} font={novel.authornotelang ? "font-urdu" : ""} dir={novel.authornotelang ? "rtl" : "ltr"} />
+      ) : null}
+
+      {hasNewSneakPeek ? (
+        <LocalizedRichTextSection value={novel.sneakPeek} heading="Sneak Peek" />
+      ) : (
+        <SneakPeeks peeks={novel.sneakPeeks} />
+      )}
+
       <ImportantNote note={novel.contentwarning} title="Content Warning" tone="warning" />
-      <ImportantNote note={novel.importantnote} title="Important Note for Readers" />
-      <SneakPeeks peeks={novel.sneakPeeks} />
-      <NovelDetails novel={novel} />
+
+      {fullStoryContent && (
+        <FullStoryContent content={fullStoryContent} isUrdu={novel.language === "Urdu"} />
+      )}
       {lastRead && (
         <section aria-labelledby="continue-heading" className="py-1">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border-2 border-brand bg-brand/5 p-5 lg:px-8">
@@ -153,7 +217,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
           </div>
         </section>
       )}
-      {onlineReadingEnabled && episodes.length > 0 && (
+      {onlineReadingEnabled && !isCompleteNovel && episodes.length > 0 && (
       <section aria-labelledby="episodes-heading">
         <Heading name="Episodes" />
         {novel.onlinereadingintro && (
@@ -194,7 +258,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
         {loadingMore && <p className="text-center opacity-60">Loading more episodes…</p>}
       </section>
       )}
-      {onlineReadingEnabled && episodes.length === 0 && (
+      {onlineReadingEnabled && !isCompleteNovel && episodes.length === 0 && (
         <section className="text-center py-8 bg-cream-soft rounded-2xl border border-line mx-4 lg:mx-0">
           <p className="text-lg font-bold text-brand">No episodes available yet</p>
           <p className="mt-2 text-sm opacity-70">Episodes for this novel will be published soon. Check back later!</p>
@@ -206,10 +270,21 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
         {isValidUrl(novel.youtubeurl) && <WatchOnYT YTurl={novel.youtubeurl} />}
       </div>
       <DownloadSection data={novel} slug={slug} />
-      <Reactions slug={slug} />
 
+      <LocalizedTextSection value={novel.readerHighlightsLocalized} heading="Reader Highlights" />
+      <ReaderHighlights intro={novel.readerhighlightintro} highlights={novel.readerhighlights} />
+
+      {novel.importantNote?.ur || novel.importantNote?.en ? (
+        <LocalizedTextSection value={novel.importantNote} heading="Important Note for Readers" />
+      ) : (
+        <ImportantNote note={novel.importantnote} title="Important Note for Readers" />
+      )}
+
+      <NovelDetails novel={novel} />
+      <AboutAuthor writer={novel.writer} image={authorImage} />
+
+      <Reactions slug={slug} />
       <Tags tags={novel.tags || []} />
-      <Themes themes={novel.themes} />
 
       {related && related.length > 0 && (
         <section aria-labelledby="related-heading" className="py-2">
@@ -219,7 +294,7 @@ export default function NovelPageClient({ novel: initialNovel, episodes: initial
           </p>
           <div className="flex gap-5 flex-wrap justify-center lg:justify-start lg:px-10 lg:gap-6">
             {related.map((item: any) => (
-              <Novel key={item._id} date={formatSafeDate(item.novelreleasedate)} href={item.slug.current} cardBanner={item.banner} novelName={item.title} writer={item.writer?.writername || ""} genre={item.genre?.genrename || ""} summary={item.shortdescription || cleanDescriptionLong(item.noveldescription, "")} />
+              <Novel key={item._id} date={formatSafeDate(item.novelreleasedate)} href={item.slug.current} cardBanner={item.banner} novelName={item.title} writer={item.writer?.writername || ""} genre={item.genre?.genrename || ""} summary={resolveSummary(item)} />
             ))}
           </div>
         </section>

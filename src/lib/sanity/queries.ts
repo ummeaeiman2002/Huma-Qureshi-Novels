@@ -1,27 +1,11 @@
 // src/lib/sanity/queries.ts
 import { client, optimizedClient } from "@/sanity/lib/client";
+import { resolveSummary } from "@/lib/seo";
 import { NovelCache } from "./cache";
 
 // This website only publishes content by Huma Qureshi.
 export const HUMA_WRITER_NAME = "Huma Qureshi";
 export const HUMA_WRITER_FILTER = `writer->writername == "${HUMA_WRITER_NAME}"`;
-
-function textSummary(value: unknown): string {
-  if (!value) return "";
-  let text = "";
-  if (typeof value === "string") {
-    text = value;
-  } else if (Array.isArray(value)) {
-    text = value
-      .map((block: any) =>
-        Array.isArray(block?.children)
-          ? block.children.map((child: any) => child?.text || "").join(" ")
-          : "",
-      )
-      .join(" ");
-  }
-  return text.replace(/\s+/g, " ").trim().slice(0, 420);
-}
 
 export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
   // Check cache first
@@ -45,6 +29,9 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
     novelreleasedate,
     noveldescription,
     shortdescription,
+    summary,
+    seodescription,
+    tagline,
     novelstatus,
     "isShortStory": coalesce(isShortStory, false),
     youtubeurl,
@@ -86,7 +73,7 @@ export async function getPaginatedNovels(page: number = 0, limit: number = 20) {
 
       return {
         ...novel,
-        summary: novel.shortdescription || textSummary(novel.noveldescription),
+        summary: resolveSummary(novel),
         episodeCount: novelEpisodes.length,
         totalViews,
         totalMonthlyViews,
@@ -110,6 +97,9 @@ export async function getNovelsByCategory(categorySlug: string) {
     novelreleasedate,
     noveldescription,
     shortdescription,
+    summary,
+    seodescription,
+    tagline,
     youtubeurl,
     tags,
     genre->{genrename},
@@ -138,7 +128,7 @@ export async function getNovelsByCategory(categorySlug: string) {
 
       return {
         ...novel,
-        summary: novel.shortdescription || textSummary(novel.noveldescription),
+        summary: resolveSummary(novel),
         totalViews: novelEpisodes.reduce(
           (sum: number, episode: any) => sum + (episode.views || 0),
           0
@@ -202,6 +192,8 @@ export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
     pdfreleasedate,
     pdfdescription,
     pdfshortdescription,
+    seodescription,
+    tagline,
     pdfurl,
     downloadformat,
     downloadsize,
@@ -220,7 +212,7 @@ export async function getPaginatedPDFs(page: number = 0, limit: number = 20) {
     .filter((pdf:any) => pdf && pdf._id) // Filter out null/undefined pdfs
     .map((pdf: any) => ({
       ...pdf,
-      summary: pdf.pdfshortdescription || textSummary(pdf.pdfdescription),
+      summary: resolveSummary(pdf),
       totalViews: pdf.views || 0,
       totalMonthlyViews: pdf.monthlyViews || 0,
     }));
@@ -320,12 +312,19 @@ export async function getNovelsByWriter(writerId: string, limit: number = 60) {
     novelreleasedate,
     noveldescription,
     shortdescription,
+    summary,
+    seodescription,
+    tagline,
     "isShortStory": coalesce(isShortStory, false),
     genre->{genrename},
     writer->{writername}
   }`;
-  return optimizedClient.fetchWithTags(query, [
+  const novels = await optimizedClient.fetchWithTags(query, [
     `writer-novels-${writerId}`,
     "novels",
   ], { writerId, limit });
+  return (Array.isArray(novels) ? novels : []).map((novel: any) => ({
+    ...novel,
+    summary: resolveSummary(novel),
+  }));
 }

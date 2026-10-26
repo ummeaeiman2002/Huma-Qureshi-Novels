@@ -12,9 +12,9 @@ async function getUrls() {
     writers: { slug: string }[];
   }>(
     `{
-      "novels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi"] { slug },
+      "novels": *[_type == "novelparent" && defined(slug.current) && writer->writername == "Huma Qureshi" && !coalesce(noIndex, false)] { slug },
       "pdfs": *[_type == "pdf" && defined(slug.current) && writer->writername == "Huma Qureshi"] { slug },
-      "episodes": *[_type == "novel" && defined(episodeslug.current) && novelparent->slug.current != null && novelparent->writer->writername == "Huma Qureshi"] { "novelSlug": novelparent->slug.current, "episodeSlug": episodeslug.current },
+      "episodes": *[_type == "novel" && defined(episodeslug.current) && novelparent->slug.current != null && novelparent->writer->writername == "Huma Qureshi" && !coalesce(novelparent->noIndex, false)] { "novelSlug": novelparent->slug.current, "episodeSlug": episodeslug.current },
       "writers": *[_type == "writer" && defined(writerslug.current)] { "slug": writerslug.current }
     }`,
     {},

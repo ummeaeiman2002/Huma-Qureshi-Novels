@@ -10,7 +10,7 @@ export const revalidate = 300;
 type Props = { params: Promise<{ slug: string; episodeslug: string }> };
 
 async function getEpisode(slug: string, episodeslug: string) {
-  const data = await client.fetch<any>(`*[_type == "novel" && episodeslug.current == $episodeSlug && novelparent->slug.current == $slug && novelparent->writer->writername == "Huma Qureshi" && (!defined(episodereleasedate) || episodereleasedate <= now())][0]{name,episodeslug,_id,body,views,novelparent->{title,slug,"banner": coalesce(bannerImage.asset->url, banner),"totalEpisodes": count(*[_type == "novel" && novelparent._ref == ^._id])},genre->{genrename,_id},writer->{writername,_id},episodereleasedate,tags,"comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}}`, { slug, episodeSlug: episodeslug }, { next: { revalidate: 300 } });
+  const data = await client.fetch<any>(`*[_type == "novel" && episodeslug.current == $episodeSlug && novelparent->slug.current == $slug && novelparent->writer->writername == "Huma Qureshi" && (!defined(episodereleasedate) || episodereleasedate <= now())][0]{name,episodeslug,_id,body,views,novelparent->{title,titleLocalized,englishtitle,slug,"banner": coalesce(bannerImage.asset->url, banner),"totalEpisodes": count(*[_type == "novel" && novelparent._ref == ^._id])},genre->{genrename,_id},writer->{writername,_id},episodereleasedate,tags,"comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}}`, { slug, episodeSlug: episodeslug }, { next: { revalidate: 300 } });
   return data;
 }
 

@@ -15,6 +15,7 @@ export default function NovelDetails({ novel, title = "Novel Details" }: { novel
     { label: "Language", value: novel.language },
     { label: "Pages", value: novel.numberofpages ?? novel.pdfnumberofpages },
     { label: "Chapters", value: novel.numberofchapters },
+    { label: "Edition", value: novel.edition },
     { label: "Status", value: novel.novelstatus },
     {
       label: "Published",

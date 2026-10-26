@@ -13,6 +13,9 @@ import { downloadSection } from "./downloadSection";
 import { siteSettings } from "./siteSettings";
 import { reaction } from "./reaction";
 import { upcomingProject } from "./upcomingProject";
+import { localizedBlockContent, localizedString, localizedText } from "./localized";
+import { novelCharacter } from "./novelCharacter";
+import { trope } from "./trope";
 
 // Premium/Auth schemas
 import { user } from "./user";
@@ -37,6 +40,12 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     siteSettings,
     reaction,
     upcomingProject,
+    // Localization + literary building blocks
+    localizedString,
+    localizedText,
+    localizedBlockContent,
+    novelCharacter,
+    trope,
     // Premium/Auth schemas
     user,
     premiumNovel,

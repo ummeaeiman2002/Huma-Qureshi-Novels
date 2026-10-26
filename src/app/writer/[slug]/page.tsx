@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getWriterBySlug, getNovelsByWriter } from "@/lib/sanity/queries";
-import { absoluteUrl, SITE_NAME, formatSafeDate, cleanDescriptionLong } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/sanity/siteSettings";
+import { absoluteUrl, SITE_NAME, formatSafeDate, resolveSummary } from "@/lib/seo";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs";
 import Heading from "@/app/components/Heading";
 import Novel from "@/app/components/Cards/Novel";
@@ -16,10 +17,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const writer = await getWriterBySlug(slug);
   if (!writer) return { title: "Author not found | Huma Qureshi Novels" };
+  const settings = await getSiteSettings();
   const description =
     writer.writerbio ||
     `Read Urdu novels and short stories by ${writer.writername} on ${SITE_NAME}.`;
   const url = absoluteUrl(`/writer/${slug}`);
+  const image = settings.authorImage || writer.writerimage || writer.writercardimageurl;
   return {
     title: `${writer.writername} — Author`,
     description,
@@ -29,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url,
       type: "profile",
-      images: writer.writerimage || writer.writercardimageurl ? [{ url: writer.writerimage || writer.writercardimageurl, alt: writer.writername }] : [],
+      images: image ? [{ url: image, alt: writer.writername }] : [],
     },
   };
 }
@@ -42,7 +45,8 @@ export default async function Page({ params }: Props) {
   const all = (await getNovelsByWriter(writer._id, 60)) || [];
   const novels = all.filter((n: any) => !n.isShortStory);
   const stories = all.filter((n: any) => n.isShortStory);
-  const image = writer.writerimage || writer.writercardimageurl || "";
+  const settings = await getSiteSettings();
+  const image = settings.authorImage || writer.writerimage || writer.writercardimageurl || "";
 
   const schema = {
     "@context": "https://schema.org",
@@ -115,7 +119,7 @@ export default async function Page({ params }: Props) {
                 novelName={item.title || ""}
                 writer={item.writer?.writername || ""}
                 genre={item.genre?.genrename || ""}
-                summary={item.shortdescription || cleanDescriptionLong(item.noveldescription, "")}
+                summary={resolveSummary(item)}
               />
             ))}
           </div>
@@ -136,7 +140,7 @@ export default async function Page({ params }: Props) {
                 novelName={item.title || ""}
                 writer={item.writer?.writername || ""}
                 genre={item.genre?.genrename || ""}
-                summary={item.shortdescription || cleanDescriptionLong(item.noveldescription, "")}
+                summary={resolveSummary(item)}
               />
             ))}
           </div>

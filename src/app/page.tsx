@@ -11,7 +11,7 @@ import Container from "./components/ui/Container";
 import SectionHeading from "./components/ui/SectionHeading";
 import { client } from "@/sanity/lib/client";
 import { getSiteSummary, getSiteSettings } from "@/lib/sanity/siteSettings";
-import { cleanDescriptionLong, formatSafeDate, SITE_URL } from "@/lib/seo";
+import { formatSafeDate, resolveSummary, SITE_URL } from "@/lib/seo";
 
 export const revalidate = 300;
 
@@ -25,24 +25,24 @@ export const metadata: Metadata = {
 async function getHomeContent() {
   const query = `{
     "featuredNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && featured == true] | order(novelreleasedate desc)[0...4] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription, shortdescription, summary, seodescription, tagline,
       "episodeCount": count(*[_type == "novel" && references(^._id)]),
       "views": *[_type == "novel" && references(^._id)].views,
       genre->{genrename}, writer->{writername}
     },
     "popularNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(novelreleasedate desc) {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription, shortdescription, summary, seodescription, tagline,
       "episodeCount": count(*[_type == "novel" && references(^._id)]),
       "views": *[_type == "novel" && references(^._id)].views,
       genre->{genrename}, writer->{writername}
     },
     "latestNovels": *[_type == "novelparent" && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(novelreleasedate desc)[0...8] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, novelstatus, isShortStory, noveldescription, shortdescription, summary, seodescription, tagline,
       "episodeCount": count(*[_type == "novel" && references(^._id)]),
       genre->{genrename}, writer->{writername}
     },
     "latestPdfs": *[_type == "pdf" && defined(pdfreleasedate) && pdfreleasedate <= now() && writer->writername == "Huma Qureshi"] | order(pdfreleasedate desc)[0...4] {
-      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, pdfdescription, downloadformat, downloadsize, pdfnumberofpages,
+      _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, pdfreleasedate, pdfdescription, pdfshortdescription, seodescription, tagline, downloadformat, downloadsize, pdfnumberofpages,
       genre->{genrename}, writer->{writername}
     },
     "latestEpisodes": *[_type == "novel" && defined(episodeslug.current) && defined(episodereleasedate) && episodereleasedate <= now() && novelparent->writer->writername == "Huma Qureshi"] | order(episodereleasedate desc) {
@@ -63,7 +63,7 @@ async function getHomeContent() {
     (list || []).map((n: any) => ({
       ...n,
       totalViews: sum(n.views),
-      summary: cleanDescriptionLong(n.noveldescription || n.pdfdescription, ""),
+      summary: resolveSummary(n),
     }));
 
   // Latest Episodes: one entry per novel (newest episode), so the list spans
@@ -163,7 +163,7 @@ export default async function HomePage() {
       {(summary.title || summary.text || summary.images.length > 0) && (
         <section id="summary" className="border-y border-line bg-cream py-14">
           <Container size="wide">
-            <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+            <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
               <div className="flex flex-col gap-5">
                 {summary.eyebrow && (
                   <span className="ui-eyebrow">{summary.eyebrow}</span>
@@ -210,22 +210,24 @@ export default async function HomePage() {
               </div>
 
               {summary.images.length > 0 && (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:gap-5">
-                  {summary.images.map((img, i) => (
+                <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-2 lg:gap-6">
+                  {summary.images.slice(0, 2).map((img, i) => (
                     <figure
                       key={i}
-                      className={`group relative aspect-[5/6] overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_18px_40px_-24px_rgba(41,40,36,0.55)] ${
-                        i === 0 && summary.images.length === 3
-                          ? "col-span-2 row-span-2 sm:col-span-2"
-                          : ""
-                      }`}
+                      className="group relative overflow-hidden rounded-3xl border border-line bg-cream-soft shadow-[0_18px_40px_-24px_rgba(41,40,36,0.55)]"
                     >
-                      <Image
-                        src={img.url}
-                        alt={img.alt || summary.title || "Huma Qureshi Urdu fiction"}
-                        fill
-                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 260px"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      <div className="relative aspect-[4/5] w-full">
+                        <Image
+                          src={img.url}
+                          alt={img.alt || summary.title || "Huma Qureshi Urdu fiction"}
+                          fill
+                          sizes="(max-width: 1024px) 50vw, (max-width: 1280px) 38vw, 560px"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-deep/70 via-transparent to-transparent"
                       />
                       <span
                         aria-hidden="true"

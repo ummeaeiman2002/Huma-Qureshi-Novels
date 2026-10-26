@@ -12,6 +12,7 @@ import Heading from "@/app/components/Heading";
 import ViewsBadge from "@/app/components/ViewsBadge";
 import Reactions from "@/app/components/Reactions";
 import { useSiteSettings } from "@/app/context/SiteSettingsContext";
+import { LocalizedNovelTitle } from "@/app/components/localized/LocalizedContent";
 
 type CommentItem = { _id: string; name: string; comment: string; _createdAt: string };
 type EpisodeSibling = { name: string; slug: string };
@@ -157,7 +158,12 @@ export default function EpisodePageClient({ episode, initialComments, prevEpisod
       <div aria-hidden="true" className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-secondary/15 blur-3xl"></div>
       <div aria-hidden="true" className="absolute -bottom-28 -left-20 w-80 h-80 rounded-full bg-gold/10 blur-3xl"></div>
       <div className="relative flex flex-col gap-6">
-        <h1 className="text-2xl lg:text-4xl font-bold text-center lg:text-start title-bright">{episode.novelparent?.title} — {episode.name}</h1>
+        <LocalizedNovelTitle
+          value={episode.novelparent?.titleLocalized}
+          fallback={episode.novelparent?.title}
+          englishFallback={episode.novelparent?.englishtitle}
+        />
+        <p className="text-center text-lg font-semibold text-brand lg:text-start">— {episode.name}</p>
         <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
           <p className="px-4 py-1.5 rounded-full border border-secondary text-secondary text-base font-medium bg-secondary/10">Written by: {episode.writer?.writername || ""}</p>
           <p className="px-4 py-1.5 rounded-full border border-secondary text-secondary text-base font-medium bg-secondary/10">Genre: {episode.genre?.genrename || ""}</p>

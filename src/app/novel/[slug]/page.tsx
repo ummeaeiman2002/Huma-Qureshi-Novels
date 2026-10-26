@@ -13,24 +13,34 @@ type Props = { params: Promise<{ slug: string }> };
 
 async function getNovel(slug: string) {
   const query = `*[_type == "novelparent" && slug.current == $slug && writer->writername == "Huma Qureshi"][0]{
-    _id,title,englishtitle,tagline,slug,novelreleasedate,lastupdated,
+    _id,title,titleLocalized,englishtitle,tagline,slug,novelreleasedate,lastupdated,coverImageAlt,
+    summary,storyIntroduction,contentFormat,fullStoryContent,storycontent,
+    "episodes": episodes[]->{_id,name,episodeslug,episodeteaser,episodereleasedate},
+    readingOrder,
     noveldescription,shortdescription,aboutnovel,storyintro,descriptionlanguage,
     characterintro,"characters": characters[]{_key, name, role, description, "imageUrl": image.asset->url},
+    "mainCharacters": mainCharacters[]{_key, nameUr, nameEn, role, introductionUr, introductionEn, "imageUrl": image.asset->url, characterImageAlt},
+    "sideCharacters": sideCharacters[]{_key, nameUr, nameEn, role, introductionUr, introductionEn, "imageUrl": image.asset->url, characterImageAlt},
+    "tropesAndThemes": tropesAndThemes[]->{_id, labelUr, labelEn, order},
+    readerHighlightsLocalized,
     readerhighlightintro,"readerhighlights": readerhighlights[]{_key, title, description},
-    authornote,authornotelang,contentwarning,importantnote,
+    authorNote,authornote,authornotelang,contentwarning,importantNote,importantnote,
+    sneakPeek,
     "banner": coalesce(bannerImage.asset->url, banner),tags,themes,pdfurl,youtubeurl,
     language,novelstatus,
     numberofpages,numberofchapters,fileformat,filesize,readingavailability,
     featured,trending,
     enableonlinereading,onlinereadingintro,
+    pdfAvailability,edition,downloadInstructions,
     downloadfile{asset->{url,size,originalFilename,extension}},
     downloadtitle,downloaddescription,downloadformat,downloadsize,externaldownloadurl,downloadbuttonlabel,
     "sneakPeeks": sneakPeeks[]{_key, "imageUrl": image.asset->url, scene, sceneIsUrdu, caption, chapterReference, order},
     genre->{genrename,_id},
     additionalgenres[]->{genrename,_id},
     writer->{writername,_id,writerslug,writerbio,writerbiofull,writercardimageurl,"writerimage":writerimage.asset->url,sociallinks[]{_key,label,url}},
-    relatednovels[]->{_id,title,"banner": coalesce(bannerImage.asset->url, banner),slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
-    relatedstories[]->{_id,title,"banner": coalesce(bannerImage.asset->url, banner),slug,novelreleasedate,noveldescription,shortdescription,genre->{genrename},writer->{writername}},
+    "seoImage": seoImage.asset->url,noIndex,
+    relatednovels[]->{_id,title,"banner": coalesce(bannerImage.asset->url, banner),slug,novelreleasedate,noveldescription,shortdescription,summary,seodescription,tagline,genre->{genrename},writer->{writername}},
+    relatedstories[]->{_id,title,"banner": coalesce(bannerImage.asset->url, banner),slug,novelreleasedate,noveldescription,shortdescription,summary,seodescription,tagline,genre->{genrename},writer->{writername}},
     "comment": *[_type == "comment" && references(^._id) && approved != false] | order(_createdAt asc){name,_id,comment,_createdAt}
   }`;
   return client.fetch<any>(query, { slug }, { next: { revalidate: 300 } });
@@ -49,7 +59,7 @@ async function getRelatedNovels(novel: any, id: string) {
   const currentGenre = novel.genre?._id || "";
   const currentWriter = novel.writer?._id || "";
   return client.fetch<any[]>(
-    `*[_type == "novelparent" && _id != $id && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && (genre->_id == $genre || writer->_id == $writer)][0...4] { _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, shortdescription, genre->{genrename}, writer->{writername} }`,
+    `*[_type == "novelparent" && _id != $id && defined(novelreleasedate) && novelreleasedate <= now() && writer->writername == "Huma Qureshi" && (genre->_id == $genre || writer->_id == $writer)][0...4] { _id, title, "banner": coalesce(bannerImage.asset->url, banner), slug, novelreleasedate, noveldescription, shortdescription, summary, seodescription, tagline, genre->{genrename}, writer->{writername} }`,
     { id, genre: currentGenre, writer: currentWriter },
     { next: { revalidate: 300 } }
   );
@@ -59,39 +69,63 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const novel = await getNovel(slug);
   if (!novel) return { title: "Novel not found | Huma Qureshi Novels", robots: { index: false, follow: true } };
+  const localizedTitle = novel.titleLocalized?.en || novel.titleLocalized?.ur || "";
+  const localizedSummary = novel.summary?.en || novel.summary?.ur || "";
   const description =
     novel.seodescription ||
-    cleanDescription(novel.noveldescription, `Read ${novel.title} by ${novel.writer?.writername || "the author"} on ${SITE_NAME}.`);
+    cleanDescription(
+      localizedSummary || novel.shortdescription || novel.noveldescription,
+      `Read ${novel.title} by ${novel.writer?.writername || "the author"} on ${SITE_NAME}.`,
+    );
   const url = absoluteUrl(`/novel/${novel.slug?.current || slug}`);
   const episodeCount = await client.fetch<number>(
     `count(*[_type == "novel" && references($id) && (!defined(episodereleasedate) || episodereleasedate <= now())])`,
     { id: novel._id }
   );
   const hasBody = Boolean(
-    novel.noveldescription || novel.aboutnovel || novel.storyintro || novel.tagline
+    localizedSummary ||
+      novel.storyIntroduction?.ur ||
+      novel.storyIntroduction?.en ||
+      (Array.isArray(novel.fullStoryContent) && novel.fullStoryContent.length > 0) ||
+      (Array.isArray(novel.storycontent) && novel.storycontent.length > 0) ||
+      novel.noveldescription ||
+      novel.shortdescription ||
+      novel.aboutnovel ||
+      novel.storyintro ||
+      novel.tagline ||
+      novel.authorNote?.ur?.length ||
+      novel.authorNote?.en?.length ||
+      novel.sneakPeek?.ur?.length ||
+      novel.sneakPeek?.en?.length ||
+      (novel.mainCharacters && novel.mainCharacters.length > 0) ||
+      (novel.sideCharacters && novel.sideCharacters.length > 0)
   );
   const isThin = !hasBody && !episodeCount;
+  const socialImage = novel.seoImage || novel.banner;
+  const ogTitle = localizedTitle || novel.title;
   return {
     title: novel.seotitle || `${novel.title} by ${novel.writer?.writername || "Author"}`,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title: novel.title,
+      title: ogTitle,
       description,
       url,
       siteName: SITE_NAME,
       type: "article",
-      images: novel.banner
-        ? [{ url: novel.banner, width: 1200, height: 630, alt: `${novel.title} cover` }]
+      images: socialImage
+        ? [{ url: socialImage, width: 1200, height: 630, alt: novel.coverImageAlt || `${novel.title} cover` }]
         : [{ url: "/icon", width: 512, height: 512, alt: SITE_NAME }],
     },
     twitter: {
       card: "summary_large_image",
-      title: novel.title,
+      title: ogTitle,
       description,
-      images: novel.banner ? [novel.banner] : ["/icon"],
+      images: socialImage ? [socialImage] : ["/icon"],
     },
-    robots: isThin ? { index: false, follow: true } : { index: true, follow: true },
+    robots: isThin || novel.noIndex
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
   };
 }
 
@@ -99,7 +133,18 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const novel = await getNovel(slug);
   if (!novel) notFound();
-  const episodes = await getEpisodes(novel._id);
+  const now = Date.now();
+  const selectedEpisodes = Array.isArray(novel.episodes)
+    ? novel.episodes.filter(
+        (episode: any) =>
+          episode &&
+          (!episode.episodereleasedate ||
+            new Date(episode.episodereleasedate).getTime() <= now),
+      )
+    : [];
+  const episodes =
+    selectedEpisodes.length > 0 ? selectedEpisodes : await getEpisodes(novel._id);
+  const hasMoreEpisodes = selectedEpisodes.length === 0 && episodes.length === 4;
   const views = await getNovelViews(novel._id);
 
   const manualRelated = (novel.relatednovels || []).concat(novel.relatedstories || []);
@@ -121,14 +166,17 @@ export default async function Page({ params }: Props) {
     author: novel.writer?.writername ? { "@type": "Person", name: novel.writer.writername } : undefined,
     genre: novel.genre?.genrename,
     image: novel.banner,
-    description: cleanDescription(novel.noveldescription, `Read ${novel.title} on ${SITE_NAME}.`),
+    description: cleanDescription(
+      novel.summary?.en || novel.summary?.ur || novel.shortdescription || novel.noveldescription,
+      `Read ${novel.title} on ${SITE_NAME}.`,
+    ),
     url: absoluteUrl(`/novel/${novel.slug?.current || slug}`),
   };
   return (
     <main className="flex flex-col gap-6 py-5">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Novels", href: "/novel" }, { label: novel.title || "Novel" }]} />
-      <NovelPageClient novel={novel} episodes={episodes} hasMore={episodes.length === 4} slug={slug} views={views} related={related} moreFromAuthor={moreFromAuthor} reviewsSlot={<ReviewMarquee reviews={testimonials} />} />
+      <NovelPageClient novel={novel} episodes={episodes} hasMore={hasMoreEpisodes} slug={slug} views={views} related={related} moreFromAuthor={moreFromAuthor} reviewsSlot={<ReviewMarquee reviews={testimonials} />} />
     </main>
   );
 }
